@@ -87,5 +87,12 @@ namespace Microsoft
 			__in PCWSTR pwszUsername,
 			__deref_out PWSTR* ppwszDomainUsername
 			);
+
+		// Pack a KERB_CHANGEPASSWORD_REQUEST
+		HRESULT KerbChangePasswordPack(
+			__in const KERB_CHANGEPASSWORD_REQUEST & cpReqIn,
+			__deref_out_bcount(*pcb) BYTE** prgb,
+			__out DWORD* pcb
+			);
 	}
 }

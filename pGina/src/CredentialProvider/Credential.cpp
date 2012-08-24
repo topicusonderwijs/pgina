@@ -237,113 +237,142 @@ namespace pGina
 			return E_NOTIMPL;
 		}
 
-		IFACEMETHODIMP Credential::GetSerialization(__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, __out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
-													__deref_out_opt PWSTR* ppwszOptionalStatusText, __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
+		IFACEMETHODIMP Credential::GetSerialization(
+			__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr, 
+			__out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
+			__deref_out_opt PWSTR* ppwszOptionalStatusText, 
+			__out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon)
 		{
-			// Workout what our username, and password are.  Plugins are responsible for parsing out domain\machine name if needed
-			PWSTR username = FindUsernameValue();			
-			PWSTR password = FindPasswordValue();
-			PWSTR domain = NULL;
+
+			// logon, unlock, or credui scenario
+			if( CPUS_LOGON == m_usageScenario || 
+				CPUS_UNLOCK_WORKSTATION == m_usageScenario || 
+				CPUS_CREDUI == m_usageScenario )
+			{
+
+				// Workout what our username, and password are.  Plugins are responsible for parsing out domain\machine name if needed
+				PWSTR username = FindUsernameValue();			
+				PWSTR password = FindPasswordValue();
+				PWSTR domain = NULL;
 			
-			pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
-			switch(m_usageScenario)
-			{
-			case CPUS_LOGON:
-				break;
-			case CPUS_UNLOCK_WORKSTATION:
-				reason = pGina::Protocol::LoginRequestMessage::Unlock;
-				break;
-			}
-
-			pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
-			pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
-			if(!loginResult.Result())
-			{
-				pERROR(L"Credential::GetSerialization: Failed login");
-				if(loginResult.Message().length() > 0)
+				pGina::Protocol::LoginRequestMessage::LoginReason reason = pGina::Protocol::LoginRequestMessage::Login;
+				switch(m_usageScenario)
 				{
-					SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);					
+				case CPUS_LOGON:
+					break;
+				case CPUS_UNLOCK_WORKSTATION:
+					reason = pGina::Protocol::LoginRequestMessage::Unlock;
+					break;
 				}
-				else
+
+				pDEBUG(L"Credential::GetSerialization: Processing login for %s", username);
+				pGina::Transactions::User::LoginResult loginResult = pGina::Transactions::User::ProcessLoginForUser(username, NULL, password, reason);
+				if(!loginResult.Result())
 				{
-					SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
-				}
-				
-				*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
-				*pcpsiOptionalStatusIcon = CPSI_ERROR;
-				return S_FALSE;
-			}
-
-			// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
-			// LogonUI/Winlogon as a serialized/packed logon structure.
-
-			pGina::Memory::ObjectCleanupPool cleanup;
-
-			username = loginResult.Username().length() > 0 ? _wcsdup(loginResult.Username().c_str()) : NULL;
-			password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
-			domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;			
-
-			cleanup.AddFree(username);
-			cleanup.AddFree(password);
-			cleanup.AddFree(domain);
-
-			PWSTR protectedPassword = NULL;			
-			HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
-			if(!SUCCEEDED(result))
-				return result;
-
-			cleanup.Add(new pGina::Memory::CoTaskMemFreeCleanup(protectedPassword));			
-
-			// CredUI we use CredPackAuthenticationBuffer
-			if(m_usageScenario == CPUS_CREDUI)
-			{
-				// Need username/domain as a single string
-				PWSTR domainUsername = NULL;
-				result = Microsoft::Sample::DomainUsernameStringAlloc(domain, username, &domainUsername);
-				if(SUCCEEDED(result))
-				{
-					DWORD size = 0;
-					BYTE* rawbits = NULL;
-					
-					if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
+					pERROR(L"Credential::GetSerialization: Failed login");
+					if(loginResult.Message().length() > 0)
 					{
-						if(GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-						{
-							rawbits = (BYTE *)HeapAlloc(GetProcessHeap(), 0, size);
-							if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
-							{
-								HeapFree(GetProcessHeap(), 0, rawbits);
-								HeapFree(GetProcessHeap(), 0, domainUsername);
-								return HRESULT_FROM_WIN32(GetLastError());
-							}
+						SHStrDupW(loginResult.Message().c_str(), ppwszOptionalStatusText);					
+					}
+					else
+					{
+						SHStrDupW(L"ProcessLoginForUser failed, but a specific error message was not provided", ppwszOptionalStatusText);
+					}
+				
+					*pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;										
+					*pcpsiOptionalStatusIcon = CPSI_ERROR;
+					return S_FALSE;
+				}
 
-							pcpcs->rgbSerialization = rawbits;
-							pcpcs->cbSerialization = size;
-						}
-						else
+				// At this point the info has passed to the service and been validated, so now we have to pack it up and provide it back to
+				// LogonUI/Winlogon as a serialized/packed logon structure.
+
+				pGina::Memory::ObjectCleanupPool cleanup;
+
+				username = loginResult.Username().length() > 0 ? _wcsdup(loginResult.Username().c_str()) : NULL;
+				password = loginResult.Password().length() > 0 ? _wcsdup(loginResult.Password().c_str()) : NULL;
+				domain = loginResult.Domain().length() > 0 ? _wcsdup(loginResult.Domain().c_str()) : NULL;			
+
+				cleanup.AddFree(username);
+				cleanup.AddFree(password);
+				cleanup.AddFree(domain);
+
+				PWSTR protectedPassword = NULL;			
+				HRESULT result = Microsoft::Sample::ProtectIfNecessaryAndCopyPassword(password, m_usageScenario, &protectedPassword);			
+				if(!SUCCEEDED(result))
+					return result;
+
+				cleanup.Add(new pGina::Memory::CoTaskMemFreeCleanup(protectedPassword));			
+
+				// CredUI we use CredPackAuthenticationBuffer
+				if(m_usageScenario == CPUS_CREDUI)
+				{
+					// Need username/domain as a single string
+					PWSTR domainUsername = NULL;
+					result = Microsoft::Sample::DomainUsernameStringAlloc(domain, username, &domainUsername);
+					if(SUCCEEDED(result))
+					{
+						DWORD size = 0;
+						BYTE* rawbits = NULL;
+					
+						if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
 						{
-							HeapFree(GetProcessHeap(), 0, domainUsername);
-							return E_FAIL;
+							if(GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+							{
+								rawbits = (BYTE *)HeapAlloc(GetProcessHeap(), 0, size);
+								if(!CredPackAuthenticationBufferW((CREDUIWIN_PACK_32_WOW & m_usageFlags) ? CRED_PACK_WOW_BUFFER : 0, domainUsername, protectedPassword, rawbits, &size))
+								{
+									HeapFree(GetProcessHeap(), 0, rawbits);
+									HeapFree(GetProcessHeap(), 0, domainUsername);
+									return HRESULT_FROM_WIN32(GetLastError());
+								}
+
+								pcpcs->rgbSerialization = rawbits;
+								pcpcs->cbSerialization = size;
+							}
+							else
+							{
+								HeapFree(GetProcessHeap(), 0, domainUsername);
+								return E_FAIL;
+							}
 						}
 					}
 				}
-			}
-			else
-			{
-				// Init kiul
-				KERB_INTERACTIVE_UNLOCK_LOGON kiul;
-				result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
-				if(!SUCCEEDED(result))
-					return result;
+				else
+				{
+					// Init kiul
+					KERB_INTERACTIVE_UNLOCK_LOGON kiul;
+					result = Microsoft::Sample::KerbInteractiveUnlockLogonInit(domain, username, password, m_usageScenario, &kiul);
+					if(!SUCCEEDED(result))
+						return result;
 
-				// Pack for the negotiate package and include our CLSID
-				result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
-				if(!SUCCEEDED(result))
-					return result;
+					// Pack for the negotiate package and include our CLSID
+					result = Microsoft::Sample::KerbInteractiveUnlockLogonPack(kiul, &pcpcs->rgbSerialization, &pcpcs->cbSerialization);
+					if(!SUCCEEDED(result))
+						return result;
+				}
+			} 
+			else if( CPUS_CHANGE_PASSWORD == m_usageScenario )
+			{
+				// TODO: get strings from text fields
+				
+				// TODO: send data down plugin chain, and recieve result
+
+				// TODO: Decide on what to put in pcpcs->rgbSerialization (KERB_CHANGEPASSWORD_REQUEST ?)
+
+				// Build the request struct
+	/*			KERB_CHANGEPASSWORD_REQUEST kcpr;
+
+				ZeroMemory(&kcpr, sizeof(kcpr));
+
+				kcpr.Impersonating = FALSE;
+				kcpr.MessageType = KerbChangePasswordMessage;*/
+
+				// TODO: Populate other fields of the struct, pack using KerbChangePasswordPack.
 			}
-			
+
 			ULONG authPackage = 0;
-			result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
+			HRESULT result = Microsoft::Sample::RetrieveNegotiateAuthPackage(&authPackage);
 			if(!SUCCEEDED(result))
 				return result;
 						
