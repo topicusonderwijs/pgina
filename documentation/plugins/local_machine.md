@@ -130,6 +130,8 @@ for removal or have its password scrambled upon logoff.
   the profile cleanup and scramble password task is done here.
   If a user is logging off the plugin is notified and executes the appropriate task.
   During that time the system won't shut down, nor is the corresponding user able to log in again until all tasks have been completed.
+  <br>
+  **Users are tracked by there profile description "pGina created"**
   <br><br>
   Since fork 3.2.0.0 <i>(only if the pgSMB plugin is'nt used)</i><br>
   <ul class="greenbg">
