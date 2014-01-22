@@ -37,7 +37,8 @@ The plugin btw. will inform an admin in case of an error, like a failed profile 
 ### Gateway Stage
 
 In the gateway stage the plugin will create the user on the local system
-than extract the compressed profile from the SMB share,
+and keep **track of this user by his profile description "pGina created pgSMB"**.
+Than extracts the compressed profile from the SMB share,
 adapt the ACL to fit the new user SID and let windows do the rest.
 If the user doesn't pass the gateway stage he is still able to login but will receive a temporary profile.
 No, not a windows temp profile. He is getting a normal user profile but without his data.
