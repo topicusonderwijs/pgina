@@ -1,19 +1,13 @@
 ---
 layout: default
 title: pGina
-pageid: Home
+pageid: Thanks
 ---
 
-<h3><span>Latest News</span></h3>
-
-<div class="divider2"></div>
-
-{% for p in site.categories.news %}
+{% for p in site.categories.thanks %}
 <div class="post">
 	<h4>{{ p.title }}</h4>
 	<div class="contentarea">
-	<div class="details">Posted by {{ p.author }} on 
-	{{ p.date | date: "%B %d, %Y" }}</div>
 {{ p.content }}
 	</div>
 </div>

@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+{% if page.pageid == "Documentation" %}
+<link rel="stylesheet" type="text/css" href="{{ site.url }}/default_doc.css" />
+{% else %}
+<link rel="stylesheet" type="text/css" href="{{ site.url }}/default.css" />
+{% endif %}
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="{{ site.url }}/index.html"><img src="{{ site.url }}/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="{{ site.url }}/index.html"{% if page.pageid == "Home" %} class="active"{%endif%}>Home</a></li>
+			<li><a href="{{ site.url }}/download.html"{% if page.pageid == "Download" %} class="active"{%endif%}>Download</a></li>
+      <li><a href="{{ site.url }}/support.html"{% if page.pageid == "Support" %} class="active"{%endif%}>Support</a></li>
+      <li><a href="{{ site.url }}/documentation.html"{% if page.pageid == "Documentation" %} class="active"{%endif%}>Documentation</a></li>
+      <li><a href="{{ site.url }}/develop.html"{% if page.pageid == "Develop" %} class="active"{%endif%}>Develop</a></li>
+      <li><a href="{{ site.url }}/faq.html"{% if page.pageid == "FAQ" %} class="active"{%endif%}>FAQ</a></li>
+      <li><a href="{{ site.url }}/thanks.html"{% if page.pageid == "Thanks" %} class="active"{%endif%}>Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    {% if page.pageid == "Home" %}
+	    <!-- Normal content: Stuff that's not going to be put in the left or right column. -->
+			<h3><strong>pGina</strong> <span>Open Source Windows Authentication</span></h3>
+			<div class="contentarea">
+				<!-- Normal content area start -->
+
+				<img src="{{ site.url }}/images/pginalogo_simple.png" class="left" alt="pGina logo" />
+				pGina is a pluggable Open Source GINA and CredentialProvider 
+				replacement.
+				<br>This allows for alternate methods of interactive user 
+            authentication and access management on machines running the Windows 
+            operating system.
+        <br><br>In short, allow your windows users to login using the backend of your choice.
+        <br>Plugins are written in managed code and 
+            allow for user authentication, authorization and session management. 
+            End result is that you, the admin, can choose how your users are 
+            authenticated, authorized and managed.
+        <br>Already have users in LDAP?
+        <br>Want to manage your users with a MySQL database?
+        <br>Using a custom backend and want to craft your own authentication code?
+        <br>pGina is the solution.
+        
+        <p><br><h3><strong>the fork</strong></h3>
+        <br><img src="{{ site.url }}/images/fork.png" class="left" alt="fork logo" />
+        The fork was created first simply because it's the way to contribute on Github.
+        <br>Later on due to time pressure and a refused pull request.
+        <br>Now the code differs so much that it's hard to merge it back again, nevertheless I still hope that someday...
+        </p>
+		  </div>
+
+	
+		<div class="divider1"></div>
+        {% endif %}
+		{% if page.pageid != "Documentation" %}
+        <!-- Primary content: Stuff that goes in the primary content column (by default, the left column) -->
+		<div id="primarycontainer">
+			<div id="primarycontent">
+				<!-- Primary content area start -->
+    {% endif %}
