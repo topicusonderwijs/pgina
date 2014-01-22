@@ -316,7 +316,7 @@ namespace pGina.Plugin.pgSMB
             this.Compressor_label.Name = "Compressor_label";
             this.Compressor_label.Size = new System.Drawing.Size(262, 13);
             this.Compressor_label.TabIndex = 13;
-            this.Compressor_label.Text = "The Programm to un-comress the Profile (Compressor)";
+            this.Compressor_label.Text = "The Program to un-comress the Profile (Compressor)";
             //
             // ConnectRetry_label
             //
