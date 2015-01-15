@@ -93,7 +93,7 @@ for removal or have its password scrambled upon logoff.
   account/profile and/or scramble the password.
 </span>
 
-
+<pre>
 <span class="greenbg">
   Since fork 3.1.6.2<br>
   this is done by [events](#notification) instead of a background timer!<br>
@@ -105,24 +105,25 @@ for removal or have its password scrambled upon logoff.
   Imagine a user doesnt choose to log off but to turn the pc off.
   <br><br>
   Since fork 3.2.0.0 <i>(only if the pgSMB plugin is'nt used)</i><br>
+  <ul class="greenbg">
+    <li>
+      import the users full name by using the
+      <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
+      (Fullname)
+    </li>
+    <li>
+      mount a home drive by using the
+      <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
+      (usri4_home_dir_drive and usri4_home_dir)
+    </li>
+    <li>
+      make use of a roaming profile by using the
+      <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
+      (usri4_profile)
+    </li>
+  </ul>
 </span>
-<ul class="greenbg">
-  <li>
-    import the users full name by using the
-    <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
-    (Fullname)
-  </li>
-  <li>
-    mount a home drive by using the
-    <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
-    (usri4_home_dir_drive and usri4_home_dir)
-  </li>
-  <li>
-    make use of a roaming profile by using the
-    <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
-    (usri4_profile)
-  </li>
-</ul>
+</pre>
 
 
 ### Notification
