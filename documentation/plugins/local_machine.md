@@ -105,7 +105,8 @@ for removal or have its password scrambled upon logoff.
   Imagine a user doesnt choose to log off but to turn the pc off.
   <br><br>
   Since fork 3.2.0.0 <i>(only if the pgSMB plugin is'nt used)</i><br>
-  <ul>
+</span>
+  <ul class="greenbg">
     <li>
       import the users full name by using the
       <a href="{{ site.url }}/documentation/plugins/ldap.html#attribute_convertter">Attribute converter</a>
@@ -122,7 +123,6 @@ for removal or have its password scrambled upon logoff.
       (usri4_profile)
     </li>
   </ul>
-</span>
 
 
 ### Notification
