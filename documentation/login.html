@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="pgina_login_mask">pGina Login Mask</h1>
+
+<h2 id="fork_diff">Fork diff</h2>
+
+<ul>
+<li>
+<p>during the system boot a message box (max. 1min) is shown to prevent a user from login</p>
+</li>
+
+<li>
+<p>if pGina is unusable for a user an exclamation mark logo will be shown</p>
+</li>
+
+<li>
+<p>the logo is primarily used to inform a user of the current pGina state</p>
+</li>
+
+<li>
+<p>a user receives a clear message if he tries to login without a running pGina service</p>
+</li>
+
+<li>
+<p>in case of an error the username and password field is cleared</p>
+</li>
+
+<li>
+<p>during a login another message box is shown to prevent any user interaction with the CP</p>
+</li>
+
+<li>
+<p>a login can’t be canceled</p>
+</li>
+</ul>
+
+<h2 id="boot">Boot</h2>
+
+<p><img alt='pGina boot' src='http://mutonufoai.github.io/pgina/images/documentation/login_start.png' style='float:right' /></p>
+
+<p>Instead of showing a login mask as soon as possible, this fork will wait for the pGina service to came up until presenting a login screen. The reason is, without a running pGina service only local administrators are able to login! With that in mind I decided to show a message box until the pgina service is up and running, at least for one minute. <br style='clear:both' /></p>
+
+<p><img alt='pGina service failed' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_failed.png' style='float:left' /></p>
+
+<p>If a minute has past and the pGina service is still down the login mask is shown, but with an exclamation mark logo. There can be a lot of reasons, like a slow machine, AV scanner, …. <br style='clear:both' /></p>
+
+<p><img alt='pGina boot' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_ok.png' style='float:right' /></p>
+
+<p>As soon as the pGina service is up the logo is shown, and thats the normal case. <br style='clear:both' /></p>
+
+<h2 id="login">Login</h2>
+
+<p>The login process is the same as always, but this fork will show another message box saying that the login is in process. <img src="http://mutonufoai.github.io/pgina/images/documentation/login_running.png" alt="user login" /></p>
+
+<p><img alt='pGina service failed' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_failed.png' style='float:right' /></p>
+
+<p>If you try to login while the pGina service is down you are limited to local administrators! <br style='clear:both' /> If a user tries to login from such a stage he will receive an error message like</p>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/login_failed.png" alt="user login failed" /></p>
+
+<h2 id="facts">Facts</h2>
+
+<p>While the system is booting</p>
+
+<ul>
+<li>
+<p>a message box is shown until the pgina service is up and running</p>
+</li>
+
+<li>
+<p>if a minute has passed the service state disconnected status is shown</p>
+</li>
+</ul>
+
+<p>If the service state changes from</p>
+
+<ul>
+<li>
+<p>connected to disconnected</p>
+
+<p>an exclamation mark logo will be shown</p>
+
+<p>the username and password field will be cleared</p>
+</li>
+
+<li>
+<p>disconnected to connected</p>
+
+<p>your logo will be shown</p>
+
+<p>the username and password field will be cleared</p>
+</li>
+</ul>
+
+<p>If the login failed</p>
+
+<ul>
+<li>the username and password field will be cleared</li>
+</ul>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

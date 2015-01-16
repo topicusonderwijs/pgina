@@ -1,0 +1,400 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html" class="active">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+	    <!-- Normal content: Stuff that's not going to be put in the left or right column. -->
+			<h3><strong>pGina</strong> <span>Open Source Windows Authentication</span></h3>
+			<div class="contentarea">
+				<!-- Normal content area start -->
+
+				<img src="http://mutonufoai.github.io/pgina/images/pginalogo_simple.png" class="left" alt="pGina logo" />
+				pGina is a pluggable Open Source GINA and CredentialProvider 
+				replacement.
+				<br>This allows for alternate methods of interactive user 
+            authentication and access management on machines running the Windows 
+            operating system.
+        <br><br>In short, allow your windows users to login using the backend of your choice.
+        <br>Plugins are written in managed code and 
+            allow for user authentication, authorization and session management. 
+            End result is that you, the admin, can choose how your users are 
+            authenticated, authorized and managed.
+        <br>Already have users in LDAP?
+        <br>Want to manage your users with a MySQL database?
+        <br>Using a custom backend and want to craft your own authentication code?
+        <br>pGina is the solution.
+        
+        <p><br><h3><strong>the fork</strong></h3>
+        <br><img src="http://mutonufoai.github.io/pgina/images/fork.png" class="left" alt="fork logo" />
+        The fork was created first simply because it's the way to contribute on Github.
+        <br>Later on due to time pressure and a refused pull request.
+        <br>Now the code differs so much that it's hard to merge it back again, nevertheless I still hope that someday...
+        </p>
+		  </div>
+
+	
+		<div class="divider1"></div>
+        
+		
+        <!-- Primary content: Stuff that goes in the primary content column (by default, the left column) -->
+		<div id="primarycontainer">
+			<div id="primarycontent">
+				<!-- Primary content area start -->
+    
+			
+<h3><span>Latest News</span></h3>
+
+<div class="divider2"></div>
+
+
+<div class="post">
+	<h4>pGina 3.2.4.1 Released!</h4>
+	<div class="contentarea">
+	<div class="details">Posted by Hans Wurst on 
+	December 16, 2014</div>
+<p>Finally its time for an update to catch up with the latest pGina improvements</p>
+
+<p><a href="download.html">Download</a> a copy of the release.</p>
+
+<p>What’s new in pGina 3.2.4.1</p>
+
+<ul>
+<li>Pgina service</li>
+
+<li>
+<ul>
+<li>extend max shutdowntime to 1h</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>service bugfixes</li>
+</ul>
+</li>
+
+<li>LDAP plugin</li>
+
+<li>
+<ul>
+<li>a view bugfixes</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>option to use authentication bind when searching in authorization and gateway stages.</li>
+</ul>
+</li>
+
+<li>pgSMB plugin</li>
+
+<li>
+<ul>
+<li>add 1 minute timeout if an SMB connection fails</li>
+</ul>
+</li>
+
+<li>Radius plugin</li>
+
+<li>
+<ul>
+<li>Lots of updates to the RADIUS plugin by Oooska</li>
+</ul>
+</li>
+
+<li>MySQL plugin</li>
+
+<li>
+<ul>
+<li>add option to prevent (or not) logon in gateway if server error occurs</li>
+</ul>
+</li>
+</ul>
+
+<p>from fork 3.2.0.0</p>
+
+<ul>
+<li>Password change option</li>
+
+<li>Various bug fixes and other improvements</li>
+</ul>
+
+<p>Improvements beyond pGina 3.2.0.0:</p>
+
+<ul>
+<li>a different password change plugin behaviour</li>
+
+<li>LDAP plugin</li>
+
+<li>
+<ul>
+<li>Attribute converter</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Enhanced hash generation</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Enhanced options for the authorization and gateway stages</li>
+</ul>
+</li>
+
+<li>pgSMB plugin</li>
+
+<li>
+<ul>
+<li>Properties can be altered by LDAP attributes</li>
+</ul>
+</li>
+
+<li>Local Machine plugin</li>
+
+<li>
+<ul>
+<li>Login script</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Roaming Profile</li>
+</ul>
+</li>
+</ul>
+
+<p>from fork 3.1.6.2</p>
+
+<ul>
+<li>An improved login mask</li>
+
+<li>Event based logoff in the Local Machine plugin</li>
+
+<li>A new plugin called pgSMB</li>
+</ul>
+	</div>
+</div>
+
+<div class="divider2"></div>
+
+<div class="post">
+	<h4>pGina 3.2.0.0 Released!</h4>
+	<div class="contentarea">
+	<div class="details">Posted by Hans Wurst on 
+	December 02, 2013</div>
+<p>Finally its time for an update to catch up with the latest pGina improvements</p>
+
+<p><a href="download.html">Download</a> a copy of the release.</p>
+
+<p>What’s new in pGina 3.2.0.0</p>
+
+<ul>
+<li>Password change option</li>
+
+<li>Various bug fixes and other improvements</li>
+</ul>
+
+<p>Improvements beyond pGina 3.2.0.0:</p>
+
+<ul>
+<li>a different password change plugin behaviour</li>
+
+<li>LDAP plugin</li>
+
+<li>
+<ul>
+<li>TLS support</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Attribute converter</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Enhanced hash generation</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Enhanced options for the authorization and gateway stages</li>
+</ul>
+</li>
+
+<li>pgSMB plugin</li>
+
+<li>
+<ul>
+<li>Properties can be altered by LDAP attributes</li>
+</ul>
+</li>
+
+<li>Local Machine plugin</li>
+
+<li>
+<ul>
+<li>Login script</li>
+</ul>
+</li>
+
+<li>
+<ul>
+<li>Roaming Profile</li>
+</ul>
+</li>
+</ul>
+
+<p>from fork 3.1.6.2</p>
+
+<ul>
+<li>An improved login mask</li>
+
+<li>Event based logoff in the Local Machine plugin</li>
+
+<li>A new plugin called pgSMB</li>
+</ul>
+	</div>
+</div>
+
+<div class="divider2"></div>
+
+<div class="post">
+	<h4>pGina 3.1.6.2 Released!</h4>
+	<div class="contentarea">
+	<div class="details">Posted by Hans Wurst on 
+	October 04, 2013</div>
+<p>After a long way of testing and fixing I got pGina how I want it to be.</p>
+
+<p><a href="download.html">Download</a> a copy of the release.</p>
+
+<p>What’s different in this 3.1.6.2 fork compared with pGina 3.1.6.0:</p>
+
+<ul>
+<li>An improved login mask</li>
+
+<li>Event based logoff in the Local Machine plugin</li>
+
+<li>A new plugin called pgSMB</li>
+
+<li>Various bug fixes and other improvements.</li>
+</ul>
+	</div>
+</div>
+
+<div class="divider2"></div>
+
+<div class="post">
+	<h4>the pull request was denied</h4>
+	<div class="contentarea">
+	<div class="details">Posted by Hans Wurst on 
+	February 27, 2013</div>
+<p>Finally the pull request was denied, simply because of its complexity. In fact, I need to migrate 500+ clients in summer, so I decided to go on with my fork and deal with the merge process at a later time. It’s not a personal thing, just a matter of time!</p>
+	</div>
+</div>
+
+<div class="divider2"></div>
+
+<div class="post">
+	<h4>pGina 3.1.6.0 Forked</h4>
+	<div class="contentarea">
+	<div class="details">Posted by Hans Wurst on 
+	November 14, 2012</div>
+<p>The pGina team requested me to fork there project in order to submit my pgSMB plugin. I’ve learned that’s the way of doing things on Github. I personally see a fork in a different light, but that’s the way it is.</p>
+	</div>
+</div>
+
+
+
+
+
+    
+				<!-- Primary content area end -->
+			</div>
+		</div>
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+		<div id="secondarycontent">
+			<!-- Secondary content area start -->
+		
+			<div>
+				<h4>Additional Resources</h4>
+				<div class="contentarea">
+					<ul class="linklist">
+            <li><a href="http://mutonufoai.github.io/pgina/documentation.html">Documentation</a></li>
+						<li><a href="https://github.com/MutonUfoAI/pgina/" target="_blank">pGina fork on Github</a></li>
+						<li><a href="http://pgina.org/" target="_blank">pGina</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- Secondary content area end -->
+		</div>
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

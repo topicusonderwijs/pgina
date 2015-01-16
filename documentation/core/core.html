@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="pgina_core_developer_documentation">pGina Core Developer Documentation</h1>
+
+<h2 id="contents">Contents</h2>
+
+<ul>
+<li><a href="#arch">The pGina Architecture</a></li>
+
+<li><a href="#cp">The Credential Provider</a></li>
+
+<li><a href="#gina">The GINA</a></li>
+
+<li><a href="#service">The pGina Service</a></li>
+</ul>
+<hr /><h2 id='arch'>The pGina Architecture</h2>
+<p>pGina’s architecture is based on three main components: the credential provider/GINA, the pGina service, and the plugins. The image below shows the components and their relationship to eachother.</p>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/core/pgina_components.png" alt="pGina components" /></p>
+
+<p>The Credential Provider or GINA augments or replaces the default Windows authentication functionality. In Windows Vista or later, this component is called a Credential Provider (CP), in prior versions of Windows, we it is a GINA. More details on each of these options is provided below, suffice it to say for now that this component plugs-in to the Windows authentication system and can configure parts of what is requested (username/ password), and what is displayed (logo, MOTD, etc.). In a standard login, the CP/GINA receives the user’s credentials and passes them along to the pGina Service via a named pipe.</p>
+
+<p>The pGina Service is the core of the pGina system. It recieves the credentials from the CP/GINA and then activates the plugins which are responsible for the authentication, authorization, and other login time actions. The pGina service does no authentication/authorization on its own. Instead, it is up to the plugins to do this work. The pGina service is essentially a “traffic cop” that invokes the plugins in their configured order and determines the overall result based on the results returned by the plugins.</p>
+
+<p>The plugins and the pGina service are both written in C# on the .NET 4.0 platform. The CP/GINA is (and must be) written in unmanged C++. Communication between the CP/GINA and the service is done via a named pipe. The plugins are loaded at startup by the service and enumerated using reflection.</p>
+<h2 id='cp'>The Credential Provider</h2>
+<p>In Windows Vista and later, in order to provide alternate methods of authentication and/or authorization, one must implement a Credential Provider (CP). The CP can configure the UI that is presented to the user, as well as determine the result of the authentication. A CP is a COM object that is loaded and instantiated by the <code>LogonUI.exe</code> process when a user is presented the opportunity to unlock, login, or otherwise interact with the <code>winlogon.exe</code> process.</p>
+
+<p>The pGina CP is defined within the main code distribution in the directory: <code>pGina/src/CredentialProvider</code>. It consists of two main parts: the provider and the credential (naturally enough). The provider class implements <code>ICredentialProvider</code>. In pGina, this class is named <code>pGina::CredProv::Provider</code> (located in <code>Provider.cpp|h</code>). The credential class implements <code>ICredentialProviderCredential</code> and the pGina implementation is <code>pGina::CredProv::Credential</code> located in <code>Credential.cpp|h</code>.</p>
+
+<p>When initializing a login/unlock/CredUI scenario, the following steps occur:</p>
+
+<ol>
+<li>The provider object is told the scenario that it is running under via a call to <code>SetUsageScenario</code>.</li>
+
+<li>The provider is asked about how many credentials it provides via a call to <code>GetCredentialCount</code>. This equates to the number of tiles that you will see in the resulting UI. For example, the default credential provider usually displays one tile for each local user.</li>
+
+<li>The provider is then queried for a <code>ICredentialProviderCredential</code> object for each credential via <code>GetCredentialAt</code>. In this function, we create a <code>Credential</code> object, initialize it, and provide it to the caller (via an output argument). The pGina CP only provides a single credential object.</li>
+</ol>
+
+<p>The provider object also defines the number of fields that are presented to the user in the UI. A field is a UI element such as a text-box, image, label, or button, and each field has a name and other properties.<br />All credentials from a given provider (in a given scenario) have the same number of fields as provided by the function <code>GetFieldDescriptorCount</code>. High level details about each field (name, id and type) are provided via <code>GetFieldDescriptorAt</code>.</p>
+
+<p>The credential object provides detailed information about the UI fields via the functions <code>GetFieldState</code> and <code>Get[Type]Value[At]</code>.</p>
+<h2 id='gina'>The GINA</h2>
+<p>TODO</p>
+<h2 id='service'>The pGina Service</h2>
+<p>TODO</p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

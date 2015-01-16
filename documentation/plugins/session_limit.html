@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="pgina_session_limit_plugin_documentation">pGina Session Limit Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> Session Limit</li>
+
+<li><strong>Plugin Type:</strong> Notification</li>
+
+<li><strong>Version:</strong> 3.1.x</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p>The Session Limit plugin will automatically log off users after a specified period of time.</p>
+
+<p>It works by tracking user logins (by recieving notification events), and managing a cache of usernames and login times. A worker thread wakes up periodically and checks for any users who have been logged on to the machine for a period of time greater than the limit. If any are found, it forces a log off for those users without warning.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/session_limit_config.png" alt="Session Limit Config" /></p>
+
+<ul>
+<li><strong>Global time limit</strong> – The number of minutes before users are logged off. If this is set to zero, it is the same as disabling this plugin.</li>
+</ul>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

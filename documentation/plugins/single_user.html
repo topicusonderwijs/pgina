@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="pgina_single_user_plugin_documentation">pGina Single User Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> Single User</li>
+
+<li><strong>Plugin Type:</strong> Gateway</li>
+
+<li><strong>Version:</strong> 3.1.x</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p>The Single User plugin forces all authenticated and authorized users to log on to the machine under a single local account. The account need not exist, but if it doesn’t exist, the Local Machine plugin should be enabled within the gateway stage to manage the creation of the account.</p>
+
+<p>When this plugin is used, it should be placed before the Local Machine plugin in the gateway stage.</p>
+
+<p>This plugin always registers success.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/single_user_config.png" alt="Single User Plugin Configuration" /></p>
+
+<ul>
+<li><strong>Username</strong> – The username of the local account.</li>
+
+<li><strong>Domain</strong> – The domain of the local account.</li>
+
+<li><strong>Password</strong> – The password of the local account.</li>
+
+<li><strong>Only substitute when all of the following plugins have authenticated</strong> – When this is checked, the plugin will not change the user’s credentials to the credentials provided above unless all of the listed plugins registered success in the authentication stage.</li>
+</ul>
+
+<p>The list of plugins requires the unique ID for each listed plugin. This ID is available under the “Plugins” tab of the main pGina configuration interface.</p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="radius_plugin_documentation">RADIUS Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> RADIUS Authentication &amp; Accounting Plugin</li>
+
+<li><strong>Plugin Type:</strong> Authentication, Notification</li>
+
+<li><strong>Version:</strong> 3.1.x</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p>The RADIUS plugin authenticates against a RADIUS source during the authentication stage and sends accounting requests during the notification stage.</p>
+
+<h2 id="typical_setup">Typical Setup</h2>
+
+<p>A typical (minimal) setup for the RADIUS plugin is to enable the Local Machine plugin in the authentication and gateway stages.</p>
+
+<p>If you would like to authenticate users against the RADIUS source, enable the RADIUS plugin in the authentication stage. Within the authentication stage, order the RADIUS plugin before Local Machine.</p>
+
+<p>If you would like to enable accounting, enable the RADIUS plugin during the notification stage.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>The configuration interface for the RADIUS plugin is shown below.</p>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/radius_config.png" alt="RADIUS Configuration" /></p>
+
+<p>Each configuration option is described below:</p>
+
+<ul>
+<li><strong>Server(s)</strong> – Space-separated list of one or more RADIUS servers to send authentication and accounting requests to.</li>
+
+<li><strong>Authentication Port</strong> – The port used for authentication. Default is 1812, though legacy RADIUS servers may default to 1645.</li>
+
+<li><strong>Accounting Port</strong> – The port used for accounting. Default is 1813, though legacy RADIUS servers may default to 1646.</li>
+
+<li><strong>Timeout</strong> – The amount of time in seconds to wait for a response from each RADIUS server.</li>
+
+<li><strong>Retry</strong> – The number of times to retry sending a RADIUS packet (per server) in the case of a timeout.</li>
+
+<li><strong>Shared Secret</strong> – The shared secret of the RADIUS server(s).</li>
+
+<li><strong>Machine Identifier</strong> – A client computer may identify itself by its IP address or a unique name (or both).</li>
+
+<li><strong>Use modified username for accounting</strong> – The RADIUS plugin will log the username entered by the user by default. If you would like to log the name after it has been modified (by the Modify Username or Single User Login plugins for example), check this.</li>
+
+<li><strong>IP Address Suggestion</strong> – When recording the IP address of the machine, the plugin will record the first viable IP address in the system. In setups with multiple network adapters (including virtual adaptors), this may record the wrong address. You may enter any regular expression that will match the desired IP address. For example “192.168.1.” will attempt to find an address matching the 192.168.1 subnet. “192.168.(24|25).” will match the 192.168.24 or 192.168.25 subnets. If no match is found, the first viable IP address is used.</li>
+</ul>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

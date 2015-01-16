@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="username_modification_plugin_documentation">Username Modification Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> Username Modification</li>
+
+<li><strong>Plugin Type:</strong> Authenticationm, Authorization, Gateway</li>
+
+<li><strong>Version:</strong> 3.1.x</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p>The username modification plugin provides several options for modifying the username during the login process.</p>
+
+<h2 id="typical_setup">Typical Setup</h2>
+
+<p>The username modification plugin will not typically be used on it’s own. It is designed to modify the entered username to conform to specific standards of the primary plugin(s). Examples of this include replacing specific characters that are not typically allowed in Windows usernames.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>The configuration interface for the username modification plugin is shown below.</p>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/username_mod.png" alt="Username Modification Configuration" /></p>
+
+<p>When adding a new rule, you’ll be faced with the following options:</p>
+
+<h2 id="stages">Stages</h2>
+
+<p>The stage you want the username modification to take place in. A brief description of the stages:</p>
+
+<ul>
+<li><strong>Authentication</strong> – The authentication stage is where the username is verified by the external service (e.g. LDAP, email server).</li>
+
+<li><strong>Authorization</strong> – The authorization stage is where group membership is defined and modified.</li>
+
+<li><strong>Gateway</strong> – The gateway stage is responsible for last minute substitutions and assigning ooptions.</li>
+</ul>
+
+<p>See the <a href="user.html#plugins">pGina Users Guide</a> for more info.</p>
+
+<h2 id="list_of_rules">List of Rules</h2>
+
+<p>The list of rules currently set. When changing the order of rules, you may only change the order of rules in the same stage. E.g. You may not swap an authentication and a authorization rule, since the authentication step takes place first.</p>
+
+<h2 id="add_rule">Add Rule</h2>
+
+<p>Adds the specified rule to the rules list.</p>
+
+<h2 id="the_rules_are_described_below">The rules are described below.</h2>
+
+<h3 id="append">Append</h3>
+
+<p>Appends the specified string to the end of the username.</p>
+
+<h3 id="prepend">Prepend</h3>
+
+<p>Prepends the specified string to the beginning of the username.</p>
+
+<h3 id="truncate">Truncate</h3>
+
+<p>Truncates the username to the specified number of characters.</p>
+
+<ul>
+<li>If the number of characters allowed is 7, the username “Bob Loblaw” becomes “Bob Lob”</li>
+</ul>
+
+<h3 id="replace">Replace</h3>
+
+<p>Replaces each specified character in the first string with the second string. If the second string is left blank, the characters will be removed. Characters are case sensitive.</p>
+
+<ul>
+<li>For the rule ’<em>Replace “abc” with “zz”</em>’, the username “Bob Loblaw” becomes “Bozz Lozzlzzw”</li>
+</ul>
+
+<h3 id="regex_replace">RegEx Replace</h3>
+
+<p>Replaces all matches for the specified regex expression with the specified string. If the second specified string is left blank, the matches will be removed.</p>
+
+<ul>
+<li>For the rule ’<em>Each regex match for “\s+” will be replaced with ””</em>’, the username “user   name” becomes “username”</li>
+
+<li>For the rule ’<em>Each regex match for “ob” will be replaced with “aw”</em>’, the username “Bob Loblaw” becomes “Baw Lawlaw”</li>
+</ul>
+
+<h3 id="match">Match</h3>
+
+<p>Rather than modifying the username, the match rule checks to see if the username conforms to the specified regular expression.</p>
+
+<p>During the authentication stage, if ANY match rule matches the username, the user will be authenticated WITHOUT verifying the password.</p>
+
+<ul>
+<li>For the rule ’<em>The username must mach “^p”</em>’, the username “pGina” will authenticate without checking the password. The username “Bob Loblaw” will not automatically authenticate unless the username/password works against another authentication method.</li>
+</ul>
+
+<p>During the authorization and gateway stages, the default behavior is to authorize the username unless one of the match rules fail. A failure during either of these two stages will prevent login.</p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

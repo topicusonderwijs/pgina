@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="pgina_mysql_authentication_plugin_documentation">pGina MySQL Authentication Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> MySQL Authentication</li>
+
+<li><strong>Plugin Type:</strong> Authentication, Gateway</li>
+
+<li><strong>Version:</strong> 3.1.x</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p>The MySQL Authentication plugin authenticates users against account information stored in a MySQL database. The plugin connects to the MySQL server, retrieves the account information including password (possibly a hash), and compares the user supplied password with the one retrieved from the database. It registers success if the passwords (or hashes) match.</p>
+
+<p>As of version 3.1, this plugin also supports adding users to local groups based on group membership information stored in the MySQL database.</p>
+
+<p>The database schema is fairly flexible and configurable (see below).</p>
+
+<h2 id="typical_setup">Typical Setup</h2>
+
+<p>A typical (minimal) setup for MySQL Authentication is to enable the Local Machine plugin in the authentication and gateway stages, and enable MySQL Auth. in the authentication stage. Within the authentication stage, order the MySQL plugin before Local Machine.</p>
+
+<h2 id="the_database_schema">The Database Schema</h2>
+
+<p>The schema includes three tables:</p>
+
+<ul>
+<li>A user table</li>
+
+<li>A group table</li>
+
+<li>A user-group table</li>
+</ul>
+
+<p>The third table (user-group) links users to groups. It contains only two coumns. Each column is a foreign key linking to the user and group tables respectively.</p>
+
+<p>The user table must have at least three or four columns (the column names can be configured):</p>
+
+<ul>
+<li>Username - The column containing the user name. This column should be unique (or the primary key).</li>
+
+<li>Hash Method - The hash method used for storing the password. This can be one of several strings (see below).</li>
+
+<li>Password - The (possibly hashed) password.</li>
+
+<li>Primary key - This column is the primary key for this table. This column can be the same as the username column.</li>
+</ul>
+
+<p>If the primary key is the same as the username, then there are only three columns, otherwise there are four.</p>
+
+<p>The Hash Method column can have one of the following values:</p>
+
+<ul>
+<li><code>NONE</code> - The password is stored in plain text.</li>
+
+<li><code>MD5</code>, <code>SHA1</code>, <code>SHA256</code>, <code>SHA384</code>, or <code>SHA512</code></li>
+
+<li><code>SMD5</code>, <code>SSHA1</code>, <code>SSHA256</code>, <code>SSHA384</code>, or <code>SSHA512</code> (The salted versions of above)</li>
+</ul>
+
+<p>The group table must have at least one or two columns (column names are configurable):</p>
+
+<ul>
+<li>Group name - The column containing the group name.</li>
+
+<li>Primary key - The primary key (can be the same as the group name column).</li>
+</ul>
+
+<p>The user-group table must have exactly two columns which are foreign keys linking to the user and group tables:</p>
+
+<ul>
+<li>User foreign key - The foreign key to the user table.</li>
+
+<li>Group foreign key - The foreign key to the group table.</li>
+</ul>
+
+<p>This table stores the group membership information.</p>
+
+<h3 id="salted_passwords">Salted Passwords</h3>
+
+<p>If any of the salted hash methods are used, this plugin expects the data to be organized as follows. The <code>password</code> column must contain a hexadecimal or base 64 encoded string that contains the following:</p>
+
+<p><strong>encoding</strong> ( <strong>hash</strong>( <em>password</em> + <em>salt</em> ) + <em>salt</em> )</p>
+
+<p>Where <strong>encoding</strong> converts to a string using either hexadecimal or base 64 encoding, and <strong>hash</strong> applies the appropriate hash algorithm.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/mysql_auth_auth.png" alt="MySQL Auth Configuration" /></p>
+
+<ul>
+<li><strong>Host</strong> – The IP or fully-qualified hostname of the MySQL server.</li>
+
+<li><strong>Port</strong> – The port where the MySQL server process is listening.</li>
+
+<li><strong>User</strong> – The username to use when connecting to the MySQL server.</li>
+
+<li><strong>Password</strong> – The password to use when connecting to the MySQL server.</li>
+
+<li><strong>Use SSL</strong> – Whether or not to use SSL encryption when connecting to the MySQL server. Note that for this to work correctly, your MySQL server must have SSL enabled. For more information on setting up a MySQL server with SSL, see <a href="http://dev.mysql.com/doc/refman/5.1/en/secure-connections.html">the MySQL documentation</a>.</li>
+
+<li><strong>MySQL Database</strong> – The database containing the account information table.</li>
+</ul>
+<h3>Database Schema Configuration</h3>
+<p>Under the “Database Schema” tab, you can configure the column names and table names. Note that any table may include more columns than those listed here. The primary key for the user table may have the same name as the username column. If so, they are treated as a single column. Similarly for the primary key for the group table.</p>
+
+<p>The “Password encoding” radio buttons indicate the binary encoding used in the password column of the database.</p>
+
+<p>The “Test…” button initiates a test of the MySQL connection, and verifies that the tables exist and are properly formatted.</p>
+
+<p>The “Create Table…” button attempts to connect to the MySQL server and create the information tables.</p>
+<h3>Gateway Configuration</h3>
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/mysql_auth_gateway.png" alt="MySQL Auth Gateway Configuration" /></p>
+
+<p>Under the “Gateway” tab you can configure a set of rules to be applied within the gateway stage. This allows you to add the user to local groups based on membership in MySQL groups.</p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

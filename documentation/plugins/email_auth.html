@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="email_authentication_plugin_documentation">Email Authentication Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> Email Authentication</li>
+
+<li><strong>Plugin Type:</strong> Authentication</li>
+
+<li><strong>Version:</strong> 3.1.x</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p>The Email Authentication plugin connects to the specified email server via the POP3 or IMAP protocol and attempts to login to the server. If the login is successful, a positive result is provided to the pGina service.</p>
+
+<h2 id="typical_setup">Typical Setup</h2>
+
+<p>A typical (minimal) setup for Email Authentication is to enable the Local Machine plugin in the authentication and gateway stages, and enable the Email Auth plugin in the authentication stage. Within the authentication stage, order the Email Auth plugin before Local Machine.</p>
+
+<h2 id="a_note_about_security">A Note About Security</h2>
+
+<p>If the email server supports SSL, using SSL is strongly recommended to ensure that the login information can not be captured. If SSL is not available, the POP3 protocol will attempt to authenticate using APOP if available to prevent sending the password as plaintext. If APOP is not available, or the IMAP protocol is being used, the password will be sent to the email server as plain text.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>The configuration interface for the email authentication plugin is shown below.</p>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/email_auth.png" alt="Email Authentication Configuration" /></p>
+
+<p>Each configuration option is described below:</p>
+
+<ul>
+<li><strong>Protocol</strong> – The protocol for the server.</li>
+
+<li><strong>Use SSL</strong> – Whether or not to use SSL encryption when connecting to the server.</li>
+
+<li><strong>Server Address</strong> – The address of the email server that should be authenticated against.</li>
+
+<li><strong>Port</strong> – The port used when connecting to the email server.</li>
+
+<li><strong>Append Domain to username</strong> – If checked, the domain specified below will be appended to the username when validating the credentials.</li>
+
+<li><strong>Domain</strong> – The domain to append to the username. E.g. For a username ‘joe’, and a domain ‘test.com’, the username sent to the email server will be ‘joe@test.com’.</li>
+</ul>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="developing_pgina_plugins">Developing pGina Plugins</h1>
+
+<h2 id="tutorial_hello_pgina">Tutorial: Hello pGina</h2>
+
+<p>To learn how to create a pGina plugins, we’ll start with a tutorial that demonstrates the implementation of a simple authentication plugin. Along the way, you’ll be introduced to the primary concepts and tools behind pGina plugin development.</p>
+
+<h3 id="tools">Tools</h3>
+
+<p>Minimally, you’ll need the following:</p>
+
+<ul>
+<li>Visual Studio 2010 Professional Trial <a href="http://download.microsoft.com/download/4/0/E/40EFE5F6-C7A5-48F7-8402-F3497FABF888/X16-42555VS2010ProTrial1.iso">iso</a> or <a href="http://download.microsoft.com/download/D/B/C/DBC11267-9597-46FF-8377-E194A73970D6/vs_proweb.exe">webinstaller</a></li>
+
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=17851">.NET 4.0</a></li>
+
+<li><a href="http://download.microsoft.com/download/E/B/A/EBA0A152-F426-47E6-9E3F-EFB686E3CA20/VS2010SP1dvd1.iso">Visual Studio 2010 Sp1</a></li>
+</ul>
+
+<h3 id="download_the_pgina_source_code">Download the pGina source code</h3>
+
+<p>The first step is to download the pGina source code.</p>
+
+<p>You can do so by downloading a zip archive from <a href="download.html">source</a>, or cloning the <a href="https://github.com/MutonUfoAI/pgina/">repository</a>.</p>
+
+<h3 id="setting_up_visual_studio">Setting up Visual Studio</h3>
+
+<p><strong>First you need to compile the plugin SDK</strong></p>
+
+<ul>
+<li>
+<p>by running <code>pGina\src\pGina-3.x-vs2010.sln</code>,</p>
+</li>
+
+<li>
+<p>than select in the Menubar\Build\Configuration Manager… choose configuration:Release</p>
+</li>
+
+<li>
+<p>now select in the Menubar\Build\Configuration Manager… choose configuration:Release and platform:x86</p>
+</li>
+
+<li>
+<p>and compile</p>
+</li>
+
+<li>
+<p>do the same for platform x64</p>
+</li>
+</ul>
+
+<p><strong>Now you can create your plugin</strong></p>
+
+<ul>
+<li>
+<p>Open Visual Studio and create a new project.</p>
+</li>
+
+<li>
+<p>In the new project dialog, select the “Class Library” template under “Visual C#” -&gt; “Windows”.</p>
+
+<p>Make sure to select “.NET Framework 4” in the drop-down list at the top.</p>
+</li>
+
+<li>
+<p>Select the <code>Plugins</code> directory of the pGina distribution as the location, and make sure to select “Create new solution.”</p>
+
+<p>The name and solution name should be a short version of the name of your plugin without any spaces.</p>
+
+<p>For this example, we’ll use the name <code>HelloPlugin</code>.</p>
+</li>
+</ul>
+
+<p>This will create a solution with a single project and a simple C# file. Before we jump into the code, let’s configure the build settings. Select “Project” -&gt; “HelloPlugin Properties…”. It makes things easiest if you set your build directory to a common location for all plugins. Currently, all contributed plugins build to <code>Plugins\bin</code>. To update your build settings so that the output directory is set to this directory, click on the “Build” tab, select “All Configurations” from the “Configuration” list, and set “Output path” to <code>..\..\bin</code>.</p>
+
+<p>We like to have all plugins use a consistent naming scheme for the output file names. This is someting like the following: <code>pGina.Plugin.PluginName</code>. Select the “Application” tab, and set the “assembly name” to <code>pGina.Plugin.HelloPlugin</code>. We should also use an isolated namespace for our plugin, so under “default namespace”, use <code>pGina.Plugin.HelloPlugin</code>.</p>
+
+<p>Save and do a quick build (“Build”-&gt;”Build Solution”). Verify that your plugin’s <code>dll</code> appears in the <code>Plugins\bin</code> directory. You should see <code>pGina.Plugin.HelloPlugin.dll</code>. Next, we need to add references to the pGina SDK dll’s and the log4net dll. Select “Project” -&gt; “Add reference…”. Select the “Browse” tab, and browse to <code>..\..\..\pGina\src\bin\</code>, and select <code>pGina.Shared.dll</code>, <code>Abstractions.dll</code>, and <code>log4net.dll</code> (<code>pGina.Core.dll</code> is not necessary for plugin development).</p>
+
+<p>You’re now ready to start developing your plugin!</p>
+
+<h3 id="implementing_the_plugin">Implementing the Plugin</h3>
+
+<p>In this example, we’ll create an authentication plugin. This plugin will successfully authenticate any user that has “hello” in the username, and “pGina” in the password.</p>
+
+<p>To create an authentication plugin, we need to implement the interface <code>IPluginAuthentication</code>. Let’s create a class in the default namespace for this plugin:</p>
+
+<pre class="csharp"><code class="csharp">
+namespace pGina.Plugin.HelloPlugin
+{
+    public class PluginImpl : pGina.Shared.Interfaces.IPluginAuthentication
+    {
+
+    }
+}
+</code></pre>
+
+<p>You’ll probably want to change the name of the file to <code>PluginImpl.cs</code> to match this class name.</p>
+
+<p>Next, we’ll implement the required interface members, starting with <code>Name</code>. This property should provide a human readable name for the plugin.</p>
+
+<pre class="csharp"><code class="csharp">
+public string Name
+{
+    get { return &quot;Hello&quot;; }
+}
+</code></pre>
+
+<p>The <code>Description</code> property should provide a short (one sentence) description of the plugin.</p>
+
+<pre class="csharp"><code class="csharp">
+public string Description
+{
+    get { return &quot;Authenticates all users with 'hello' in the username and 'pGina' in the password&quot;; }
+}
+</code></pre>
+
+<p>The <code>Uuid</code> property must return a unique ID for this plugin. You can generate a new Guid using Visual Studio ( select “Tools” -&gt; “Create GUID” ).</p>
+
+<pre class="csharp"><code class="csharp">
+private static readonly Guid m_uuid = new Guid(&quot;CED8D126-9121-4CD2-86DE-3D84E4A2625E&quot;); 
+
+public Guid Uuid
+{
+    get { return m_uuid; }
+}
+</code></pre>
+
+<p>Note that the above is just an example. You should generate a GUID and replace the string above with that GUID.</p>
+
+<p>The <code>Version</code> property should return the version number for your plugin. The best way to do this is to query for it using reflection. For example:</p>
+
+<pre class="csharp"><code class="csharp">
+public string Version
+{
+    get
+    {
+        return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+    }
+}
+</code></pre>
+
+<p>To change the version number, modify <code>Properties\AssemblyInfo.cs</code>.</p>
+
+<p>Next, we implement the <code>Starting</code> and <code>Stopping</code> methods. These are executed at startup/shutdown of the pGina service. They’re intended for initialization/cleanup tasks for things that are service related. Note that they are <strong>not</strong> intended as intialization/cleanup for each logon. They are not called during simulation so you should not do anything in these methods that is needed for logon processing. Most plugins don’t need to do anything within these methods. For our example plugin, we leave them empty.</p>
+
+<pre class="csharp"><code class="csharp">
+public void Starting() { }
+
+public void Stopping() { }
+</code></pre>
+
+<p>Finally, we get to the meat of our plugin, the <code>AuthenticateUser</code> method. This is called by the pGina service at the appropriate time during the authentication stage of a login. The parameter, a <code>SessionProperties</code> object contains information about the user including the username and password. For our plugin, we need to simply verify that the username contains the word <code>hello</code> and that the password contains <code>pGina</code>. If that is the case, we return a successful result, if not we return failure. We return the result in a <code>BooleanResult</code> object.</p>
+
+<pre class="csharp"><code class="csharp">
+public BooleanResult AuthenticateUser(SessionProperties properties)
+{
+    UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
+
+    if (userInfo.Username.Contains(&quot;hello&quot;) &amp;&amp; userInfo.Password.Contains(&quot;pGina&quot;))
+    {
+        // Successful authentication
+        return new BooleanResult() { Success = true };
+    }
+    // Authentication failure
+    return new BooleanResult() { Success = false, Message = &quot;Incorrect username or password.&quot; };
+}
+</code></pre>
+
+<p>The <code>BooleanResult</code> object contains two properties: <code>Success</code> and <code>Message</code>. You do not always need to set the <code>Message</code> property, but you always want to set the <code>Success</code> property. We recommend that you always set the <code>Message</code> property when the authentication fails.</p>
+
+<p>That’s it! You’ve implemented a simple pGina plugin.</p>
+
+<h3 id="testing_your_plugin">Testing your plugin</h3>
+
+<p>Execute the pGina configuration utility, under the “Plugin Configuration” tab, make sure to add the plugin build directory in the pGina distribution (<code>Plugins\bin</code>), and enable the plugin by checking the checkbox for the authentication stage. Then, under the “Simulation” tab, test your plugin by trying out a few logins.</p>
+
+<p>There’s much more to learn about plugins, but this should give you a starting point. In the sections below, we’ll dive into some more advanced plugin concepts.</p>
+
+<h2 id="adding_logging_to_your_plugin">Adding Logging to Your Plugin</h2>
+
+<p>Your plugin should log information about its progress and activites. Logging support is provided via <a href="http://logging.apache.org/log4net/" title="Log4Net web site">Apache log4net</a>. Adding logging to a plugin is simple. The first step is to create a logger object. You can do this in the <code>Starting</code> method, or the constructor. We recommend that you do not statically initialize this object. For example, to initialize your logger in the constructor, use the following code:</p>
+
+<pre class="csharp"><code class="csharp">
+private ILog m_logger;
+
+public PluginImpl()
+{
+    m_logger = LogManager.GetLogger(&quot;pGina.Plugin.HelloPlugin&quot;);
+}
+</code></pre>
+
+<p>To log messages using the logger, you can use any of the standard <a href="http://logging.apache.org/log4net/" title="Log4Net web site">log4net</a> logging functions. For example:</p>
+
+<pre class="csharp"><code class="csharp">
+if (userInfo.Username.Contains(&quot;hello&quot;) &amp;&amp; userInfo.Password.Contains(&quot;pGina&quot;))
+{
+    // Successful authentication
+    m_logger.InfoFormat(&quot;Successfully authenticated {0}&quot;, userInfo.Username);
+    return new BooleanResult() { Success = true };
+}
+// Authentication failure
+m_logger.ErrorFormat(&quot;Authentication failed for {0}&quot;, userInfo.Username);
+return new BooleanResult() { Success = false, Message = &quot;Incorrect username or password.&quot; };
+</code></pre>
+
+<p>For more about log4net, vist the <a href="http://logging.apache.org/log4net/" title="Log4Net web site">log4net web site</a>.</p>
+
+<h2 id="storing_plugin_settings_in_the_registry">Storing Plugin Settings in the Registry</h2>
+
+<p>If your plugin requires configurable settings, they should be stored in the registry, as a sub-key of the main pGina registry key. Support for this is provided via the <code>pGinaDynamicSettings</code> class. This class utilizes the C# <code>DynamicObject</code> class and the <code>dynamic</code> type. Settings can be queried and set as if they are properties of the object.</p>
+
+<p>To use <code>pGinaDynamicSettings</code> we recommend that you instantiate the object and immediately set the defaults for all of your settings. It makes sense to do this in a static initializer. For example:</p>
+
+<pre class="csharp"><code class="csharp">
+private static dynamic m_settings;
+internal static dynamic Settings { get { return m_settings; } }
+
+static PluginImpl()
+{
+    m_settings = new pGina.Shared.Settings.pGinaDynamicSettings(m_uuid);
+
+    m_settings.SetDefault(&quot;Foo&quot;, &quot;Bar&quot;);
+    m_settings.SetDefault(&quot;DoSomething&quot;, true);
+    m_settings.SetDefault(&quot;ListOfStuff&quot;, new string[] { &quot;a&quot;, &quot;b&quot;, &quot;c&quot; });
+    m_settings.SetDefault(&quot;Size&quot;, 1);
+}
+</code></pre>
+
+<p>The <code>SetDefault</code> method will initalize a setting in the registry if it does not already exist. If the registry setting exists, the method has no effect. Be sure to instantiate the <code>pGinaDynamicSettings</code> object using the <code>Guid</code> of your plugin. This will ensure that your settings are stored in the approprate registry key (usually: <code>HKLM\SOFTWARE\pGina3\Plugins\{guid}</code> where <code>{guid}</code> is replaced with the Guid of your plugin).</p>
+
+<p>The supported data types for settings are <code>string</code>, <code>bool</code>, <code>string[]</code>, and <code>int</code>. It is highly recommended that you set defaults as soon as your object is created. This will avoid runtime exceptions when trying to access a non-existent registry value.</p>
+
+<p>To set/read the settings, you simply treat them as properties of the object. For example:</p>
+
+<pre class="csharp"><code class="csharp">
+bool okToGoAhead = Settings.DoSomething;
+if (okToGoAhead)
+{
+    Settings.Foo = &quot;Baz&quot;;
+}
+</code></pre>
+
+<p>Note that when reading a property it must be able to determine the data type at run-time. If you try to read the setting in a context that is ambiguous, you may recieve a run-time exception. Your best bet is to assign the setting to a local variable with the appropriate data type (as shown above).</p>
+
+<h2 id="creating_a_plugin_configuration_dialog">Creating a Plugin Configuration Dialog</h2>
+
+<p>To provide a dialog to the user for configuration of your plugin via the pGina configuration UI, you implement the <code>IPluginConfiguration</code> interface.</p>
+
+<pre class="csharp"><code class="csharp">
+public class PluginImpl : pGina.Shared.Interfaces.IPluginAuthentication,
+    pGina.Shared.Interfaces.IPluginConfiguration
+</code></pre>
+
+<p>This requires you to implement the method <code>Configure</code>. This method should initalize and display your dialog, and will be called by the pGina configuration UI when the user requests to configure your plugin.</p>
+
+<p>Create a Windows form (use “Project” -&gt; “Add windows form…”), and set up your dialog. Then make sure to invoke your windows form within the <code>Configure</code> method. For example, if my Windows form was called <code>Configuration</code>, I’d use the following code:</p>
+
+<pre class="csharp"><code class="csharp">
+public void Configure()
+{
+    Configuration myDialog = new Configuration();
+    myDialog.ShowDialog();
+}
+</code></pre>
+
+<h2 id="authorization_and_gateway_plugins">Authorization and Gateway Plugins</h2>
+
+<p>To have your plugin support the authorization stage, implement the <code>IPluginAuthorization</code> interface. This requires the implementation of the following method:</p>
+
+<pre class="csharp"><code class="csharp">
+BooleanResult AuthorizeUser(SessionProperties properties) { ... }
+</code></pre>
+
+<p>This method should return a <code>BooleanResult</code> with <code>Success</code> set to <code>true</code> if the user is authorized by this plugin, otherwise <code>Success</code> should be set to <code>false</code> and an appropriate message provided in the <code>Message</code> property.</p>
+
+<p>To support the gateway stage, implement the <code>IPluginAuthenticationGateway</code> interface. This requires you to implement the following method:</p>
+
+<pre class="csharp"><code class="csharp">
+BooleanResult AuthenticatedUserGateway(SessionProperties properties) { ... }
+</code></pre>
+
+<p>The gateway stage is intended for any last minute post-authorization actions that may be necessary. For example, a user’s group membership might be modified (e.g. LDAP plugin), or the user’s username might be modified (e.g. the single user plugin). Generally, this stage should not fail, except under exceptional circumstances. You should almost always return a <code>BooleanResult</code> with <code>Success</code> set to <code>true</code> unless for some reason the login should be denied. Usually in the gateway stage, the login should not be denied. The only situation that might warrant a failure for this stage is if an error of some kind occurs, however, even in that situation, it often makes sense to log the error and return a successful result.</p>
+
+<h2 id=""><code>Session Properties</code></h2>
+
+<p>The <code>SessionProperties</code> object is provided as a parameter to each of the three methods corresponding to the three stages (authentication, authorization, and gateway). The most obvious use of this is to query the user information (by retrieving the <code>UserInformation</code> object), such as username, password, and group membership. However, it is actually a general purpose storage object, and can be used to store any information that a plugin may need to persist across stages. In fact, it is recommended that if you have any persistent state that needs to be passed between stages, you should use this object rather than using instance fields.</p>
+
+<p>You can store objects in the <code>SessionProperties</code> object using the provided methods listed below.</p>
+
+<pre class="csharp"><code class="csharp">
+public void AddTracked&lt;T&gt;(string name, T val) { ... }
+public void AddTrackedSingle&lt;T&gt;(T val) { ... }
+
+public T GetTracked&lt;T&gt;(string name) { ... }
+public T GetTrackedSingle&lt;T&gt;() { ... }
+</code></pre>
+
+<p>You can store an object associated with a key (a <code>string</code>) using <code>AddTracked</code>, or you can store a single instance of a class using <code>AddTrackedSingle</code>. Of course, your plugin should not add a tracked single of the class <code>UserInformation</code>, because that would clobber the <code>UserInformation</code> object that is provided by pGina core.</p>
+
+<p>A unique <code>SessionProperties</code> object will be provided for each login. If your plugin is only involved in a single stage, then there is no need to store anything in this object. However, if your plugin is involved in multiple stages, then it makes sense to store any persistent state related to a given login within this object.</p>
+
+<p>Note that if you need to make a connection to a remote data source and you’d like that connection to persiste between stages, you should make use of the <code>SessionProperties</code> object along with the <code>IStatefulPlugin</code> interface (see below).</p>
+
+<h3 id="getting_information_about_plugin_activity">Getting Information about Plugin Activity</h3>
+
+<p>It is often the case that a plugin needs to know what other plugins have executed previously in the login chain, and the result of those plugins. This information is stored in the <code>SessionProperties</code> object and is in a tracked single of type <code>PluginActivityInformation</code>. You can query for the result of a given plugin via the methods <code>GetAuthenticationResult</code>, <code>GetAuthorizationResult</code>, or <code>GetGatewayResult</code>. However, use caution because if a plugin has not executed yet, these will throw an exeception. To be safe, you should first use <code>GetAuthenticationPlugins</code>, <code>GetAuthorizationPlugins</code>, or <code>GetGatewayPlugins</code> to get a list of plugins that have executed and iterate through the list.</p>
+
+<p>For example, to count the number of successful authentications in the authentication stage so far, you could use the following code:</p>
+
+<pre class="csharp"><code class="csharp">
+PluginActivityInformation pluginInfo = sessionProps.GetTrackedSingle&lt;PluginActivityInformation&gt;();
+
+int nSuccess = 0;
+foreach( Guid pluginId in pluginInfo.GetAuthenticationPlugins() )
+{
+    BooleanResult result = pluginInfo.GetAuthenticationResult( pluginId );
+    if( result.Success )
+        nSuccess++;
+}
+
+// nSuccess has the number of plugins that have registered success in the authentication
+// stage so far.
+</code></pre>
+
+<h2 id="the__interface">The <code>IStatefulPlugin</code> Interface</h2>
+
+<p>If your plugin has state that needs to persist between stages of a login, and/or makes connections to resources that need to be relased at the end of a login chain (such as making a connection to a remote data source), you should implement the <code>IStatefulPlugin</code> interface. This interface requires two methods:</p>
+
+<pre class="csharp"><code class="csharp">
+void BeginChain(SessionProperties props) { ... }
+void EndChain(SessionProperties props) { ... }
+</code></pre>
+
+<p><code>BeginChain</code> is called prior to the authentication stage and should be used for initialization and set-up. You should store any state in the provided <code>SessionProperties</code> object (see above). For example, one might initialize a connection to a remote data source here and store a reference to the connection within the <code>SessionProperties</code> object.</p>
+
+<p><code>EndChain</code> is called at the end of a login chain regardless of the success or failure of the login. This should be used to clean up any resources that are held by the plugin. For example, one might terminate the connection with a remote data source here.</p>
+
+<h2 id="notification_plugins">Notification Plugins</h2>
+
+<p>To implement a notification plugin, you should implement the <code>IPluginEventNotifications</code> interface. This interface requires the following method:</p>
+
+<pre class="csharp"><code class="csharp">
+void SessionChange(SessionChangeDescription changeDescription, SessionProperties properties) { ... }
+</code></pre>
+
+<p>This method is called when any of the standard Windows terminal events occurs. The first parameter provides a description of the event. This class is <a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.sessionchangedescription.aspx" title="MSDN OnSessionChange">documented in the MSDN documentation</a>, and provides two main properties: <code>Reason</code> and <code>SessionId</code>. Of primary importance is the <code>Reason</code> property. The <a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.sessionchangedescription.reason.aspx" title="MSDN SessionChangeReason">MSDN documentation</a> describes the possible values for this property. Based on the value of the <code>Reason</code> property, you can take the action that is appropriate for your plugin.</p>
+
+<h3 id="sub_notification__interface">sub Notification <code>IPluginLogoffRequestAddTime</code> interface</h3>
+
+<p><span class='greenbg'>
+Since fork 3.1.6.2<br />
+This is a sub-interface of the <code>IPluginEventNotifications</code> interface.
+<br />
+The purpose of this interface is, to let the plugin know if the system is trying to shut down.
+<br />
+A plugin using this interface is able to delay a shutdown.
+</span></p>
+
+<p>This interface requires the following:</p>
+
+<p>a directory containing all useres with active running tasks</p>
+
+<pre class="csharp"><code class="csharp">
+private Dictionary&lt;string, Boolean&gt; RunningTasks = new Dictionary&lt;string, Boolean&gt;();
+</code></pre>
+
+<p><br /><br /></p>
+
+<p>a locker for the directory</p>
+
+<pre class="csharp"><code class="csharp">
+private ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+</code></pre>
+
+<p><br /><br /></p>
+
+<p>a bool to be set from the pgina service. True means the system is shutting down</p>
+
+<pre class="csharp"><code class="csharp">
+public static Boolean IsShuttingDown = false;
+</code></pre>
+
+<p><br /><br /></p>
+
+<p><code>LogoffRequestAddTime</code> is called in a loop from the pgina service while the system is shutting down</p>
+
+<p>be sure to clean the Dictionary from any logged of user</p>
+
+<pre class="csharp"><code class="csharp">
+public Boolean LogoffRequestAddTime()
+{
+    IsShuttingDown = true;
+    try
+    {
+        Locker.TryEnterReadLock(-1);
+        if (RunningTasks.Values.Contains(true))
+            return true;
+    }
+    catch (Exception ex)
+    {
+        m_logger.InfoFormat(&quot;LogoffRequestAddTime() error {0}&quot;, ex.Message);
+    }
+    finally
+    {
+        Locker.ExitReadLock();
+    }
+
+    return false;
+}
+</code></pre>
+
+<p><br /><br /></p>
+
+<p><code>LoginUserRequest</code> is called from the pgina service during a login attempt</p>
+
+<p>its possible that a user that has logged of retries to relogin while a cleanup task is running</p>
+
+<p>(yes the logoff can and should be non blocking)</p>
+
+<p>To prevent a messed up profile we check the Dictionary</p>
+
+<pre class="csharp"><code class="csharp">
+public Boolean LoginUserRequest(string username)
+{
+    try
+    {
+        Locker.TryEnterReadLock(-1);
+        if (RunningTasks.Keys.Contains(username.ToLower()))
+        {
+            m_logger.InfoFormat(&quot;LoginUserRequest() logoff in process for {0}&quot;, username);
+            return true;
+        }
+        else
+        {
+            m_logger.InfoFormat(&quot;LoginUserRequest() {0} free to login&quot;, username);
+            return false;
+        }
+    }
+    catch (Exception ex)
+    {
+        m_logger.InfoFormat(&quot;LoginUserRequest() {0} error {1}&quot;, username, ex.Message);
+    }
+    finally
+    {
+        Locker.ExitReadLock();
+    }
+
+    return false;
+}
+</code></pre>
+
+<p><br /><br /></p>
+
+<p>this requires IPluginEventNotifications interface to work</p>
+
+<pre class="csharp"><code class="csharp">
+public void SessionChange(SessionChangeDescription changeDescription, SessionProperties properties)
+{
+    UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
+
+    if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
+    {
+        try
+        {
+            Locker.TryEnterWriteLock(-1);
+            RunningTasks.Add(userInfo.Username, true);
+        }
+        finally
+        {
+            Locker.ExitWriteLock();
+        }
+
+        // dont block others, run your stuff in its own thread
+        Thread rem_smb = new Thread(() =&gt; cleanup(userInfo, changeDescription.SessionId));
+        rem_smb.Start();
+    }
+}
+
+private void cleanup(UserInformation userInfo, int sessionID)
+{
+    // do your stuff
+    try
+    {
+        Locker.TryEnterWriteLock(-1);
+        RunningTasks.Remove(userInfo.Username);
+    }
+    finally
+    {
+        Locker.ExitWriteLock();
+    }
+}
+</code></pre>
+
+<h2 id="change_password_plugins">Change Password Plugins</h2>
+
+<p>To implement a change password plugin, you should implement the IPluginChangePassword interface. This interface requires the following method:</p>
+
+<pre class="csharp"><code class="csharp">
+public BooleanResult ChangePassword(SessionProperties properties,
+                                    ChangePasswordPluginActivityInfo pluginInfo)
+{
+    UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
+    if (userInfo.HasSID)
+    {
+        string username = userInfo.Username;
+        string password_old = userInfo.oldPassword;
+        string password = userInfo.Password;
+
+        if (password.Length &gt;= 5 &amp;&amp; password.Length &lt;= 8)
+            if (Regex.IsMatch(password, @&quot;\d&quot;))
+                if (Regex.IsMatch(password, @&quot;(?i)[a-z]&quot;))
+                    if (Regex.IsMatch(password, &quot;(?i)[^a-z0-9]&quot;))
+                        pass_ok = &quot;special character ar'nt allowed&quot;;
+                    else
+                        pass_ok = null;
+                else
+                    pass_ok = &quot;The password does'nt contain letters&quot;;
+            else
+                pass_ok = &quot;The password does'nt contain numbers&quot;;
+        else
+            pass_ok = &quot;The password length must be between 5 and 8&quot;;
+
+        if (!String.IsNullOrEmpty(pass_ok))
+            return new BooleanResult()
+            {
+              Success = false,
+              Message = String.Format(&quot;{0}\n\nYour password does'nt fit the password policy\n\n{1}&quot;,
+              pass_ok, &quot;the policy ...&quot;)
+            };
+    }
+
+    return new BooleanResult() { Success = true };
+}
+</code></pre>
+
+<p>This method is called when a user changed his password using CTRL+ALT+DEL</p>
+
+<p><span class='greenbg'>
+Since fork 3.2.0.0<br />Instead of using the ChangePasswordInfo class from pGina this fork uses the SessionProperties class. You are than able to get all UserInformation instead of a few<br />Related to the order in which plugins are called is also different to the one from pGina. This fork will call the IPluginChangePassword interface from a plugin and stops calling any other plugin if a false BooleanResult is returned. The error message of this plugin is than presented to the user.</span></p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+
