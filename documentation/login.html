@@ -50,38 +50,6 @@
 			
 <h1 id="pgina_login_mask">pGina Login Mask</h1>
 
-<h2 id="fork_diff">Fork diff</h2>
-
-<ul>
-<li>
-<p>during the system boot a message box (max. 1min) is shown to prevent a user from login</p>
-</li>
-
-<li>
-<p>if pGina is unusable for a user an exclamation mark logo will be shown</p>
-</li>
-
-<li>
-<p>the logo is primarily used to inform a user of the current pGina state</p>
-</li>
-
-<li>
-<p>a user receives a clear message if he tries to login without a running pGina service</p>
-</li>
-
-<li>
-<p>in case of an error the username and password field is cleared</p>
-</li>
-
-<li>
-<p>during a login another message box is shown to prevent any user interaction with the CP</p>
-</li>
-
-<li>
-<p>a login can’t be canceled</p>
-</li>
-</ul>
-
 <h2 id="boot">Boot</h2>
 
 <p><img alt='pGina boot' src='http://mutonufoai.github.io/pgina/images/documentation/login_start.png' style='float:right' /></p>
@@ -92,27 +60,43 @@
 
 <p>If a minute has past and the pGina service is still down the login mask is shown, but with an exclamation mark logo. There can be a lot of reasons, like a slow machine, AV scanner, …. <br style='clear:both' /></p>
 
-<p><img alt='pGina boot' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_ok.png' style='float:right' /></p>
+<p><span style='float:right'>
+As soon as the pGina service is up the logo is shown, and thats the normal case.
+<img alt='pGina boot' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_ok.png' style='vertical-align:text-top' /></span></p>
 
-<p>As soon as the pGina service is up the logo is shown, and thats the normal case. <br style='clear:both' /></p>
+<p><br style='clear:both' /></p>
 
 <h2 id="login">Login</h2>
 
-<p>The login process is the same as always, but this fork will show another message box saying that the login is in process. <img src="http://mutonufoai.github.io/pgina/images/documentation/login_running.png" alt="user login" /></p>
+<p>The login process is the same as always, but this fork will show another message box saying that the login is in process. <img alt='pGina boot' src='http://mutonufoai.github.io/pgina/images/documentation/login_running.png' style='float:left' /></p>
 
-<p><img alt='pGina service failed' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_failed.png' style='float:right' /></p>
+<p><span style='float:right'>
+If you try to login while the pGina service is down you are limited to local administrators!
+<img alt='pGina service failed' src='http://mutonufoai.github.io/pgina/images/documentation/login_start_failed.png' style='vertical-align:text-top' /></span></p>
 
-<p>If you try to login while the pGina service is down you are limited to local administrators! <br style='clear:both' /> If a user tries to login from such a stage he will receive an error message like</p>
+<p><br style='clear:both' /></p>
+
+<p>If a user tries to login from such a stage he will receive an error message like</p>
 
 <p><img src="http://mutonufoai.github.io/pgina/images/documentation/login_failed.png" alt="user login failed" /></p>
 
+<h2 id="user_name_formats">User Name Formats</h2>
+
+<h3 id="user_principal_name">User Principal Name</h3>
+
+<p>User principal name (UPN) format is used to specify an Internet-style name, such as UserName@Example.Microsoft.com. The following table summarizes the parts of a UPN.</p>
+<table border='1'><tr><td>Part</td><td>Example</td></tr><tr><td><p>User account name. Also known as the logon name.</p></td><td><p><em>UserName</em></p></td></tr><tr><td><p>Separator. A character literal, the at sign (@).</p></td><td><p>@</p></td></tr><tr><td><p>UPN suffix. Also known as the domain name.</p></td><td><p><em>Example.Microsoft</em><strong>.com</strong></p></td></tr></table>
+<h3 id="downlevel_logon_name">Down-Level Logon Name</h3>
+
+<p>The down-level logon name format is used to specify a domain and a user account in that domain, for example, DOMAIN\UserName. The following table summarizes the parts of a down-level logon name.</p>
+<table border='1'><tr><th>Part</th><th scope='col'>Example</th></tr><tr><td><p>NetBIOS domain name.</p></td><td><p><em>DOMAIN</em></p></td></tr><tr><td><p>Separator. A character literal, the backslash (\).</p></td><td><p>&nbsp;\</p></td></tr><tr><td><p>User account name. Also known as the logon name.</p></td><td><p><em>UserName</em></p></td></tr></table>
 <h2 id="facts">Facts</h2>
 
 <p>While the system is booting</p>
 
 <ul>
 <li>
-<p>a message box is shown until the pgina service is up and running</p>
+<p>a message box is shown until the pgina service is up and running or a minute has passed</p>
 </li>
 
 <li>
@@ -155,7 +139,7 @@
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

@@ -55,22 +55,24 @@
 
 <li><strong>Plugin Type:</strong> Gateway, Notification</li>
 
-<li><strong>Version:</strong> 3.2.0</li>
+<li><strong>Version:</strong> 3.3.0</li>
 </ul>
 
 <h2 id="how_it_works">How it Works</h2>
 
-<p>The pgSMB plugin is a clone of the pGina 1.x pgFTP plugin. It’s purpose is to un/load compressed roaming profiles. Instead of using the windows internal roaming profile function and upload a profile file by file, this plugin will compress the whole profile before uploading it and decompress it before loading it.</p>
+<p><img alt='pgSMB how' src='http://mutonufoai.github.io/pgina/images/documentation/plugins/pgsmb_how.png' style='float:left; border:0px; padding-right:10px;' /></p>
+
+<p>The pgSMB plugin is a clone of the pGina 1.x pgFTP plugin. It’s purpose is to un/load compressed roaming profiles. Instead of using the windows internal roaming profile function, and upload a profile file by file, this plugin will compress the whole profile before uploading it and decompress it before loading it.</p>
 
 <p><em>What is this god for?</em></p>
 
-<p>If your users dont login on only one station, rather than moving from pc to pc and you want them to be able to use there profile on all station, than you need a reliable way to upload there profiles after logging out. The windows internal roaming profile upload is’nt reliable, because each file is uploaded one by one. That means, if a file can’t be uploaded (of whatever reason) windows will give up after the 3rd try and stops the whole upload process. The result is a jumbled roaming profile.</p>
+<p>If your users dont logon only at one station, rather than moving from pc to pc, and you want them to be able to use there profile on all station, than you need a reliable way to upload there profiles after logging out. The windows internal roaming profile upload is’nt reliable, because each file is uploaded one by one. That means, if a file can’t be uploaded (of whatever reason) windows will give up after the 3rd try and stops the whole upload process. The result is a jumbled roaming profile. This plugin is’nt the best way to achieve a reliable way to uplaod the profile, because it still depends on windows roaming. It only mitigates problems that occure during roaming, because of that the plugin pgSMB2 was created which does not depend on windows roaming profiles.</p>
 
 <p><em>Whats going on?</em></p>
 
-<p>Because of the desing of pGina 3 im not able to load a profile directly (for the experts LoadUserProfile) like in pgina 1 or 2. This plugin still uses the windows internal roaming profile but configures it to store the data locally on the disk. This way an admin is able to manage the roaming profile trough a local GPO.</p>
+<p>This plugin still uses the windows internal roaming profile but configures it to store the data temporary local on the disk. That local “roaming profile” is than compressed and uploaded to an smb share. This way an admin is able to manage the roaming profile trough a local GPO.</p>
 
-<p>The plugin btw. will inform an admin in case of an error, like a failed profile upload.</p>
+<p>The plugin btw. will inform an admin in case of an error, like a failed profile upload. <br style='clear:both' /></p>
 
 <h3 id="gateway_stage">Gateway Stage</h3>
 
@@ -80,23 +82,35 @@
 
 <p>Such a user recieves “pGina created pgSMB tmp” as description instead of “pGina created pgSMB” and this tmp marked profile is excluded from the profile upload procedure.</p>
 
-<p>Is there a problem during the gateway stage the plugin will retry as often as you specified in the configuration, if the procedure failed an email is generated designated to the mail addresses you’ve entered.</p>
+<p>Is there a problem during the gateway stage the plugin will retry as often as you specified in the configuration, if the procedure failed an email is generated designated to the global mail addresses you’ve entered.</p>
 
 <p><br /></p>
 
 <p><a name='cfiles'> </a></p>
 
-<p>* <br />If the user still owns a local profile, like after a BSOD, the plugin will check the timestamps of the local users ntuser.dat and the remote %f (Filename). Is ntuser.dat newer (UTC) than the remote %f the profile wont be downloaded.</p>
+<p><br />If the user still owns a local profile, like after a BSOD, the plugin will check the timestamps of</p>
+
+<p>the local users ntuser.dat and the remote %f (Filename). Is ntuser.dat newer (UTC) than the remote %f the profile wont be downloaded.</p>
 
 <p><br /></p>
 
+<ul>
+<li>
 <p><strong>You still need the Local Machine plugin to do the group membership!</strong></p>
+</li>
 
-<p><strong>The plugin gateway order need to be pgSMB before Local Machine.</strong></p>
+<li>
+<p><strong>The plugin gateway order need to be pgSMB2 before Local Machine.</strong></p>
+</li>
 
+<li>
+<p><strong>do not use pgSMB2 in conjunction with pgSMB</strong></p>
+</li>
+
+<li>
 <p><strong>Its important that you’ve created the appropriate folder structure to store the profile.</strong></p>
-
-<p>C:\Users\Public does fit well, but if you prefer a more secure structure</p>
+</li>
+</ul>
 
 <p>cacls output</p>
 
@@ -146,11 +160,11 @@ Set-Acl C:\roaming $sd
 
 <p>The login script is triggered by the login event received from the pGina service, also the max profile space value is applied in this stage.</p>
 
-<p>The logoff procedure is triggered by a logoff event. First a new thread is created than this thread will wait until the user has logged off. If so the profile will be compressed and pushed into an SMB share. The plugin keeps a backup of the older profile on the share called %f.bak (Filename). Is there a problem compressing or pushing, the plugin will retry as often as you specified in the configuration. If the procedure failed an email is generated designated to the mail addresses you’ve entered. If the error occurred during the fileupload the compressed profile keeps stored at %d (RoamingDest) named %f (Filename).</p>
+<p>The logoff procedure is triggered by a logoff event. First a new thread is created than this thread will wait until the user has logged off. If so the profile will be compressed and pushed into an SMB share. The plugin keeps a backup of the older profile on the share called %f.bak (Filename). Is there a problem compressing or pushing the plugin will retry as often as you specified in the configuration. If the procedure failed an email is generated designated to the mail addresses you’ve entered. If the error occurred during the fileupload the compressed profile keep stored at %d (RoamingDest) named %f (Filename).</p>
 
 <h2 id="configuration">Configuration</h2>
 
-<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/pgsmb.png" alt="pgSMB configuration" /></p>
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/pgsmb_config.png" alt="pgSMB configuration" /></p>
 
 <h3 id="roaming_profile">Roaming Profile</h3>
 
@@ -233,19 +247,7 @@ Set-Acl C:\roaming $sd
 <h3 id="administrative">Administrative</h3>
 
 <ul>
-<li>
-<p><strong>space seperated ntp FQDN servers</strong> – a space seperated list of ntp servers</p>
-</li>
-
-<li>
-<p><strong>space seperated emails</strong> – a space seperated list of emails to receive error messages</p>
-</li>
-
-<li>
-<p><strong>space seperated smtp FQDN servers</strong> – a space seperated list of smtp servers</p>
-
-<p>the logged in username and password will be used</p>
-</li>
+<li><strong>space seperated ntp FQDN servers</strong> – a space seperated list of ntp servers</li>
 </ul>
 
     
@@ -257,7 +259,7 @@ Set-Acl C:\roaming $sd
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

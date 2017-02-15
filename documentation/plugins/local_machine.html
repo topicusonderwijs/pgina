@@ -55,48 +55,14 @@
 
 <li><strong>Plugin Type:</strong> Authentication, Authorization, Gateway, Notification, Change Password</li>
 
-<li><strong>Version:</strong> 3.2.0</li>
-</ul>
-
-<h2 id="fork_diff">Fork diff</h2>
-
-<ul>
-<li>
-<p>Event based</p>
-
-<p>Remove account and profile after logout</p>
-
-<p>Scramble password after logout</p>
-</li>
-
-<li>
-<p>Mandantory groups can handle SIDs too</p>
-</li>
-
-<li>
-<p>pGina created users are tracked by the profile description</p>
-</li>
-
-<li>
-<p>using LDAP plugin attribute converter</p>
-
-<p>run user login script</p>
-
-<p>a roaming profile can be used</p>
-
-<p>a home drive can be mounted</p>
-
-<p>the users full name can be imported</p>
-
-<p>user profile space limit (GPO)</p>
-</li>
+<li><strong>Version:</strong> 3.9.9.2</li>
 </ul>
 
 <h2 id="how_it_works">How it Works</h2>
 
 <p>The local machine plugin manages authentication and authorization for accounts that exist on the machine itself. It also is responsible for creating local accounts (possibly temporary ones) when a user is authorized to log in, but does not have a local account. During a logoff the plugin is also responsible to delete a user or scramble the password. Much of the functionality provided by this plugin was formerly part of the core in pGina 2.x and earlier.</p>
 
-<p>The local machine plugin can execute in any or all of the three main pGina stages (authentication, authorization, gateway, notification and change password).</p>
+<p>The local machine plugin can execute in any or all main pGina stages (authentication, authorization, gateway, notification and change password).</p>
 
 <h3 id="authentication_stage">Authentication Stage</h3>
 
@@ -120,52 +86,29 @@
 
 <p>We recommend that you have this plugin enabled in the gateway stage if you are using non-local account logins such as LDAP or MySQL Authentication.</p>
 
-<p>The plugin can also be configured such that the local account should be scheduled for removal or have its password scrambled upon logoff.</p>
+<p>The plugin can also be configured such that the local account should be scheduled for removal or have its password scrambled upon logoff. This is done by <a href="#notification">notifications</a>.</p>
 
-<p><span class='redbg'>This is implemented in the following way. Upon successful completion of this stage, it records the username as a successful login. A background thread wakes up every so often to check if the user has logged off. If so, the plugin tries to delete the account/profile and/or scramble the password.</span></p>
+<p>It’s possible to import user attributes from an LDAP <i>(only if the pgSMB2 plugin is’nt used)</i></p>
 
-<p><span class='greenbg'>
-  Since fork 3.1.6.2<br />
-  this is done by <a href='#notification'>events</a> instead of a background timer!<br />The timer based profile cleanup or password scramble is very dangerous, because the thread doing the task doesnt inform the plugin that &quot;he&quot; is still working. In such a case its likely that a user who logged off and logged in right back receives a damaged profile. The cause is the cleanup thread is cleaning the profile while winlogon.exe on the other hand creates the profile again. The other problem is, that you cant be sure that the task does even start nor complete. Imagine a user doesnt choose to log off but to turn the pc off.<br /><br />
-  Since fork 3.2.0.0 <i>(only if the pgSMB plugin is’nt used)</i><br />
-  <ul class='greenbg'>
-    <li>
-      import the users full name by using the
-      <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a>
-      (Fullname)
-    </li>
-    <li>
-      mount a home drive by using the
-      <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a>
-      (usri4_home_dir_drive and usri4_home_dir)
-    </li>
-    <li>
-      make use of a roaming profile by using the
-      <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a>
-      (usri4_profile)
-      <br /><b>Requires enabled GPO setting</b> <i>"Do not check for user ownership of Roaming Profile Folders"</i>
-    </li>
-  </ul>
-</span></p>
+<ul>
+<li>import the users full name by using the <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (Fullname)</li>
+
+<li>mount a home drive by using the <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (usri4_home_dir_drive and usri4_home_dir)</li>
+
+<li>make use of a roaming profile by using the <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (usri4_profile) <br /><b>Requires enabled GPO setting</b> <i>&quot;Do not check for user ownership of Roaming Profile Folders&quot;</i></li>
+</ul>
 
 <h3 id="notification">Notification</h3>
 
-<p><span class='greenbg'>
-  Since fork 3.1.6.2<br />the profile cleanup and scramble password task is done here. If a user is logging off, the plugin is notified and executes the appropriate task. During that time the system won’t shut down, nor is the corresponding user able to log in again, until all tasks have been completed. Another user is able to login while another instance of the plugin is still logging someone out. It’s so called<i>&quot;non blocking&quot;</i>. You can relay on, that the user is deleted or the password scrambled, before this user is able to relogin or the system shuts down.<br />
-  <strong>Users are tracked by there profile description &quot;pGina created&quot;</strong>
-  <br /><br />
-  Since fork 3.2.0.0 <i>(only if the pgSMB plugin is’nt used)</i><br />
-  <ul class='greenbg'>
-    <li>
-      a login script can be started in the users context during log on.
-      Its only possible by using the LDAP plugin <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (LoginScript)
-    </li>
-    <li>
-      the profile size can be limitited.
-      Its only possible by using the LDAP plugin <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (usri4_max_storage)
-    </li>
-  </ul>
-</span></p>
+<p>The profile cleanup and scramble password task is done here. If a user is logging off, the plugin is notified and executes the appropriate task. During that time the system won’t shut down, nor is the corresponding user able to log in again, until all tasks have been completed. Another user is able to login while another instance of the plugin is still logging someone out. It’s so called <i>&quot;non blocking&quot;</i>. You can relay on, that the user is deleted or the password scrambled, before this user is able to relogin or the system shuts down. <br /><strong>Users are tracked by there profile description “pGina created”</strong></p>
+
+<p>Following can be done too <i>(only if the pgSMB2 plugin is’nt used)</i><br /></p>
+
+<ul>
+<li>a login script can be started in the users context during log on. Its only possible by using the LDAP plugin <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (LoginScript)</li>
+
+<li>the profile size can be limitited. Its only possible by using the LDAP plugin <a href='http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options'>Attribute converter</a> (usri4_max_storage)</li>
+</ul>
 
 <h3 id="change_password">Change Password</h3>
 
@@ -178,30 +121,6 @@
 <p>In the gateway stage, this plugin will make sure that the group membership of the local account is an exact match with the list of groups provided by the plugins. This can potentially remove or add groups to an existing account. In order to understand this, consider the pGina login process. During the execution of the pGina pipeline, plugins can add or remove groups from an internal list of groups. This list is initially empty at the beginning of the pipeline. When the gateway stage is executed, the LocalMachine plugin sees this list of groups of which the user should be a member, and attempts to make sure that the actual local account is a member of the same list of groups (no more, no less). To do so, it may remove or add groups to the local account as necessary.</p>
 
 <p>If the local account already exists prior to logon, there are two locations where this plugin will copy the group membership of the existing local account into the internal list of groups described above. First, in the authentication stage the LocalMachine plugin will copy the group membership if the user is successfully authenticated by the plugin. Second, the authorization stage will copy the group membership of the local account if configured to do so (see the “Mirror groups from local user” option below).</p>
-
-<p>Care must be taken to avoid removing needed groups. As an example of the kind of thing that might happen, consider the following scenario where a user is unintentionally removed from the <code>Administrators</code> group. Suppose that account <code>foo</code> exists locally on the machine and in LDAP. The local account is a member of the <code>Administrators</code> group. The <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html">LDAP plugin</a> is enabled in the authentication stage and the LocalMachine plugin is enabled in authentication and gateway stages. Further, suppose that the LocalMachine settings are the default settings.</p>
-
-<p>The following scenario then occurs:</p>
-
-<ol>
-<li>
-<p>User <code>foo</code> enters credentials that are valid for LDAP, but not for the local account. This might happen if the local account’s password was scrambled by the LocalMachine plugin (see configuration below), or the LDAP password was changed and the local account’s password hasn’t been updated.</p>
-</li>
-
-<li>
-<p>The user is authenticated by the <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html">LDAP plugin</a>, but fails authentication in the LocalMachine plugin. The internal list of groups is empty because the LocalMachine plugin failed to authenticate and therefore did not add any groups to the list (see above).</p>
-</li>
-
-<li>
-<p>The LocalMachine plugin does not execute in the authorization stage because in the default configuration, the authorization stage is not enabled.</p>
-</li>
-
-<li>
-<p>In the gateway stage, the internal list of groups is empty so the Administrators group is removed from the local account prior to logon.</p>
-</li>
-</ol>
-
-<p>If this is not the desired outcome from this scenario, one solution is to enable the authorization stage for the LocalMachine plugin and make sure that the “mirror local groups” option is enabled and the “authorize all authenticated users” option is also enabled.</p>
 
 <p>Also, note that you probably want to make sure that the LocalMachine plugin executes <strong>last</strong> in the gateway stage. This is because there may be other plugins who change the group membership in the gateway stage. They should do so before the LocalMachine plugin executes because it is the LocalMachine plugin that makes sure that the local account is actually a member of the internal list of groups.</p>
 
@@ -220,13 +139,13 @@
 <h3 id="authorization">Authorization</h3>
 
 <ul>
-<li><strong>Mirror groups from local user</strong> – Load all groups from the local account into the pGina user information store so that the LocalMachine’s Gateway stage (and other subsequent plugins) will see that the user should be a member of those groups. When this plugin is enabled in the Gateway stage, it will attempt to make sure that the local account has the same groups as listed in the internal user information store. This is automatically done if the user was authenticated by this plugin regardless of the state of this option.</li>
+<li><strong>Mirror groups from local user</strong> – Load all groups from the local account into the pGina user information store so that the LocalMachine’s Gateway stage (and other subsequent plugins) will see that the user should be a member of those groups. When this plugin is enabled in the Gateway stage, it will attempt to make sure that the local account has the same groups as listed in the internal user information store. This is automatically done if the user was authenticated by this plugin regardless of the state of this option. <b>Will erase all previous collected group informations</b></li>
 
 <li><strong>Authorize all authenticated users</strong> – When this is checked, the plugin will attempt to authorize all users. Otherwise, the plugin will only authorize users that were authenticated successfully by this plugin.</li>
 
 <li><strong>Require local administrator group membership</strong> – Only authorize users that are members of the Administrators group.</li>
 
-<li><strong>Require membership in one of the following local groups</strong> – Only authorize users that are members of one of the groups listed below this checkbox.(SIDs are’nt allowed)</li>
+<li><strong>Require membership in one of the following local groups</strong> – Only authorize users that are members of one of the groups listed below this checkbox.</li>
 </ul>
 
 <h3 id="gateway">Gateway</h3>
@@ -234,15 +153,15 @@
 <ul>
 <li><strong>Failure to create or join local groups should prevent login</strong> – When this is checked, the plugin will register failure if it is unable to create or join the local groups that are requested.</li>
 
-<li><strong>Remove account and profile after logout when account does not exist prior to logon</strong> – When this is selected, the plugin will attempt to remove the account and its profile after logout when the account did not exist prior to logon.</li>
+<li><strong>Mandantory groups</strong> – The local account is added to these local groups if not already a member.</li>
+</ul>
 
-<li><strong>Scramble password after logout</strong> – When this is checked, the plugin will attempt to scramble the password of the local account after logout. <strong>Caution:</strong> when this option is enabled it is a good idea to have the below option enabled or place some exceptions in the list to “Never scramble.” Otherwise, you risk being locked out of your machine if you rely on some local accounts.</li>
+<h3 id="notification_2">Notification</h3>
 
-<li><strong>Only scramble when LocalMachine authentication fails or does not execute</strong> – When the “Scramble password after logout” option is enabled, this causes the plugin to only scramble when the LocalMachine fails to authenticate the user.</li>
+<ul>
+<li><strong>Remove account and profile after logout</strong> – When this is selected, the plugin will remove the account and its profile after logout. Its only applied to users created by pgina!</li>
 
-<li><strong>Never scramble the passwords for these accounts</strong> – This is a list of usernames that will never have their passwords scrambled regardless of the above options.</li>
-
-<li><strong>Mandantory groups</strong> – The local account is added to these local groups if not already a member. (SIDs are allowed)</li>
+<li><strong>Scramble password after logout</strong> – When this is checked, the plugin will scramble the password of the local account after logout. Its only applied to users created by pgina!</li>
 </ul>
 
     
@@ -254,7 +173,7 @@
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

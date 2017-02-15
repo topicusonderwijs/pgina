@@ -77,6 +77,12 @@
 <p><strong>First you need to compile the plugin SDK</strong></p>
 
 <ul>
+<li>by running <code>pGina\src\compile.cmd</code></li>
+</ul>
+
+<p>or</p>
+
+<ul>
 <li>
 <p>by running <code>pGina\src\pGina-3.x-vs2010.sln</code>,</p>
 </li>
@@ -261,18 +267,30 @@ return new BooleanResult() { Success = false, Message = &quot;Incorrect username
 
 <p>To use <code>pGinaDynamicSettings</code> we recommend that you instantiate the object and immediately set the defaults for all of your settings. It makes sense to do this in a static initializer. For example:</p>
 
+<p>Add a new Class Element into your Project and name it Settings.cs (“Project” -&gt; “Add new element…”).</p>
+
 <pre class="csharp"><code class="csharp">
-private static dynamic m_settings;
-internal static dynamic Settings { get { return m_settings; } }
+using pGina.Shared.Settings;
 
-static PluginImpl()
+namespace pGina.Plugin.HelloPlugin
 {
-    m_settings = new pGina.Shared.Settings.pGinaDynamicSettings(m_uuid);
+    public class Settings
+    {
+        private static dynamic m_settings = new pGinaDynamicSettings(PluginImpl.PluginUuid);
 
-    m_settings.SetDefault(&quot;Foo&quot;, &quot;Bar&quot;);
-    m_settings.SetDefault(&quot;DoSomething&quot;, true);
-    m_settings.SetDefault(&quot;ListOfStuff&quot;, new string[] { &quot;a&quot;, &quot;b&quot;, &quot;c&quot; });
-    m_settings.SetDefault(&quot;Size&quot;, 1);
+        static Settings()
+        {
+            m_settings.SetDefault(&quot;Foo&quot;, &quot;Bar&quot;);
+            m_settings.SetDefault(&quot;DoSomething&quot;, true);
+            m_settings.SetDefault(&quot;ListOfStuff&quot;, new string[] { &quot;a&quot;, &quot;b&quot;, &quot;c&quot; });
+            m_settings.SetDefault(&quot;Size&quot;, 1);
+        }
+
+        public static dynamic Store
+        {
+            get { return m_settings; }
+        }
+    }
 }
 </code></pre>
 
@@ -283,11 +301,15 @@ static PluginImpl()
 <p>To set/read the settings, you simply treat them as properties of the object. For example:</p>
 
 <pre class="csharp"><code class="csharp">
-bool okToGoAhead = Settings.DoSomething;
+bool okToGoAhead = Settings.Store.DoSomething;
 if (okToGoAhead)
 {
     Settings.Foo = &quot;Baz&quot;;
 }
+</code></pre>
+
+<pre class="csharp"><code class="csharp">
+Settings.Store.Size = 5;
 </code></pre>
 
 <p>Note that when reading a property it must be able to determine the data type at run-time. If you try to read the setting in a context that is ambiguous, you may recieve a run-time exception. Your best bet is to assign the setting to a local variable with the appropriate data type (as shown above).</p>
@@ -318,7 +340,7 @@ public void Configure()
 <p>To have your plugin support the authorization stage, implement the <code>IPluginAuthorization</code> interface. This requires the implementation of the following method:</p>
 
 <pre class="csharp"><code class="csharp">
-BooleanResult AuthorizeUser(SessionProperties properties) { ... }
+public BooleanResult AuthorizeUser(SessionProperties properties) { ... }
 </code></pre>
 
 <p>This method should return a <code>BooleanResult</code> with <code>Success</code> set to <code>true</code> if the user is authorized by this plugin, otherwise <code>Success</code> should be set to <code>false</code> and an appropriate message provided in the <code>Message</code> property.</p>
@@ -326,7 +348,7 @@ BooleanResult AuthorizeUser(SessionProperties properties) { ... }
 <p>To support the gateway stage, implement the <code>IPluginAuthenticationGateway</code> interface. This requires you to implement the following method:</p>
 
 <pre class="csharp"><code class="csharp">
-BooleanResult AuthenticatedUserGateway(SessionProperties properties) { ... }
+public BooleanResult AuthenticatedUserGateway(SessionProperties properties) { ... }
 </code></pre>
 
 <p>The gateway stage is intended for any last minute post-authorization actions that may be necessary. For example, a user’s group membership might be modified (e.g. LDAP plugin), or the user’s username might be modified (e.g. the single user plugin). Generally, this stage should not fail, except under exceptional circumstances. You should almost always return a <code>BooleanResult</code> with <code>Success</code> set to <code>true</code> unless for some reason the login should be denied. Usually in the gateway stage, the login should not be denied. The only situation that might warrant a failure for this stage is if an error of some kind occurs, however, even in that situation, it often makes sense to log the error and return a successful result.</p>
@@ -390,164 +412,238 @@ void EndChain(SessionProperties props) { ... }
 <p>To implement a notification plugin, you should implement the <code>IPluginEventNotifications</code> interface. This interface requires the following method:</p>
 
 <pre class="csharp"><code class="csharp">
-void SessionChange(SessionChangeDescription changeDescription, SessionProperties properties) { ... }
+void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties) { ... }
 </code></pre>
 
-<p>This method is called when any of the standard Windows terminal events occurs. The first parameter provides a description of the event. This class is <a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.sessionchangedescription.aspx" title="MSDN OnSessionChange">documented in the MSDN documentation</a>, and provides two main properties: <code>Reason</code> and <code>SessionId</code>. Of primary importance is the <code>Reason</code> property. The <a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.sessionchangedescription.reason.aspx" title="MSDN SessionChangeReason">MSDN documentation</a> describes the possible values for this property. Based on the value of the <code>Reason</code> property, you can take the action that is appropriate for your plugin.</p>
-
-<h3 id="sub_notification__interface">sub Notification <code>IPluginLogoffRequestAddTime</code> interface</h3>
-
-<p><span class='greenbg'>
-Since fork 3.1.6.2<br />
-This is a sub-interface of the <code>IPluginEventNotifications</code> interface.
-<br />
-The purpose of this interface is, to let the plugin know if the system is trying to shut down.
-<br />
-A plugin using this interface is able to delay a shutdown.
-</span></p>
-
-<p>This interface requires the following:</p>
-
-<p>a directory containing all useres with active running tasks</p>
+<p>This method is called when a SERVICE_CONTROL_SESSIONCHANGE parameter was received by a hidden form which is part of the pGina service. The first parameter is the SessionId who is generating a SessionChangeReason enumeration as parameter two and the SessionProperties class from pGina.Shared.Types as parameter three.</p>
 
 <pre class="csharp"><code class="csharp">
-private Dictionary&lt;string, Boolean&gt; RunningTasks = new Dictionary&lt;string, Boolean&gt;();
-</code></pre>
-
-<p><br /><br /></p>
-
-<p>a locker for the directory</p>
-
-<pre class="csharp"><code class="csharp">
-private ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-</code></pre>
-
-<p><br /><br /></p>
-
-<p>a bool to be set from the pgina service. True means the system is shutting down</p>
-
-<pre class="csharp"><code class="csharp">
-public static Boolean IsShuttingDown = false;
-</code></pre>
-
-<p><br /><br /></p>
-
-<p><code>LogoffRequestAddTime</code> is called in a loop from the pgina service while the system is shutting down</p>
-
-<p>be sure to clean the Dictionary from any logged of user</p>
-
-<pre class="csharp"><code class="csharp">
-public Boolean LogoffRequestAddTime()
+public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
 {
-    IsShuttingDown = true;
-    try
+    if (properties == null)
     {
-        Locker.TryEnterReadLock(-1);
-        if (RunningTasks.Values.Contains(true))
-            return true;
-    }
-    catch (Exception ex)
-    {
-        m_logger.InfoFormat(&quot;LogoffRequestAddTime() error {0}&quot;, ex.Message);
-    }
-    finally
-    {
-        Locker.ExitReadLock();
+        return;
     }
 
-    return false;
-}
-</code></pre>
-
-<p><br /><br /></p>
-
-<p><code>LoginUserRequest</code> is called from the pgina service during a login attempt</p>
-
-<p>its possible that a user that has logged of retries to relogin while a cleanup task is running</p>
-
-<p>(yes the logoff can and should be non blocking)</p>
-
-<p>To prevent a messed up profile we check the Dictionary</p>
-
-<pre class="csharp"><code class="csharp">
-public Boolean LoginUserRequest(string username)
-{
-    try
+    if (Reason == System.ServiceProcess.SessionChangeReason.SessionLogon)
     {
-        Locker.TryEnterReadLock(-1);
-        if (RunningTasks.Keys.Contains(username.ToLower()))
+        UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
+        if (!userInfo.HasSID)
         {
-            m_logger.InfoFormat(&quot;LoginUserRequest() logoff in process for {0}&quot;, username);
-            return true;
+            m_logger.InfoFormat(&quot;{1} SessionLogon Event denied for ID:{0}&quot;, SessionId, userInfo.Username);
+            return;
+        }
+        m_logger.DebugFormat(&quot;{1} SessionChange SessionLogon for ID:{0}&quot;, SessionId, userInfo.Username);
+
+        if (userInfo.Description.Contains(&quot;pGina created&quot;) &amp;&amp; !userInfo.Description.Contains(&quot;pgSMB&quot;))
+        {
+            IntPtr hToken = Abstractions.WindowsApi.pInvokes.GetUserToken(userInfo.Username, null, userInfo.Password);
+            if (hToken != IntPtr.Zero)
+            {
+                string uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfilePath(hToken);
+                if (String.IsNullOrEmpty(uprofile))
+                {
+                    uprofile = Abstractions.WindowsApi.pInvokes.GetUserProfileDir(hToken);
+                }
+                Abstractions.WindowsApi.pInvokes.CloseHandle(hToken);
+
+                if (uprofile.Contains(@&quot;\TEMP&quot;))
+                {
+                    Abstractions.Windows.Networking.sendMail(pGina.Shared.Settings.pGinaDynamicSettings.GetSettings(pGina.Shared.Settings.pGinaDynamicSettings.pGinaRoot, new string[] { &quot;notify_pass&quot; }), userInfo.Username, userInfo.Password, String.Format(&quot;pGina: Windows tmp Login {0} from {1}&quot;, userInfo.Username, Environment.MachineName), &quot;Windows was unable to load the profile&quot;);
+                }
+            }
         }
         else
         {
-            m_logger.InfoFormat(&quot;LoginUserRequest() {0} free to login&quot;, username);
-            return false;
+            m_logger.InfoFormat(&quot;{0} {1}. I'm not executing Notification stage&quot;, userInfo.Username, (userInfo.Description.Contains(&quot;pgSMB&quot;)) ? &quot;was created by pgSMB&quot; : &quot;is'nt a pGina created user&quot;);
         }
-    }
-    catch (Exception ex)
-    {
-        m_logger.InfoFormat(&quot;LoginUserRequest() {0} error {1}&quot;, username, ex.Message);
-    }
-    finally
-    {
-        Locker.ExitReadLock();
-    }
-
-    return false;
-}
-</code></pre>
-
-<p><br /><br /></p>
-
-<p>this requires IPluginEventNotifications interface to work</p>
-
-<pre class="csharp"><code class="csharp">
-public void SessionChange(SessionChangeDescription changeDescription, SessionProperties properties)
-{
-    UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
-
-    if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
-    {
-        try
-        {
-            Locker.TryEnterWriteLock(-1);
-            RunningTasks.Add(userInfo.Username, true);
-        }
-        finally
-        {
-            Locker.ExitWriteLock();
-        }
-
-        // dont block others, run your stuff in its own thread
-        Thread rem_smb = new Thread(() =&gt; cleanup(userInfo, changeDescription.SessionId));
-        rem_smb.Start();
-    }
-}
-
-private void cleanup(UserInformation userInfo, int sessionID)
-{
-    // do your stuff
-    try
-    {
-        Locker.TryEnterWriteLock(-1);
-        RunningTasks.Remove(userInfo.Username);
-    }
-    finally
-    {
-        Locker.ExitWriteLock();
     }
 }
 </code></pre>
 
+<h3 id="sub_notification__interface">sub Notification <code>IPluginLogoffRequestAddTime</code> interface</h3>
+
+<p>This is a sub-interface of the <code>IPluginEventNotifications</code> interface. <br />The purpose of this interface is, to let the plugin know if the system is trying to shut down. <br />A plugin using this interface is able to delay a shutdown.</p>
+
+<p>This interface requires the following:</p>
+<ul>
+  <li>
+    a directory containing all useres with active running tasks
+    <pre class='csharp'><code class='csharp'>
+      private Dictionary&lt;string, Boolean&gt; RunningTasks = new Dictionary&lt;string, Boolean&gt;();
+    </code></pre>
+  </li>
+  <li>
+    a locker for the directory
+    <pre class='csharp'><code class='csharp'>
+      private ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+    </code></pre>
+  </li>
+  <li>
+    a bool to be set from the pgina service. True means the system is shutting down
+    <pre class='csharp'><code class='csharp'>
+      public static Boolean IsShuttingDown = false;
+    </code></pre>
+  </li>
+  <li>
+    <i>LogoffRequestAddTime</i> is called in a loop from the pgina service while the system is shutting down.
+    <br />Make sure to clean the Dictionary from any logged of user
+    
+    <pre class='csharp'><code class='csharp'>
+      public Boolean LogoffRequestAddTime()
+      {
+          IsShuttingDown = true;
+          try
+          {
+              Locker.TryEnterReadLock(-1);
+              if (RunningTasks.Values.Contains(true))
+                  return true;
+          }
+          catch (Exception ex)
+          {
+              m_logger.InfoFormat("LogoffRequestAddTime() error {0}", ex.Message);
+          }
+          finally
+          {
+              Locker.ExitReadLock();
+          }
+      
+          return false;
+      }
+    </code></pre>
+  </li>
+  <li>
+    <i>LoginUserRequest</i> is called from the pgina service during a login attempt.
+    <br />Its possible that a user that has logged of and retries to relogin while a cleanup task is running
+    <br />(yes the logoff can and should be non blocking) To prevent a messed up profile we check the Dictionary
+    <pre class='csharp'><code class='csharp'>
+      public Boolean LoginUserRequest(string username)
+      {
+          try
+          {
+              Locker.TryEnterReadLock(-1);
+              if (RunningTasks.Keys.Contains(username.ToLower()))
+              {
+                  m_logger.InfoFormat("LoginUserRequest() logoff in process for {0}", username);
+                  return true;
+              }
+              else
+              {
+                  m_logger.InfoFormat("LoginUserRequest() {0} free to login", username);
+                  return false;
+              }
+          }
+          catch (Exception ex)
+          {
+              m_logger.InfoFormat("LoginUserRequest() {0} error {1}", username, ex.Message);
+          }
+          finally
+          {
+              Locker.ExitReadLock();
+          }
+      
+          return false;
+      }
+    </code></pre>
+  </li>
+  <li>
+    A notification is triggert during a login or logoff and SessionChange called.
+    <br />This requires IPluginEventNotifications interface to work
+    <pre class='csharp'><code class='csharp'>
+      public void SessionChange(int SessionId, System.ServiceProcess.SessionChangeReason Reason, SessionProperties properties)
+      {
+          if (properties == null)
+          {
+              return;
+          }
+      
+          UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
+      
+          if (changeDescription.Reason == System.ServiceProcess.SessionChangeReason.SessionLogoff)
+          {
+              try
+              {
+                  Locker.TryEnterWriteLock(-1);
+                  RunningTasks.Add(userInfo.Username.ToLower(), true);
+              }
+              finally
+              {
+                  Locker.ExitWriteLock();
+              }
+
+              // we add this plugin UUID to a list
+              // telling other plugins that we are working on this profile
+              // this list is in order corresponding to the event notification plugin order
+              // its telling other plugings (if propper implemented) "hold on until im finished."
+              PluginActivityInformation notification = properties.GetTrackedSingle&lt;PluginActivityInformation&gt;();
+              notification.AddNotificationResult(PluginUuid, new BooleanResult { Message = "", Success = false });
+              properties.AddTrackedSingle&lt;PluginActivityInformation&gt;(notification);
+              
+              // dont block others, run your stuff in its own thread
+              Thread rem_smb = new Thread(() => cleanup(userInfo, SessionId, properties));
+              rem_smb.Start();
+          }
+      }
+      
+      private void cleanup(UserInformation userInfo, int sessionID, SessionProperties properties)
+      {
+          while (true)
+          {
+              // logoff detection is quite a problem under NT6
+              // a disconnectEvent is only triggered during a logoff
+              // but not during a shutdown/reboot
+              // and the SessionLogoffEvent is only saying that the user is logging of
+              // So, there is no event that is fired during a user-logoff/reboot/shutdown
+              // that indicates that the user has logged of
+              if (Abstractions.WindowsApi.pInvokes.IsSessionLoggedOFF(sessionID) || IsShuttingDown)
+              {
+                  break;
+              }
+              else
+              {
+                  Thread.Sleep(1000);
+              }
+          }
+          while (true)
+          {
+              // if no other notification plugin is working on this user we can start
+              // if the first entry from GetNotificationPlugins is equal to this plugin UID than its our turn
+              IEnumerable&lt;Guid&gt; guids = properties.GetTrackedSingle&lt;PluginActivityInformation&gt;().GetNotificationPlugins();
+              if (guids.DefaultIfEmpty(Guid.Empty).FirstOrDefault().Equals(PluginUuid) || guids.ToList().Count == 0)
+              {
+                  break;
+              }
+      
+              Thread.Sleep(1000);
+          }
+          
+          // do your stuff
+          
+          try
+          {
+              Locker.TryEnterWriteLock(-1);
+              RunningTasks.Remove(userInfo.Username.ToLower());
+
+              // remove this plugin from the list
+              // we have ended our work
+              PluginActivityInformation notification = properties.GetTrackedSingle&lt;PluginActivityInformation&gt;();
+              notification.DelNotificationResult(PluginUuid);
+              properties.AddTrackedSingle&lt;PluginActivityInformation&gt;(notification);
+          }
+          finally
+          {
+              Locker.ExitWriteLock();
+          }
+      }
+    </code></pre>
+  </li>
+</ul>
 <h2 id="change_password_plugins">Change Password Plugins</h2>
 
 <p>To implement a change password plugin, you should implement the IPluginChangePassword interface. This interface requires the following method:</p>
 
 <pre class="csharp"><code class="csharp">
-public BooleanResult ChangePassword(SessionProperties properties,
-                                    ChangePasswordPluginActivityInfo pluginInfo)
+public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
 {
     UserInformation userInfo = properties.GetTrackedSingle&lt;UserInformation&gt;();
     if (userInfo.HasSID)
@@ -585,8 +681,7 @@ public BooleanResult ChangePassword(SessionProperties properties,
 
 <p>This method is called when a user changed his password using CTRL+ALT+DEL</p>
 
-<p><span class='greenbg'>
-Since fork 3.2.0.0<br />Instead of using the ChangePasswordInfo class from pGina this fork uses the SessionProperties class. You are than able to get all UserInformation instead of a few<br />Related to the order in which plugins are called is also different to the one from pGina. This fork will call the IPluginChangePassword interface from a plugin and stops calling any other plugin if a false BooleanResult is returned. The error message of this plugin is than presented to the user.</span></p>
+<p>This fork will call the IPluginChangePassword interface from a plugin and stops calling any other plugin if a false BooleanResult is returned. The error message of this plugin is than presented to the user.</p>
 
     
 		
@@ -597,7 +692,7 @@ Since fork 3.2.0.0<br />Instead of using the ChangePasswordInfo class from pGina
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

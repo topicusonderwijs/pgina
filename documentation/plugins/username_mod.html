@@ -144,6 +144,11 @@
 
 <p>During the authorization and gateway stages, the default behavior is to authorize the username unless one of the match rules fail. A failure during either of these two stages will prevent login.</p>
 
+<h2 id="consider_this">Consider this</h2>
+
+<p><span class='redbg'><b>
+By using this plugin pGina is unable to verify a user during logon as shown  <a href='http://mutonufoai.github.io/pgina/documentation/user.html#how_pgina_works'>here</a>. Pgina can’t detect a loggin off session from this user nor if this user is already logged in and tries to unlock the user. As you can see the Username Modification Plugin runs in stage 3 while the above checks are done in stage 2.</b></span></p>
+
     
 		
 		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
@@ -153,7 +158,7 @@
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

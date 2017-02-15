@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h2 id="rdp_to_a_pgina_client">RDP to a pGina client</h2>
+
+<p>There is no problem connection to a pGina client using RDP, only that you need to disable preauthentication. pGina doesn’t support preauthentication and on the other hand, how do you authenticate a user that doesn’t exist on the system before pGina create it.</p>
+
+<p>There are two ways to achieve this</p>
+
+<ul>
+<li>by adding “enablecredsspsupport:i:0” to C:\Users\&lt;your username&gt;\Documents\Default.rdp</li>
+
+<li>by using a preconfigured rdp file</li>
+</ul>
+
+<p>If you manipulate Default.rdp than this setting will be applied to all new connections. A preconfigured rdp file on the other hand can do even an autologin.</p>
+<pre>
+screen mode id:i:2
+desktopwidth:i:2560
+desktopheight:i:1024
+session bpp:i:16
+winposstr:s:0,1,-1181,71,-29,905
+full address:s:client.local
+compression:i:1
+keyboardhook:i:2
+audiomode:i:0
+redirectdrives:i:0
+redirectprinters:i:0
+redirectcomports:i:0
+redirectsmartcards:i:1
+displayconnectionbar:i:1
+autoreconnection enabled:i:1
+authentication level:i:0
+username:s:username
+domain:s:
+alternate shell:s:
+shell working directory:s:
+disable wallpaper:i:0
+disable full window drag:i:0
+disable menu anims:i:0
+disable themes:i:0
+disable cursor setting:i:0
+bitmapcachepersistenable:i:1
+enablecredsspsupport:i:0
+</pre>
+<ul>
+<li>Put the full FQDN or IP Address at “full address:s:” like
+<ul>
+<li>full address:s:172.18.241.164</li>
+
+<li>full address:s:student001.local</li>
+</ul>
+</li>
+
+<li>The username at “username:s:”</li>
+
+<li>The domain if you want at “domain:s:” or leave it blank.</li>
+</ul>
+<pre>
+password 51:b:longbytestring
+</pre>
+<p>If you add a password hash at “password 51:b:” than you achieve an autologin, otherwise the user needs to type his password into the password field of the logon screen.</p>
+
+<p>Some google results for: <a href="https://www.google.com/search?q=rdp+encrypt+password">How to hash RDP pwd</a></p>
+
+<h2 id="rdp_from_a_pgina_client">RDP from a pgina client</h2>
+
+<p>You can’t use pgina to preauthenticate on another machine. Only Windows default password provider (“Use another account”) will do this. <img src="http://mutonufoai.github.io/pgina/images/documentation/rdp_remote_connection.png" alt="Windows RDP GUI" /></p>
+
+<h2 id="windows_10">Windows 10</h2>
+
+<p>If you want to connect to a Windows 10 RDP server you also need to set a regkey to disable preauthentication.</p>
+
+<p>reg add “HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp” /v SecurityLayer /t REG_DWORD /d 0 /f</p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2017 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h1 id="pgina_pgsmb2_plugin_documentation">pGina pgSMB2 Plugin Documentation</h1>
+
+<ul>
+<li><strong>Plugin Name:</strong> pgSMB2</li>
+
+<li><strong>Plugin Type:</strong> Gateway, Notification</li>
+
+<li><strong>Version:</strong> 3.9.9.4</li>
+</ul>
+
+<h2 id="how_it_works">How it Works</h2>
+
+<p><a href='http://mutonufoai.github.io/pgina/images/documentation/plugins/pgsmb2_diagram.png' target='_blank'><img alt='pgSMB2 how' src='http://mutonufoai.github.io/pgina/images/documentation/plugins/pgsmb2_diagram_preview.png' style='float:left; border:0px; padding-right:10px;' /></a></p>
+
+<p>The pgSMB2 plugin is a clone of the pGina 1.x pgFTP plugin. It’s purpose is to implement a raoming profile stored in a compressed file on an SMB server.</p>
+
+<p><em>What is this god for?</em></p>
+
+<p>The main problem is the unreliable windows internal roaming. There is no guaranty that a user profile is entirely uploaded to the server, especially on slow network connections. That doesnt matter if users are always using the same machine, but if they dont you are running into a problem. This plugin does make sure that profiles are up- an down-loaded to the server and if there is an error a mail is send to an administrator.</p>
+
+<p><em>Whats going on?</em></p>
+
+<p>As soon as a user has logged of, even if he/she had chosen to shutdown, the profile is compressed and uploaded to an SMB share. If someone is trying to logon the profile is decompressed localy to the station and winlogon.exe is continuing the logon process.</p>
+
+<p><br style='clear:both' /></p>
+
+<h3 id="windows_8_and_10">Windows 8 and 10</h3>
+
+<p>There is a bug in Windows 8 and 10 related to long login delays. As you can imagine extracting a profile from a remote source can take a while, but that bug is preventing a sucessfully logon.</p>
+
+<ul>
+<li>if the logon require more than 2 min. on Windows 8 with activated “CTRL+ALT+DEL required before logon”</li>
+
+<li>if a logon take longer than 30 sec. on Windows 10 (14393) with activated Lock screen</li>
+</ul>
+
+<p><a href="https://github.com/MutonUfoAI/pgina/issues/32">Issue 32</a></p>
+
+<ul>
+<li>in Windows 8 you need to disable “CTRL+ALT+DEL required before logon”</li>
+
+<li>in Windows 10 you need to disable the Lock Screen
+<ul>
+<li>reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization /v NoLockScreen /t REG_DWORD /d 1 /f</li>
+
+<li>the bad thing is, this will not work in Windows 10 Pro</li>
+</ul>
+</li>
+</ul>
+
+<p>Another problem arise with “Fast Startup”. If a user is selecting shutdown from the startmenu, the system is put into hibernation and there is no way to prevent it. As a result the user profile can’t be uploaded.</p>
+
+<p>To disable “Fast Startup” run</p>
+
+<p>reg.exe add “HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power” /v HiberbootEnabled /t REG_DWORD /d 0 /f</p>
+
+<h3 id="gateway_stage">Gateway Stage</h3>
+
+<p>In the gateway stage the plugin will create the user on the local system and keep <strong>track of this user by his profile description “pGina created pgSMB2”</strong>. Than extract the compressed profile from the SMB share <a href="#cfiles">*</a>, adapt the ACL to fit the new user SID and let windows do the rest. If the user doesn’t pass the gateway stage he is still able to login but will receive a temporary profile. No, not a windows temp profile, he/she is getting a new user profile. You can detect such a profile by calling</p>
+
+<p><em>net user %username% | find /I “pGina created pgSMB2 tmp” &amp;&amp; @echo I’m a temp user</em></p>
+
+<p>Such a user recieves “pGina created pgSMB2 tmp” as description instead of “pGina created pgSMB2” and this tmp marked profile is excluded from the profile upload procedure.</p>
+
+<p>Is there a problem during the gateway stage the plugin will retry as often as you specified in the configuration, if the procedure failed an email is generated designated to the global mail addresses you’ve entered in the pGina configuration UI.</p>
+
+<p><br /></p>
+
+<p><a name='cfiles'> </a></p>
+
+<p><br />If the user still owns a local profile, like after a BSOD, the plugin will check the timestamps of</p>
+
+<p>the local users ntuser.dat and the remote %f (Filename). Is ntuser.dat newer (UTC) than the remote %f, the profile wont be downloaded.</p>
+
+<p><br /></p>
+
+<ul>
+<li>
+<p><strong>You still need the Local Machine plugin to do the group membership!</strong></p>
+</li>
+
+<li>
+<p><strong>The plugin gateway order need to be pgSMB2 before Local Machine.</strong></p>
+</li>
+
+<li>
+<p><strong>Its a good idea to created a new folder to store compressed user profiles (TempComp).</strong></p>
+
+<p>C:\Users\Public does fit well, but if you prefer a more secure structure</p>
+
+<p>cacls output</p>
+
+<pre class="cacls"><code class="cacls">
+c:\roaming NT AUTHORITY\SYSTEM:(OI)(CI)F
+           BUILTIN\Administrators:(OI)(CI)F
+</code></pre>
+
+<p><br /><br />You can apply these settings using this view lines</p>
+
+<pre class="powershell"><code class="powershell">
+powershell
+$sddl = 'O:BAG:SYD:PAI(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)'
+$sd = Get-Acl C:\roaming
+$sd.SetSecurityDescriptorSddlForm($sddl)
+$sd.Sddl
+Set-Acl C:\roaming $sd
+</code></pre>
+</li>
+</ul>
+
+<h3 id="notification">Notification</h3>
+
+<p>The login script is triggered by the login event received from the pGina service, also the max profile space value is applied in this stage.</p>
+
+<p>The logoff procedure is triggered by a logoff event. First a new thread is created than this thread will wait until the user has logged off. If so, the profile will be compressed and pushed into an SMB share. The plugin keeps a backup of the older profile on the share called %f.bak (Filename). Is there a problem during compressing or pushing, the plugin will retry as often as you specified in the configuration. If the procedure failed, an email is generated designated to the mail addresses you’ve entered in the pGina configuration UI. If the error occurred during the fileupload, the compressed profile keeps stored at %d (TempComp) named %f (Filename).</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/plugins/pgsmb2_config.png" alt="pgSMB2 configuration" /></p>
+
+<h3 id="roaming_profile">Roaming Profile</h3>
+
+<ul>
+<li>
+<p><em>value in parenthesis</em> – represent the regkey value</p>
+</li>
+
+<li>
+<p><em>%?</em> – is a macro variable for this value</p>
+</li>
+
+<li>
+<p><strong>The SMB share to connect</strong> – The path to the share which the plugin will try to connect to</p>
+
+<p>to be overridden by <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> pgSMB_SMBshare</p>
+</li>
+
+<li>
+<p><strong>Where to store the compressed Profile</strong> – This is the place where the compressed profile will be stored</p>
+
+<p>to be overridden by <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> usri4_profile</p>
+</li>
+
+<li>
+<p><strong>The name and extension of the Profile</strong> – How do you want to name the compressed profile</p>
+
+<p>to be overridden by <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> pgSMB_Filename</p>
+</li>
+
+<li>
+<p><strong>Where to locally store the compressed Profile</strong> – The locally compressed profile will be compressed to this location as defined in CompressCLI</p>
+</li>
+
+<li>
+<p><strong>Try n times to connect/extract/compress</strong> – How often shall the plugin try to get a task done</p>
+</li>
+
+<li>
+<p><strong>The Program to un-compress the Profile</strong> – What program to use for (de)compression</p>
+
+<ul>
+<li>If you use ImagexEX.exe you also need Imagex from Microsoft. Download <a href="https://download.microsoft.com/download/6/A/E/6AEA92B0-A412-4622-983E-5B305D2EBE56/adk/adksetup.exe">ADK 8.1</a> 1.36Mbyte.</li>
+
+<li>Run it an select only “Deployment Tools”, you then find the binaries at</li>
+
+<li>C:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit\Deployment Tools\&lt;x86 and amd64&gt;\DISM.</li>
+
+<li>Place imagex.exe in the pGina main installation folder (C:\Program Files\pGina.fork)</li>
+</ul>
+</li>
+
+<li>
+<p><strong>The command to uncompress the Profile</strong> – The command line for the decompress call</p>
+</li>
+
+<li>
+<p><strong>The command to compress the Profile</strong> – The command line for the compress call</p>
+</li>
+</ul>
+
+<h3 id="user">User</h3>
+
+<ul>
+<li>
+<p><strong>The user HomeDir</strong> – The path to the home share</p>
+
+<p>to be overridden by the <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> usri4_home_dir</p>
+</li>
+
+<li>
+<p><strong>The user HomedirDrive</strong> – The drive name of this share</p>
+
+<p>to be overridden by <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> usri4_home_dir_drive</p>
+</li>
+
+<li>
+<p><strong>Script Path</strong> – The script to run in the user context during a login</p>
+
+<p>to be overridden by <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> LoginScript</p>
+
+<p>make sure that a remote share is registered under Local intranet pages IE/Options/Security</p>
+</li>
+
+<li>
+<p><strong>The user quota in kbytes</strong> – limit the profile size</p>
+
+<p>A Profile that has reached its limit wont be uploaded, and an email is generated.</p>
+
+<p>to be overridden by <a href="http://mutonufoai.github.io/pgina/documentation/plugins/ldap.html#attribute_converter_options">Attribute converter</a> usri4_max_storage</p>
+</li>
+
+<li>
+<p><strong>Exclude profile directories from quota as regex</strong> – This folders are excluded from the quota</p>
+</li>
+
+<li>
+<p><strong>Proquota Ballontip and MessageBox Text</strong> – You are able to set your own quota text informations, warnings and errors.</p>
+</li>
+</ul>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2017 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

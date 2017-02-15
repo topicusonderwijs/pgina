@@ -57,8 +57,6 @@
 
 <li><a href="#cp">The Credential Provider</a></li>
 
-<li><a href="#gina">The GINA</a></li>
-
 <li><a href="#service">The pGina Service</a></li>
 </ul>
 <hr /><h2 id='arch'>The pGina Architecture</h2>
@@ -89,10 +87,30 @@
 <p>The provider object also defines the number of fields that are presented to the user in the UI. A field is a UI element such as a text-box, image, label, or button, and each field has a name and other properties.<br />All credentials from a given provider (in a given scenario) have the same number of fields as provided by the function <code>GetFieldDescriptorCount</code>. High level details about each field (name, id and type) are provided via <code>GetFieldDescriptorAt</code>.</p>
 
 <p>The credential object provides detailed information about the UI fields via the functions <code>GetFieldState</code> and <code>Get[Type]Value[At]</code>.</p>
-<h2 id='gina'>The GINA</h2>
-<p>TODO</p>
 <h2 id='service'>The pGina Service</h2>
-<p>TODO</p>
+<p>The Service is a “conductor to guid the orchestra through the login process”. Of course, it does more than that. Its responsible to handle events, catch exceptions, run the plugin chain and storing user data. Communication with plugins is done by pGina.Shared.Interfaces while the CP communicaton is done via a named pipe.</p>
+
+<h3 id="events"><strong>events</strong></h3>
+
+<p>Shutdown events are catched in the ServiceBase.OnCustomCommand method. The service will inform any plugin registred for IPluginLogoffRequestAddTime Interface that a shutdown is going on and polling those plugins by calling LogoffRequestAddTime(), waiting for them to report false.</p>
+
+<p>SessionChange events are captured with a hidden form and passed down to plugins by using the IPluginEventNotifications interface. The SessionChange Method is part of the Service class in pGina.Service.Impl.</p>
+
+<h3 id="exceptions"><strong>exceptions</strong></h3>
+
+<p>If there is an unhandled ecxeption, CurrentDomain_UnhandledException method is called and the exception logged in the pgina log. The service will stop in such a situation. Exceptions from plugins are catched by the service without ending it and the plugin status is set to false.</p>
+
+<h3 id="plugin_chain"><strong>plugin chain</strong></h3>
+
+<p>The plugin chain is called with sessionDriver.PerformLoginProcess() from the HandleLoginRequest method in the Service class of pGina.Service.Impl. Before even doing that HandleLoginRequest will check if it is appropriate to call PerformLoginProcess(). If its an unlock scenario its not necessary also UAC stuff came into account. Its HandleLoginRequest who decide what need to be done with the information delivered from the CP, it also return the status and message of the login to the CP.</p>
+
+<h3 id="user_data"><strong>user data</strong></h3>
+
+<p>Userdata is stored in the private ObjectCache m_sessionPropertyCache in the Service class of pGina.Service.Impl. The key of the dictonary represents the sessionId while the value is a list of SessionProperties. The first entry in the SessionProperties list contains informations about the user who is logged into the session, any other entry is for UAC users. UAC users are programs started by “run as administrator” though the pgina UAC GUI. A lot of methods are reading and writing to m_sessionPropertyCache it is essential to lock this resource if you access it.</p>
+
+<h3 id="communication"><strong>communication</strong></h3>
+
+<p>Communication with plugins is done by pGina.Shared.Interfaces. Depending on the plugin Interface assignment, information is transmited and received to and from plugins. Pipe communication with the CP is defined in Abstractions.Pipes and handled with HandleMessage in the Service class of pGina.Service.Impl. Its a minor communication, basically login status informations or the type of login that is requested.</p>
 
     
 		
@@ -103,7 +121,7 @@
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

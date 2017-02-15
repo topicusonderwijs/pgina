@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default_doc.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html" class="active">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+			
+<h2 id="change_password_support_in_pgina">Change Password support in pGina</h2>
+
+<p>Password change during a login is supported for:</p>
+
+<ul>
+<li>local accounts</li>
+
+<li>domain accounts</li>
+
+<li>local pGina accounts using Local Machine plugin</li>
+
+<li>accounts authenticated by the LDAP plugin (only Samba 3 and AD is implemented)</li>
+</ul>
+
+<p><b>Consider that a pGina user password change using Powershell, net user, Control Panel or any other method than CTRL+ALT+DEL will not inform pGina about that change.</b></p>
+
+<p><img alt='pGina UAC' src='http://mutonufoai.github.io/pgina/images/documentation/changepwd_change_error.png' style='float:left; border:0px; padding-right:10px;' /></p>
+
+<p>… after submitting your credentials and a successfully detection of an password expired error. <br style='clear:both' /></p>
+
+<p><img alt='pGina UAC' src='http://mutonufoai.github.io/pgina/images/documentation/changepwd_logon_ui.png' style='float:left; border:0px; padding-right:10px;' /></p>
+
+<p>… enter your new password <br style='clear:both' /></p>
+
+<p><img alt='pGina UAC' src='http://mutonufoai.github.io/pgina/images/documentation/changepwd_success.png' style='float:left; border:0px; padding-right:10px;' /></p>
+
+<p>If everything went OK, than you’ll see a success message. In case of an error you’ll get an error message. <br style='clear:both' /></p>
+
+<p><img alt='pGina UAC' src='http://mutonufoai.github.io/pgina/images/documentation/changepwd_ctrl_alt_del.png' style='float:left; border:0px; padding-right:10px;' /></p>
+
+<p>If you hit CTRL+ALT+DEL while logged in than you’ll get this kind of change password user interface. <br style='clear:both' /></p>
+
+<p><img alt='pGina UAC' src='http://mutonufoai.github.io/pgina/images/documentation/changepwd_expire_warning.png' style='float:left; border:0px; padding-right:10px;' /></p>
+
+<p>If a password is close to expiration (5 days), a user is receiving a message telling him how long the password remains valid (LDAP plugin only). <br style='clear:both' /></p>
+
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2017 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

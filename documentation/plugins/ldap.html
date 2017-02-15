@@ -55,17 +55,7 @@
 
 <li><strong>Plugin Type:</strong> Authentication, Authorization, Gateway, Change Password</li>
 
-<li><strong>Version:</strong> 3.2.0</li>
-</ul>
-
-<h2 id="fork_diff">Fork diff</h2>
-
-<ul>
-<li>You can import LDAP attributes into pGina using the attribute converter</li>
-
-<li>In the authorization and gateway stages you can create your own query</li>
-
-<li>More password change methods are available</li>
+<li><strong>Version:</strong> 3.9.9.0</li>
 </ul>
 
 <h2 id="how_the_ldap_plugin_works">How the LDAP Plugin Works</h2>
@@ -80,42 +70,23 @@
 
 <h4 id="attribute_converter">Attribute converter</h4>
 
-<p><span class='greenbg'>
-Since fork 3.2.0.0<br />
-During Authentication you can map LDAP to pGina attributes, like LDAP cn to pGina Fullname
-</span></p>
+<p>During Authentication you can map LDAP to pGina attributes, like LDAP cn to pGina Fullname</p>
 
 <h3 id="authorization">Authorization</h3>
 
-<p><span class='redbg'>In the authorization stage the LDAP plugin can authorize users based on membership in LDAP groups. The plugin searches the LDAP tree for group membership and allows or denies based on a set of rules that can be configured via the configuration interface (see below).</span></p>
-
-<p><span class='greenbg'>
-Since fork 3.2.0.0<br />
-Instead of restricting a query to a group membership only you are now free in your query.
-</span></p>
+<p>In the authorization stage the LDAP plugin can authorize users based on membership in LDAP groups. The plugin searches the LDAP tree for group membership and allows or denies based on a set of rules that can be configured via the configuration interface (see below).</p>
 
 <p>If the LDAP server cannot be contacted, it can be configured to allow or deny access. It can also be configured to deny if the LDAP plugin fails in the authentication stage.</p>
 
 <h3 id="gateway">Gateway</h3>
 
-<p><span class='redbg'>In the gateway stage, this plugin can add the user to local groups based on membership in LDAP groups. The plugin will search the LDAP tree for group membership then add the user to local groups based on a set of rules (see below). A common use for this is to add the user to the local Administrators group when the user is a member of a given LDAP admin group.</span></p>
-
-<p><span class='greenbg'>
-Since fork 3.2.0.0<br />
-Instead of restricting a query to a group membership only you are now free in your query.
-</span></p>
+<p>In the gateway stage, this plugin can add the user to local groups based on membership in LDAP groups. The plugin will search the LDAP tree for group membership then add the user to local groups based on a set of rules (see below). A common use for this is to add the user to the local Administrators group when the user is a member of a given LDAP admin group.</p>
 
 <h3 id="password">Password</h3>
 
 <p>This is’nt a stage during login, its more an event that is triggered during a password change. You can determine which LDAP attribute need to change during a pasword reset</p>
 
 <p><strong>The password change event is only triggered if the user is using CTRL+ALT+DEL or CTRL+ALT+END.</strong></p>
-
-<p><span class='greenbg'>
-You can choose more methods<br />
-<strong>hashing:</strong> MD5, salted MD5, LM<br />
-<strong>timestamp:</strong> days or seconds since 1970
-</span></p>
 
 <h2 id="typical_setup">Typical Setup</h2>
 
@@ -176,17 +147,17 @@ You can choose more methods<br />
 <ul>
 <li>Fullname – The Full Name for this user</li>
 
-<li>usri4_max_storage – profile space limit the user can use (GPO setting)</li>
+<li>usri4_max_storage – profile space limit the user can use (GPO setting) (used in Local Machine and pgSMB2)</li>
 
-<li>usri4_profile – The path to the roaming profile</li>
+<li>usri4_profile – The path to the roaming profile (used in Local Machine and pgSMB2)</li>
 
-<li>usri4_home_dir_drive – The home drive name</li>
+<li>usri4_home_dir_drive – The home drive name (used in Local Machine and pgSMB2)</li>
 
-<li>usri4_home_dir – The path to the home drive</li>
+<li>usri4_home_dir – The path to the home drive (used in Local Machine and pgSMB2)</li>
 
 <li>Email – users email address</li>
 
-<li>LoginScript – The path to the users login script</li>
+<li>LoginScript – The path to the users login script (used in Local Machine and pgSMB2(ScriptPath parameter))</li>
 
 <li>pgSMB_Filename – Used in pgSMB plugin only to specify the compressed profile name</li>
 
@@ -204,7 +175,7 @@ You can choose more methods<br />
 <p>The other configuration options are described below:</p>
 
 <ul>
-<li><strong>Default</strong> – If none of the rules match, the default rule is applied</li>
+<li><strong>Default</strong> – If none of the rules match, the default rule is applied. Use <i>Deny</i> only if you are <u>not</u> using another pluging for authorization</li>
 
 <li><strong>Deny when LDAP authentication fails</strong> – If this is checked, authorization fails when the LDAP plugin fails to authenticate the user in the authentication stage or the LDAP plugin does not execute in that stage.</li>
 
@@ -268,7 +239,7 @@ You can choose more methods<br />
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

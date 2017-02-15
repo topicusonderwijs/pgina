@@ -91,6 +91,97 @@
 
 
 <div class="post">
+	<h4>pGina 3.9.9.7 Released!</h4>
+	<div class="contentarea">
+	<div class="details">Posted by Hans Wurst on 
+	February 15, 2017</div>
+<p><a href="download.html">Download</a> a copy of the release.</p>
+
+<p>What’s new in pGina 3.9.9.7</p>
+
+<ul>
+<li>Pgina
+<ul>
+<li>option to display last username</li>
+
+<li>disabled login simulator</li>
+
+<li>message during unlock, pwd change or credUI (error msg too) as seen during logon</li>
+
+<li>no relogin if user unlocks his session or doing a credUI</li>
+
+<li>support for terminal servers, multilogon (switch session)</li>
+
+<li>support for credUI Events or runas</li>
+
+<li>support for empty password</li>
+
+<li>logon password change support</li>
+
+<li>non pgina users are not processed by pgina</li>
+
+<li>support for domain logins
+<ul>
+<li>logins are verified in the same order as the default CP does</li>
+
+<li>if a machine is a domain member, a login is verified against the domain</li>
+
+<li>if a machine is not part of a domain, a login is verified against the local SAM</li>
+
+<li>to force a local authentication on a domain member use .\username</li>
+
+<li>to force a domain login of a subdomain use username@sub.contoso.local</li>
+</ul>
+</li>
+
+<li>Implemented IConnectableCredentialProviderCredential
+<ul>
+<li>fix issue in Windows 7 with enabled LockScreen Interactive logon: Do not require CTRL+ALT+DEL</li>
+
+<li>still not working properly on Windows 8 if CTRL+ALT+DEL is active</li>
+
+<li>same for Windows 10 as long as the LockScreen is active (independent from CTRL+ALT+DEL)</li>
+
+<li><a href="https://github.com/MutonUfoAI/pgina/issues/32">Issue 32</a> effects logins that take longer than 2min only</li>
+</ul>
+</li>
+
+<li>logfiles are saved now in UTF-16 format</li>
+
+<li>set default installation folder to pgina.fork</li>
+</ul>
+</li>
+
+<li>new plugins
+<ul>
+<li>Kerberos (Seth Walsh)</li>
+
+<li>MultiEmail (Manuel Pérez Ayala)</li>
+
+<li>HttpAuth (Václav Klecanda)</li>
+
+<li>SSHAuth (David Dumas)</li>
+
+<li>dropped pgSMB and replaced it with pgSMB2
+<ul>
+<li>Windows 8/10
+<ul>
+<li>Disable fast startup if you are using pgSMB2</li>
+
+<li>reg add “HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power” /v HiberbootEnabled /t REG_DWORD /d 0 /f</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+	</div>
+</div>
+
+<div class="divider2"></div>
+
+<div class="post">
 	<h4>pGina 3.2.4.1 Released!</h4>
 	<div class="contentarea">
 	<div class="details">Posted by Hans Wurst on 
@@ -102,53 +193,35 @@
 <p>What’s new in pGina 3.2.4.1</p>
 
 <ul>
-<li>Pgina service</li>
-
-<li>
+<li>Pgina service
 <ul>
 <li>extend max shutdowntime to 1h</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>service bugfixes</li>
 </ul>
 </li>
 
-<li>LDAP plugin</li>
-
-<li>
+<li>LDAP plugin
 <ul>
 <li>a view bugfixes</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>option to use authentication bind when searching in authorization and gateway stages.</li>
 </ul>
 </li>
 
-<li>pgSMB plugin</li>
-
-<li>
+<li>pgSMB plugin
 <ul>
 <li>add 1 minute timeout if an SMB connection fails</li>
 </ul>
 </li>
 
-<li>Radius plugin</li>
-
-<li>
+<li>Radius plugin
 <ul>
 <li>Lots of updates to the RADIUS plugin by Oooska</li>
 </ul>
 </li>
 
-<li>MySQL plugin</li>
-
-<li>
+<li>MySQL plugin
 <ul>
 <li>add option to prevent (or not) logon in gateway if server error occurs</li>
 </ul>
@@ -168,44 +241,26 @@
 <ul>
 <li>a different password change plugin behaviour</li>
 
-<li>LDAP plugin</li>
-
-<li>
+<li>LDAP plugin
 <ul>
 <li>Attribute converter</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Enhanced hash generation</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Enhanced options for the authorization and gateway stages</li>
 </ul>
 </li>
 
-<li>pgSMB plugin</li>
-
-<li>
+<li>pgSMB plugin
 <ul>
 <li>Properties can be altered by LDAP attributes</li>
 </ul>
 </li>
 
-<li>Local Machine plugin</li>
-
-<li>
+<li>Local Machine plugin
 <ul>
 <li>Login script</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Roaming Profile</li>
 </ul>
 </li>
@@ -247,50 +302,28 @@
 <ul>
 <li>a different password change plugin behaviour</li>
 
-<li>LDAP plugin</li>
-
-<li>
+<li>LDAP plugin
 <ul>
 <li>TLS support</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Attribute converter</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Enhanced hash generation</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Enhanced options for the authorization and gateway stages</li>
 </ul>
 </li>
 
-<li>pgSMB plugin</li>
-
-<li>
+<li>pgSMB plugin
 <ul>
 <li>Properties can be altered by LDAP attributes</li>
 </ul>
 </li>
 
-<li>Local Machine plugin</li>
-
-<li>
+<li>Local Machine plugin
 <ul>
 <li>Login script</li>
-</ul>
-</li>
 
-<li>
-<ul>
 <li>Roaming Profile</li>
 </ul>
 </li>
@@ -388,7 +421,7 @@
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>

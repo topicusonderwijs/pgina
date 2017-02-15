@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+	zenlike1.0 by nodethirtythree design
+	http://www.nodethirtythree.com
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>pGina fork</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="stylesheet" type="text/css" href="http://mutonufoai.github.io/pgina/default.css" />
+
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>pGina fork</h1>
+			<h2>Open Source Windows Authentication</h2>
+		</div>
+		<div id="logo"><a href="http://mutonufoai.github.io/pgina/index.html"><img src="http://mutonufoai.github.io/pgina/images/pginalogo.png" /></a></div>
+	</div>
+
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		<ul>
+			<li><a href="http://mutonufoai.github.io/pgina/index.html">Home</a></li>
+			<li><a href="http://mutonufoai.github.io/pgina/download.html">Download</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/support.html">Support</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/documentation.html">Documentation</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/develop.html">Develop</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/faq.html">FAQ</a></li>
+      <li><a href="http://mutonufoai.github.io/pgina/thanks.html">Thanks</a></li>
+		</ul>
+	</div>
+
+	<div id="menubottom"></div>
+
+	<div id="content">
+	    
+	    
+		
+        <!-- Primary content: Stuff that goes in the primary content column (by default, the left column) -->
+		<div id="primarycontainer">
+			<div id="primarycontent">
+				<!-- Primary content area start -->
+    
+
+
+<div class="post">
+	<h4></h4>
+	<div class="contentarea">
+	<div class="details">Posted by <a href="#"></a> on </div>	
+<p><a href="download.html">Download</a> a copy of the release.</p>
+
+<p>What’s new in pGina 3.9.9.7</p>
+
+<ul>
+<li>Pgina
+<ul>
+<li>option to display last username</li>
+
+<li>disabled login simulator</li>
+
+<li>message during unlock, pwd change or credUI (error msg too) as seen during logon</li>
+
+<li>no relogin if user unlocks his session or doing a credUI</li>
+
+<li>support for terminal servers, multilogon (switch session)</li>
+
+<li>support for credUI Events or runas</li>
+
+<li>support for empty password</li>
+
+<li>logon password change support</li>
+
+<li>non pgina users are not processed by pgina</li>
+
+<li>support for domain logins
+<ul>
+<li>logins are verified in the same order as the default CP does</li>
+
+<li>if a machine is a domain member, a login is verified against the domain</li>
+
+<li>if a machine is not part of a domain, a login is verified against the local SAM</li>
+
+<li>to force a local authentication on a domain member use .\username</li>
+
+<li>to force a domain login of a subdomain use username@sub.contoso.local</li>
+</ul>
+</li>
+
+<li>Implemented IConnectableCredentialProviderCredential
+<ul>
+<li>fix issue in Windows 7 with enabled LockScreen Interactive logon: Do not require CTRL+ALT+DEL</li>
+
+<li>still not working properly on Windows 8 if CTRL+ALT+DEL is active</li>
+
+<li>same for Windows 10 as long as the LockScreen is active (independent from CTRL+ALT+DEL)</li>
+
+<li><a href="https://github.com/MutonUfoAI/pgina/issues/32">Issue 32</a> effects logins that take longer than 2min only</li>
+</ul>
+</li>
+
+<li>logfiles are saved now in UTF-16 format</li>
+
+<li>set default installation folder to pgina.fork</li>
+</ul>
+</li>
+
+<li>new plugins
+<ul>
+<li>Kerberos (Seth Walsh)</li>
+
+<li>MultiEmail (Manuel Pérez Ayala)</li>
+
+<li>HttpAuth (Václav Klecanda)</li>
+
+<li>SSHAuth (David Dumas)</li>
+
+<li>dropped pgSMB and replaced it with pgSMB2
+<ul>
+<li>Windows 8/10
+<ul>
+<li>Disable fast startup if you are using pgSMB2</li>
+
+<li>reg add “HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power” /v HiberbootEnabled /t REG_DWORD /d 0 /f</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+	
+	<ul class="controls">
+		<li><a href="#" class="printerfriendly">Printer Friendly</a></li>
+		<li><a href="#" class="comments">Comments (18)</a></li>
+		<li><a href="#" class="more">Read More</a></li>				
+	</ul>
+	</div>
+</div>
+
+
+    
+				<!-- Primary content area end -->
+			</div>
+		</div>
+    
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+
+		<div id="secondarycontent">
+			<!-- Secondary content area start -->
+		
+			<div>
+				<h4>Additional Resources</h4>
+				<div class="contentarea">
+					<ul class="linklist">
+            <li><a href="http://mutonufoai.github.io/pgina/documentation.html">Documentation</a></li>
+						<li><a href="https://github.com/MutonUfoAI/pgina/" target="_blank">pGina fork on Github</a></li>
+						<li><a href="http://pgina.org/" target="_blank">pGina</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- Secondary content area end -->
+		</div>
+
+
+
+	</div>
+
+	<div id="footer">
+			<div class="left">&copy; 2017 pgina.org</div>
+			<div class="right">Original design by 
+			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>
+

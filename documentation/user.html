@@ -55,13 +55,15 @@
 
 <li><a href="#how_pgina_works">How pGina Works</a></li>
 
-<li><a href="#selecting_and_configuring_plugins">Selecting and Configuring Plugins</a></li>
+<li><a href="#configuration">Configuration</a></li>
 
 <li><a href="#ordering_plugins">Ordering Plugins</a></li>
 
-<li><a href="#testing_plugins">Testing Plugins</a></li>
+<li><a href="#credential_provider_filter">Credential Provider Filter</a></li>
 
 <li><a href="#logging">Logging</a></li>
+
+<li><a href="#remember">Remember</a></li>
 </ul>
 
 <h2 id="installation">Installation</h2>
@@ -88,12 +90,14 @@
 
 <p><img src="http://mutonufoai.github.io/pgina/images/documentation/pGina-logon-overview.png" alt="pGina logon diagram" /></p>
 
+<p><span class='greenbg'>To distinguish between pGina and a nomal windows user account, every pGina user is marked with a user comment of<i>&quot;pGina created&quot;</i>. Only<i>&quot;pGina created&quot;</i>user accounts are touched by pGina, if that’s not the case then this particular account wont be altered by pGina. To go further, local non pGina users dont run through the plugin chain!</span></p>
+
 <p>The logon process proceeds as follows:</p>
 
 <ol>
 <li>The user enters their credentials at the pGina logon user interface. Note that this UI may be one of several options (called credential providers) presented to the user. For example, the user might be presented with several tiles, many of which are local accounts with only one being the pGina UI.</li>
 
-<li>The pGina credential provider (or GINA) passes the unaltered credentials to the pGina service. The service then sends those credentials through the <a href="#plugins">plugin pipeline</a> described below.</li>
+<li>The pGina credential provider (or GINA) passes the unaltered credentials to the pGina service. If the username is currently loggin off a relogin is denied. If the user is not a pGina user than he is processed by WinAPI authentication procedures, and if a user was already authenticated he will be also processed by the WinAPI. If nothing from above apply, than the service sends those credentials through the <a href="#plugins">plugin pipeline</a> described below. <strong>This stage potentially fails if you modified the username by using a plugin like <a href="http://mutonufoai.github.io/pgina/documentation/plugins/username_mod.html">Username Modification</a>!</strong></li>
 
 <li>After the credentials have been <a href="#plugins">processed by the plugins</a>, the pGina service sends a result (success/failure) along with a set of credentials (username/ password) back to the pGina CP. Note that these credentials may not be the same as those that were provided by the user. They may have been altered at some stage by one or more plugins.</li>
 
@@ -110,9 +114,49 @@
 
 <p>The CP augments or replaces the default Windows authentication user interface. It plugs-in to the Windows system and can configure the UI that is displayed at login time (or during unlock, UAC control, etc.). The pGina CP, however, does very little on its own. It simply receives the user’s credentials and passes them along to the pGina service via a named pipe, and then waits for a response from the service. User authentication/authorization is instead managed by the plugins that run within the pGina service.</p>
 
-<p>The pGina service is a standard Windows service that is started at boot time, and runs with administrator priviledges. Note that upon initial boot, it may take some time for pGina service to start, and the CP will (of course) be unable to communicate with the service until it is started.</p>
+<p>The pGina service is a standard Windows service that is started at boot time, and runs with SYSTEM priviledges. Note that upon initial boot, it may take some time for pGina service to start, and the CP will (of course) be unable to communicate with the service until it is started.</p>
 
-<h3 id="plugins">Plugins</h3>
+<h3 id="configuration">Configuration</h3>
+
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/pgina_configuration_global.png" alt="pGina stages" /></p>
+
+<ul>
+<li><strong>Tile Image</strong> - You can set your own Image here. 200x200 BMP</li>
+
+<li><strong>MOTD</strong> - A short message to display on the login screen. No new lines are displayed!</li>
+
+<li><strong>pGina Service</strong> - The status of the service</li>
+
+<li><strong>Credential Provider</strong> - Enable, disable, register or unregister pGina credential provider</li>
+
+<li><strong>NTP Servers</strong> - You can set NTP Servers here, line by line</li>
+
+<li><strong>Unlock</strong> - If you modify the username using a plugin, you can force here to use the real username during an unlock
+<ul>
+<li>This will only apply in the unlock screen!</li>
+</ul>
+</li>
+
+<li><strong>Logon</strong> - If enabled the last successfully logged in username will be displayed by pGina</li>
+
+<li><strong>Email Notifications</strong> - If something goes wrong you can enable email notifications here
+<ul>
+<li>smtp Server - space seperated list of smtp servers smtp.domain.local:25</li>
+
+<li>email Addr: - space seperated list of email recipients</li>
+
+<li>Username: - Username for authentication against an smtp server</li>
+
+<li>Password: - Password for authentication against an smtp server</li>
+
+<li>Prefer Login credentials - If enabled login credentials from the logon/logoff user are used to authenticate against the smtp. As a fallback option Username: and Password: where used</li>
+
+<li>SSL - If disabled the smtp connection is unencrypted. Unencrypted transfer is a fallback if encrytion is not possible.</li>
+</ul>
+</li>
+</ul>
+
+<h4 id="plugins">Plugins</h4>
 
 <p>pGina manages the logon process by delegating the work to a set of zero or more plugins. Plugins have the job of deciding whether or not the user is who she says she is (authentication), whether the user should be granted access (authorization), and taking other login-time actions. The process involves a pipeline consisting of three main stages as illustrated in the following diagram.</p>
 
@@ -131,15 +175,20 @@
 <p>Plugins can be configured to provide services for zero or more of the above stages. For example, the “LocalMachine” plugin provides services for all three stages. In the authentication stage, it verifies that the user’s credentials match that of some existing local account, and in the authorization state, it verifies that the authenticated user is allowed to log on to the machine.</p>
 
 <p>There can be zero or more plugins involved with each stage. If any stage fails, the login fails. However, stages have different rules regarding when a stage succeeds or fails.</p>
-
-<ul>
-<li><strong>Authentication</strong> - At least one of the plugins involved in this stage must register success for the process to continue. If there are zero plugins registered, this stage fails.</li>
-
-<li><strong>Authorization</strong> - All plugins involved in this stage must register success for the process to continue. If there are no plugins registered, this stage succeeds.</li>
-
-<li><strong>Gateway</strong> - All plugins involved in this stage must register success for the process to continue. If there are no plugins registered, this stage succeeds. However, the “Local Machine” plugin will almost always be registered in this stage.</li>
+<ul class='greenbg'>
+  <li><b>Authentication</b> - At least one of the plugins involved in this stage must register
+    success for the process to continue.  If there are zero plugins registered, 
+    this stage fails.
+  </li>
+  <li><b>Authorization</b> -  All plugins involved in this stage must register success for the process to continue.
+    If there are no plugins registered, this stage succeeds.
+  </li>
+  <li><b>Gateway</b> - All plugins involved in this stage must register success for 
+    the process to continue.  If there are no plugins registered, this stage
+    succeeds.  However, the "Local Machine" plugin will almost always be registered
+    in this stage.
+  </li>
 </ul>
-
 <p>Plugins can provide services to multiple stages, and these services can be selectively turned on or off. For example, consider plugin Foo that provides Authentication and Authorization. pGina can be confiured such that Foo only provides Authentication, only Authorization, both, or neither. Configuration is described later in this document.</p>
 
 <p>Plugins can also be ordered within each stage. For example, suppose plugins Foo and Bar are providing services to the user session stage. We can configure Foo to be invoked before Bar, or Bar before Foo.</p>
@@ -152,11 +201,11 @@
 
 <h3 id="event_notifications">Event Notifications</h3>
 
-<p>Plugins may also register to recieve event notifications from Windows Terminal Services. These events include: logon, logoff, lock, unlock, console connect, console disconnect, and a few others (see <a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.sessionchangereason.aspx">msdn</a> for a full list). A plugin that desires to recieve these notifications will be listed as a “Notification” plugin in the configuration interface. The plugin will not recieve events unless it is enabled (see the section on configuration below).</p>
+<p>Plugins may also register to recieve event notifications from a WindowProc function. These events include: logon, logoff, lock, unlock, console connect, console disconnect, and a few others (see <a href="https://msdn.microsoft.com/en-us/library/aa383828.aspx">msdn</a> for a full list). A plugin that desires to recieve these notifications will be listed as a “Notification” plugin in the configuration interface. The plugin will not recieve events unless it is enabled (see the section on configuration below). Its a good idea to keep Notifications enabled.</p>
 
 <h3 id="change_password">Change Password</h3>
 
-<p>Plugins can register to recieve change password notifications from the Credential Provider, by using CTRL+ALT+DEL or CTRL+ALT+END. Pgina will not recieve a change password event from the control panel or managment console! A plugin that desires to recieve these notifications will be listed as a “Change Password” plugin in the configuration interface. The plugin will not recieve events unless it is enabled (see the section on configuration below).</p>
+<p>Plugins can register to recieve change password notifications from the Credential Provider, by using CTRL+ALT+DEL or CTRL+ALT+END. <br /><strong>Pgina will not recieve a change password event from the control panel or managment console!</strong> A plugin that desires to recieve these notifications will be listed as a “Change Password” plugin in the configuration interface. The plugin will not recieve events unless it is enabled (see the section on configuration below).</p>
 
 <h2 id="selecting_and_configuring_plugins">Selecting and Configuring Plugins</h2>
 
@@ -164,21 +213,23 @@
 
 <p>To configure a plugin, double click on it or select it and click on “Configure..”. The plugin’s configuration dialog will appear. The options are plugin specific, and you should refer to the documentation for each plugin for details about configuration of an individual plugin.</p>
 
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/pgina_configuration_plugins.png" alt="pGina stages" /></p>
+
 <h2 id="ordering_plugins">Ordering Plugins</h2>
 
 <p>Under the “Plugin Order” tab, you can determine the order that each plugin is invoked. There is a list for each pGina stage, and you can re-order the plugins within each list.</p>
 
-<h2 id="testing_plugins">Testing Plugins</h2>
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/pgina_configuration_pluginorder.png" alt="pGina stages" /></p>
 
-<p>To verify that your plugins are configured and working properly, pGina provides a login simulator that can be found under the “Simulation” tab in the pGina configuration interface. With the simulator, you can initiate a simulated login, and verify success or failure of each pGina plugin and pipeline stage.<br />The simulator also provides a “live” view of the pGina log file via the “View Log” button. If something fails to work as expected, you should be able to find information within the log view regarding what occured.</p>
+<h2 id="credential_provider_filter">Credential Provider Filter</h2>
 
-<p>Under “Final User Data,” the simulator shows the final set of credentials that are provided to Windows. These credentials must match a local account (possibly created by a plugin) for the logon to be successful.</p>
+<p>Credential Providers can be filtered for the Logon, Unlock, Change Password and Cred UI screens. Installed Providers are listed under <i>Credential Provider</i>. If you want pGina to be the only Credential Provider available on the logon screen than you need to enable the <i>Logon</i> checkbox for the <i>PasswordProvider</i>.</p>
 
-<p>Under “Local Groups,” the simulator shows the pGina list of local groups after the pipeline is complete. Note that this list may not be the list that is actually granted to the local account unless the local machine plugin executes <strong>last</strong> in the Gateway stage.</p>
+<p><img src="http://mutonufoai.github.io/pgina/images/documentation/pgina_configuration_providerfilter.png" alt="pGina stages" /></p>
 
 <h2 id="logging">Logging</h2>
 
-<p>pGina logs information to the following files, found in the main pGina installation directory (<code>%ProgramFiles%\pGina\log</code>).</p>
+<p>pGina logs information to the following files, found in the main pGina installation directory (<code>%ProgramFiles%\pGina.fork\log</code>).</p>
 
 <ul>
 <li>
@@ -202,9 +253,23 @@
 
 <p>Logging support in pGina is supported by <a href="http://logging.apache.org/log4net/">Apache log4net</a>, and is configured within the log4net configuration file, which is (by default) located here:</p>
 
-<p><code>%ProgramFiles%\pGina\log4net.config</code>.</p>
+<p><code>%ProgramFiles%\pGina.fork\log4net.config</code>.</p>
 
 <p>If you would like to log to a different file, simply edit this file. For details about log4net configuration, see the <a href="http://logging.apache.org/log4net/release/manual/introduction.html">Apache log4net documentation</a>.</p>
+
+<h2 id="remember">Remember</h2>
+
+<ul>
+<li>local non pGina users and AD users dont run through the plugin chain</li>
+
+<li>pGina users are marked with the user comment of <i>&quot;pGina created&quot;</i></li>
+
+<li>make sure that plugins are in the correct order</li>
+
+<li>be careful if you disable credential providers</li>
+
+<li>use <i>%ProgramFiles%\pGina.fork\log\pGina.Service.ServiceHost_log.txt</i> to trace failures</li>
+</ul>
 
     
 		
@@ -215,7 +280,7 @@
 	</div>
 
 	<div id="footer">
-			<div class="left">&copy; 2014 pgina.org</div>
+			<div class="left">&copy; 2017 pgina.org</div>
 			<div class="right">Original design by 
 			<a href="http://www.nodethirtythree.com/">NodeThirtyThree Design</a></div>
 	</div>
