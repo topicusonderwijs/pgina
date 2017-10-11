@@ -50,7 +50,7 @@ namespace pGina.Core
             AuthorizeEnabled     = 1 << 2,
             GatewayEnabled       = 1 << 3,
             NotificationEnabled  = 1 << 4,
-            ChangePasswordEnabled = 1 << 5,
+            ChangePasswordEnabled = 1 << 5
         }
 
         public static string[] PluginDirectories

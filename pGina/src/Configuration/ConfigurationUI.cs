@@ -26,11 +26,9 @@
 */
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.ServiceProcess;
@@ -39,8 +37,6 @@ using Microsoft.Win32;
 
 using pGina.Core;
 using pGina.Core.Messages;
-
-using pGina.Shared.Logging;
 using pGina.Shared.Interfaces;
 
 using Abstractions.WindowsApi;
@@ -49,6 +45,7 @@ using Abstractions.Pipes;
 
 using log4net;
 using pGina.Shared.Types;
+using Newtonsoft.Json;
 
 namespace pGina.Configuration
 {
@@ -81,6 +78,7 @@ namespace pGina.Configuration
         private const string GATEWAY_COLUMN = "Gateway";
         private const string NOTIFICATION_COLUMN = "Notification";
         private const string PASSWORD_COLUMN = "Change Password";
+        private const string IMPORTEXPORT_COLUMN = "Import / Export";
 
         // Cred Prov Filter data grid view
         private const string CPF_CP_NAME_COLUMN = "Name";
@@ -548,6 +546,14 @@ namespace pGina.Configuration
                 ReadOnly = true
             });
 
+            pluginsDG.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                Name = IMPORTEXPORT_COLUMN,
+                HeaderText = "Can Import/Export",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                ReadOnly = true
+            });
+
             pluginsDG.Columns.Add(new DataGridViewTextBoxColumn()
             {
                 Name = PLUGIN_VERSION_COLUMN,
@@ -576,6 +582,7 @@ namespace pGina.Configuration
         void pluginsDG_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex >= 0 && e.RowIndex >= 0 &&
+                !pluginsDG[e.ColumnIndex, e.RowIndex].ReadOnly &&
                 pluginsDG[e.ColumnIndex, e.RowIndex].ValueType == typeof(bool))
             {
                 DataGridViewCell cell = this.pluginsDG[e.ColumnIndex, e.RowIndex];
@@ -669,9 +676,12 @@ namespace pGina.Configuration
                     }
 
                     this.m_plugins.Add(p.Uuid.ToString(), p);
+                    var importExportEnabled = p as IPluginImportExport != null;
                     pluginsDG.Rows.Add(
-                        new object[] { p.Name, false, false, false, false, false, p.Description, p.Version, p.Uuid.ToString() });
+                        new object[] { p.Name, false, false, false, false, false, p.Description, importExportEnabled, p.Version, p.Uuid.ToString() });
                     DataGridViewRow row = pluginsDG.Rows[i];
+
+                    row.Cells[IMPORTEXPORT_COLUMN].Tag = "DisplayOnlyCheckBox";
 
                     this.SetupCheckBoxCell<IPluginAuthentication>(row.Cells[AUTHENTICATION_COLUMN], p);
                     this.SetupCheckBoxCell<IPluginAuthorization>(row.Cells[AUTHORIZATION_COLUMN], p);
@@ -803,12 +813,13 @@ namespace pGina.Configuration
 
         private void pluginsDG_PaintCell(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            // Determine if the cell should have a checkbox or not (via the ReadOnly setting),
+            // Determine if the cell should have a checkbox or not (via the ReadOnly setting and (no) Tag),
             // if not, we draw over the checkbox.
             if (e != null && sender != null)
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0 &&
                     pluginsDG[e.ColumnIndex, e.RowIndex].ReadOnly &&
+                    pluginsDG[e.ColumnIndex, e.RowIndex].Tag == null &&
                     pluginsDG[e.ColumnIndex, e.RowIndex].ValueType == typeof(bool))
                 {
                     Type foo = pluginsDG[e.ColumnIndex, e.RowIndex].ValueType;
@@ -854,20 +865,11 @@ namespace pGina.Configuration
                 try
                 {
                     IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_UUID_COLUMN].Value];
-                    int mask = 0;
-
-                    if (Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
-                    if (Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.AuthorizeEnabled;
-                    if (Convert.ToBoolean(row.Cells[GATEWAY_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.GatewayEnabled;
-                    if (Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.NotificationEnabled;
-                    if (Convert.ToBoolean(row.Cells[PASSWORD_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
-
-                    Core.Settings.Get.SetSetting(p.Uuid.ToString(), mask);
+                    SetPluginMask(p.Uuid, Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[GATEWAY_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[PASSWORD_COLUMN].Value));
                 }
                 catch (Exception e)
                 {
@@ -1617,6 +1619,124 @@ namespace pGina.Configuration
         private void Btn_help(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation.html");
+        }
+
+        private void SetPluginMask(Guid pluginUuid, bool authenticateEnabled, bool authorizeEnabled, 
+            bool gatewayEnabled, bool notificationEnabled, bool changePasswordEnabled)
+        {
+            int mask = 0;
+            if (authenticateEnabled)
+                mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
+            if (authorizeEnabled)
+                mask |= (int)Core.PluginLoader.State.AuthorizeEnabled;
+            if (gatewayEnabled)
+                mask |= (int)Core.PluginLoader.State.GatewayEnabled;
+            if (notificationEnabled)
+                mask |= (int)Core.PluginLoader.State.NotificationEnabled;
+            if (changePasswordEnabled)
+                mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
+
+            Core.Settings.Get.SetSetting(pluginUuid.ToString(), mask);
+        }
+
+        private void ImportButton_Click(object sender, EventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog { Filter = "JSON File | *.json" };
+            var settingsstring = "";
+            var importerror = false;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    StreamReader sr = new StreamReader(openFileDialog.FileName);
+                    settingsstring = sr.ReadToEnd();
+                    sr.Close();
+                    List<pGinaImportExportPluginSetting> importsettings = JsonConvert.DeserializeObject<List<pGinaImportExportPluginSetting>>(settingsstring);
+                    foreach (var plugin in m_plugins)
+                    {
+                        if (plugin.Value is IPluginImportExport)
+                        {
+                            try
+                            {
+                                var pluginsettings = importsettings.FirstOrDefault(b => b.Uuid == plugin.Value.Uuid);
+
+                                if (pluginsettings != null)
+                                {
+                                    SetPluginMask(plugin.Value.Uuid, pluginsettings.AuthenticateEnabled, pluginsettings.AuthorizeEnabled,
+                                        pluginsettings.GatewayEnabled, pluginsettings.NotificationEnabled, pluginsettings.ChangePasswordEnabled);
+                                    var importplugin = (IPluginImportExport)plugin.Value;
+                                    importplugin.Import(pluginsettings.Settings);
+                                    m_logger.ErrorFormat("Import succeeded for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
+                                }
+                            }
+                            catch
+                            {
+                                importerror = true;
+                                m_logger.ErrorFormat("Import malfunction for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("Overal import malfunction");
+                }
+            }
+            if (importerror)
+            {
+                MessageBox.Show("An import of a plugin malfunction");
+            }
+            RefreshPluginLists();
+        }
+       
+        private void ExportButton_Click(object sender, EventArgs e)
+        {
+            var exportsettings = new List<pGinaImportExportPluginSetting>();
+            var exporterror = false;
+            foreach (var plugin in m_plugins)
+            {
+                if (plugin.Value is IPluginImportExport)
+                {
+                    try
+                    {
+                        var exportplugin = (IPluginImportExport)plugin.Value;
+
+                        int pluginMask = Settings.Get.GetSetting(exportplugin.Uuid.ToString());
+                        exportsettings.Add(new pGinaImportExportPluginSetting {
+                            Name = exportplugin.Name,
+                            Uuid = exportplugin.Uuid,
+                            Settings = exportplugin.Export(),
+                            AuthenticateEnabled = PluginLoader.IsEnabledFor<IPluginAuthentication>(pluginMask),
+                            AuthorizeEnabled = PluginLoader.IsEnabledFor<IPluginAuthorization>(pluginMask),
+                            ChangePasswordEnabled = PluginLoader.IsEnabledFor<IPluginChangePassword>(pluginMask),
+                            GatewayEnabled = PluginLoader.IsEnabledFor<IPluginAuthenticationGateway>(pluginMask),
+                            NotificationEnabled = PluginLoader.IsEnabledFor<IPluginEventNotifications>(pluginMask)
+                        });
+                    }
+                    catch
+                    {
+                        exporterror = true;
+                        m_logger.ErrorFormat("Export malfunction for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
+                    }
+                }
+            }
+            var json = JsonConvert.SerializeObject(exportsettings);
+            var saveFileDialog = new SaveFileDialog
+            {
+                FileName = "pGinaPluginSettings.json",
+                Filter = "JSON File | *.json"
+            };
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var writer = new StreamWriter(saveFileDialog.OpenFile());
+                writer.WriteLine(json);
+                writer.Dispose();
+                writer.Close();
+            }
+            if (exporterror)
+            {
+                MessageBox.Show("An export of a plugin malfunction");
+            }
         }
     }
 }
