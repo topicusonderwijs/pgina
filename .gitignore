@@ -19,3 +19,5 @@ Installer/Output
 
 # Installer pre-processor
 Installer/PreprocessedpGina0.iss
+/pGina/src/packages/**
+/pGina/src/*.log
