@@ -676,7 +676,7 @@ namespace pGina.Configuration
                     }
 
                     this.m_plugins.Add(p.Uuid.ToString(), p);
-                    var importExportEnabled = PluginLoader.IsEnabledFor<IPluginImportExport>(p);
+                    var importExportEnabled = p as IPluginImportExport != null;
                     pluginsDG.Rows.Add(
                         new object[] { p.Name, false, false, false, false, false, p.Description, importExportEnabled, p.Version, p.Uuid.ToString() });
                     DataGridViewRow row = pluginsDG.Rows[i];
@@ -865,20 +865,11 @@ namespace pGina.Configuration
                 try
                 {
                     IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_UUID_COLUMN].Value];
-                    int mask = 0;
-
-                    if (Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
-                    if (Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.AuthorizeEnabled;
-                    if (Convert.ToBoolean(row.Cells[GATEWAY_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.GatewayEnabled;
-                    if (Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.NotificationEnabled;
-                    if (Convert.ToBoolean(row.Cells[PASSWORD_COLUMN].Value))
-                        mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
-
-                    Core.Settings.Get.SetSetting(p.Uuid.ToString(), mask);
+                    SetPluginMask(p.Uuid, Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[GATEWAY_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value),
+                        Convert.ToBoolean(row.Cells[PASSWORD_COLUMN].Value));
                 }
                 catch (Exception e)
                 {
@@ -1630,6 +1621,24 @@ namespace pGina.Configuration
             System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation.html");
         }
 
+        private void SetPluginMask(Guid pluginUuid, bool authenticateEnabled, bool authorizeEnabled, 
+            bool gatewayEnabled, bool notificationEnabled, bool changePasswordEnabled)
+        {
+            int mask = 0;
+            if (authenticateEnabled)
+                mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
+            if (authorizeEnabled)
+                mask |= (int)Core.PluginLoader.State.AuthorizeEnabled;
+            if (gatewayEnabled)
+                mask |= (int)Core.PluginLoader.State.GatewayEnabled;
+            if (notificationEnabled)
+                mask |= (int)Core.PluginLoader.State.NotificationEnabled;
+            if (changePasswordEnabled)
+                mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
+
+            Core.Settings.Get.SetSetting(pluginUuid.ToString(), mask);
+        }
+
         private void ImportButton_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog { Filter = "JSON File | *.json" };
@@ -1637,37 +1646,47 @@ namespace pGina.Configuration
             var importerror = false;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                System.IO.StreamReader sr = new
-                    System.IO.StreamReader(openFileDialog.FileName);
-                settingsstring = sr.ReadToEnd();
-                sr.Close();
-                List<pGinaImportExportPluginSetting> importsettings = JsonConvert.DeserializeObject<List<pGinaImportExportPluginSetting>>(settingsstring);
-                foreach (var plugin in m_plugins)
+                try
                 {
-                    if (plugin.Value is IPluginImportExport)
+                    StreamReader sr = new StreamReader(openFileDialog.FileName);
+                    settingsstring = sr.ReadToEnd();
+                    sr.Close();
+                    List<pGinaImportExportPluginSetting> importsettings = JsonConvert.DeserializeObject<List<pGinaImportExportPluginSetting>>(settingsstring);
+                    foreach (var plugin in m_plugins)
                     {
-                        try
+                        if (plugin.Value is IPluginImportExport)
                         {
-                            var pluginsettings = importsettings.FirstOrDefault(b => b.Uuid == plugin.Value.Uuid);
-                            if (pluginsettings != null)
+                            try
                             {
-                                var importplugin = (IPluginImportExport)plugin.Value;
-                                importplugin.Import(pluginsettings.Settings);
-                                m_logger.ErrorFormat("Import succeeded for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
+                                var pluginsettings = importsettings.FirstOrDefault(b => b.Uuid == plugin.Value.Uuid);
+
+                                if (pluginsettings != null)
+                                {
+                                    SetPluginMask(plugin.Value.Uuid, pluginsettings.AuthenticateEnabled, pluginsettings.AuthorizeEnabled,
+                                        pluginsettings.GatewayEnabled, pluginsettings.NotificationEnabled, pluginsettings.ChangePasswordEnabled);
+                                    var importplugin = (IPluginImportExport)plugin.Value;
+                                    importplugin.Import(pluginsettings.Settings);
+                                    m_logger.ErrorFormat("Import succeeded for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
+                                }
+                            }
+                            catch
+                            {
+                                importerror = true;
+                                m_logger.ErrorFormat("Import malfunction for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
                             }
                         }
-                        catch
-                        {
-                            importerror = true;
-                            m_logger.ErrorFormat("Import malfunction for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
-                        }
                     }
+                }
+                catch
+                {
+                    MessageBox.Show("Overal import malfunction");
                 }
             }
             if (importerror)
             {
                 MessageBox.Show("An import of a plugin malfunction");
-            }            
+            }
+            RefreshPluginLists();
         }
        
         private void ExportButton_Click(object sender, EventArgs e)
@@ -1681,7 +1700,18 @@ namespace pGina.Configuration
                     try
                     {
                         var exportplugin = (IPluginImportExport)plugin.Value;
-                        exportsettings.Add(new pGinaImportExportPluginSetting { Name = exportplugin.Name, Uuid = exportplugin.Uuid, Settings = exportplugin.Export() });
+
+                        int pluginMask = Settings.Get.GetSetting(exportplugin.Uuid.ToString());
+                        exportsettings.Add(new pGinaImportExportPluginSetting {
+                            Name = exportplugin.Name,
+                            Uuid = exportplugin.Uuid,
+                            Settings = exportplugin.Export(),
+                            AuthenticateEnabled = PluginLoader.IsEnabledFor<IPluginAuthentication>(pluginMask),
+                            AuthorizeEnabled = PluginLoader.IsEnabledFor<IPluginAuthorization>(pluginMask),
+                            ChangePasswordEnabled = PluginLoader.IsEnabledFor<IPluginChangePassword>(pluginMask),
+                            GatewayEnabled = PluginLoader.IsEnabledFor<IPluginAuthenticationGateway>(pluginMask),
+                            NotificationEnabled = PluginLoader.IsEnabledFor<IPluginEventNotifications>(pluginMask)
+                        });
                     }
                     catch
                     {

@@ -62,7 +62,7 @@ namespace pGina.Shared.Interfaces
     /// </summary>
     public interface IPluginImportExport : IPluginBase
     {
-        void Import(JToken PluginSettings);
+        void Import(JToken pluginSettings);
 
         JToken Export();
     }
