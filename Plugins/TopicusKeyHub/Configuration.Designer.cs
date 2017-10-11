@@ -31,8 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Configuration));
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.btnExport = new System.Windows.Forms.Button();
-            this.btnImport = new System.Windows.Forms.Button();
             this.tcPluginSettings = new System.Windows.Forms.TabControl();
             this.tpLDAPServer = new System.Windows.Forms.TabPage();
             this.btnTestConnection = new System.Windows.Forms.Button();
@@ -53,6 +51,8 @@
             this.ldapPortLabel = new System.Windows.Forms.Label();
             this.ldapHostDescriptionLabel = new System.Windows.Forms.Label();
             this.tpGroups = new System.Windows.Forms.TabPage();
+            this.lblSelected = new System.Windows.Forms.Label();
+            this.lblNotSelected = new System.Windows.Forms.Label();
             this.btLoadGroups = new System.Windows.Forms.Button();
             this.btRemove = new System.Windows.Forms.Button();
             this.btAdd = new System.Windows.Forms.Button();
@@ -61,8 +61,6 @@
             this.cbDynamic = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.btnClose = new System.Windows.Forms.Button();
-            this.lblNotSelected = new System.Windows.Forms.Label();
-            this.lblSelected = new System.Windows.Forms.Label();
             this.tcPluginSettings.SuspendLayout();
             this.tpLDAPServer.SuspendLayout();
             this.ldapServerGroupBox.SuspendLayout();
@@ -88,26 +86,6 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
-            // btnExport
-            // 
-            this.btnExport.Location = new System.Drawing.Point(94, 253);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(75, 23);
-            this.btnExport.TabIndex = 5;
-            this.btnExport.Text = "Export";
-            this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            // 
-            // btnImport
-            // 
-            this.btnImport.Location = new System.Drawing.Point(13, 253);
-            this.btnImport.Name = "btnImport";
-            this.btnImport.Size = new System.Drawing.Size(75, 23);
-            this.btnImport.TabIndex = 8;
-            this.btnImport.Text = "Import";
-            this.btnImport.UseVisualStyleBackColor = true;
-            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
             // 
             // tcPluginSettings
             // 
@@ -314,6 +292,24 @@
             this.tpGroups.Text = "Groups";
             this.tpGroups.UseVisualStyleBackColor = true;
             // 
+            // lblSelected
+            // 
+            this.lblSelected.AutoSize = true;
+            this.lblSelected.Location = new System.Drawing.Point(441, 12);
+            this.lblSelected.Name = "lblSelected";
+            this.lblSelected.Size = new System.Drawing.Size(49, 13);
+            this.lblSelected.TabIndex = 7;
+            this.lblSelected.Text = "Selected";
+            // 
+            // lblNotSelected
+            // 
+            this.lblNotSelected.AutoSize = true;
+            this.lblNotSelected.Location = new System.Drawing.Point(165, 12);
+            this.lblNotSelected.Name = "lblNotSelected";
+            this.lblNotSelected.Size = new System.Drawing.Size(69, 13);
+            this.lblNotSelected.TabIndex = 6;
+            this.lblNotSelected.Text = "Not Selected";
+            // 
             // btLoadGroups
             // 
             this.btLoadGroups.Location = new System.Drawing.Point(30, 180);
@@ -393,24 +389,6 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // lblNotSelected
-            // 
-            this.lblNotSelected.AutoSize = true;
-            this.lblNotSelected.Location = new System.Drawing.Point(165, 12);
-            this.lblNotSelected.Name = "lblNotSelected";
-            this.lblNotSelected.Size = new System.Drawing.Size(69, 13);
-            this.lblNotSelected.TabIndex = 6;
-            this.lblNotSelected.Text = "Not Selected";
-            // 
-            // lblSelected
-            // 
-            this.lblSelected.AutoSize = true;
-            this.lblSelected.Location = new System.Drawing.Point(441, 12);
-            this.lblSelected.Name = "lblSelected";
-            this.lblSelected.Size = new System.Drawing.Size(49, 13);
-            this.lblSelected.TabIndex = 7;
-            this.lblSelected.Text = "Selected";
-            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -418,8 +396,6 @@
             this.ClientSize = new System.Drawing.Size(733, 299);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.tcPluginSettings);
-            this.Controls.Add(this.btnImport);
-            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -438,8 +414,6 @@
         #endregion
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Button btnExport;
-        private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.TabControl tcPluginSettings;
         private System.Windows.Forms.TabPage tpLDAPServer;
         private System.Windows.Forms.TabPage tpGroups;

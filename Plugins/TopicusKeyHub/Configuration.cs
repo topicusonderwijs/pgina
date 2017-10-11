@@ -144,41 +144,6 @@
             this.Close();
         }
 
-        private void btnExport_Click(object sender, EventArgs e)
-        {
-            var json = JsonConvert.SerializeObject(this.topicusKeyHubSettings);
-            var save = new SaveFileDialog
-            {
-                FileName = "TopicusKeyHubSettings.json",
-                Filter = "JSON File | *.json"
-            };
-            if (save.ShowDialog() == DialogResult.OK)
-            {
-                var writer = new StreamWriter(save.OpenFile());
-                writer.WriteLine(json);
-                writer.Dispose();
-                writer.Close();
-            }
-        }
-
-        private void btnImport_Click(object sender, EventArgs e)
-        {
-            var openFileDialog1 = new OpenFileDialog {Filter = "JSON File | *.json"};
-            var settingsstring = "";
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                System.IO.StreamReader sr = new
-                    System.IO.StreamReader(openFileDialog1.FileName);
-                settingsstring = sr.ReadToEnd();
-                sr.Close();
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.Converters.Add(new TopicusKeyHubSettingsConverter());
-                var json = JsonConvert.DeserializeObject<TopicusKeyHubSettings>(settingsstring, settings);
-                this.topicusKeyHubSettings = json;
-                this.InitSettings();
-            }
-        }
-
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();

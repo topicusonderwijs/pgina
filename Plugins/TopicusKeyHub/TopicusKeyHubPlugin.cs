@@ -6,13 +6,16 @@
     using log4net;
     using LDAP;
     using LDAP.Model;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using Settings;
+    using Settings.ImportExport;
     using Settings.Model;
     using Shared.Interfaces;
     using Shared.Types;
 
 
-    public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginAuthorization
+    public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginAuthorization, IPluginImportExport
     {
         private readonly ILog logger = LogManager.GetLogger("TopicusKeyHubPlugin");
         public static Guid TopicusKeyHubUuid = new Guid("{EF869D73-8C63-4A93-B952-B94E52BAFB13}");
@@ -179,6 +182,18 @@
             this.logger.Debug("EndChain");
             var serv = props.GetTrackedSingle<LdapServer>();
             if (serv != null) serv.Close();
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var jsonSerializerSettings = new JsonSerializerSettings();
+            jsonSerializerSettings.Converters.Add(new TopicusKeyHubSettingsConverter());
+            JsonConvert.DeserializeObject<TopicusKeyHubSettings>(pluginSettings.ToString(), jsonSerializerSettings);            
+        }
+
+        public JToken Export()
+        {
+            return JToken.FromObject(this.settings);
         }
     }
 }
