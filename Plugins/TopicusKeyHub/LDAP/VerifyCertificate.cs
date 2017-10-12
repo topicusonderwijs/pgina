@@ -20,7 +20,7 @@
             return _instance;
         }
 
-        public bool VerifyMachineUser(X509Certificate2 serverCert)
+        internal bool VerifyMachineUser(X509Certificate2 serverCert)
         {
             // We set the RevocationMode to NoCheck because most custom (self-generated) CAs
             // do not work properly with revocation lists.  This is slightly less secure, but
@@ -54,7 +54,7 @@
             }
         }
 
-        public bool VerifyCARoot(X509Certificate2 chainCert, X509Certificate2 serverCert)
+        internal bool VerifyCARoot(X509Certificate2 chainCert, X509Certificate2 serverCert)
         {
             var chain = new X509Chain();
             chain.ChainPolicy.ExtraStore.Add(chainCert);

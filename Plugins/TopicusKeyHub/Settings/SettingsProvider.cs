@@ -25,7 +25,7 @@
             this.settings.SetDefault("Dynamic", true);
         }
 
-        public static SettingsProvider GetInstance(Guid settingsGuid)
+        internal static SettingsProvider GetInstance(Guid settingsGuid)
         {
             if (_instance == null)
             {
@@ -34,7 +34,7 @@
             return _instance;
         }
 
-        public TopicusKeyHubSettings GetSettings()
+        internal TopicusKeyHubSettings GetSettings()
         {
             return TopicusKeyHubSettings.GetInstance(ref this.settings);
         }

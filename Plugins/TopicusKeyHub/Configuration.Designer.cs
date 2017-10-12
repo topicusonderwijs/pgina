@@ -59,7 +59,6 @@
             this.lvGroupsSelected = new System.Windows.Forms.ListView();
             this.lvGroupsNotSelected = new System.Windows.Forms.ListView();
             this.cbDynamic = new System.Windows.Forms.CheckBox();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
             this.btnClose = new System.Windows.Forms.Button();
             this.tcPluginSettings.SuspendLayout();
             this.tpLDAPServer.SuspendLayout();
@@ -91,7 +90,6 @@
             // 
             this.tcPluginSettings.Controls.Add(this.tpLDAPServer);
             this.tcPluginSettings.Controls.Add(this.tpGroups);
-            this.tcPluginSettings.Controls.Add(this.tabPage3);
             this.tcPluginSettings.Location = new System.Drawing.Point(12, 12);
             this.tcPluginSettings.Name = "tcPluginSettings";
             this.tcPluginSettings.SelectedIndex = 0;
@@ -369,16 +367,6 @@
             this.cbDynamic.UseVisualStyleBackColor = true;
             this.cbDynamic.CheckedChanged += new System.EventHandler(this.cbDynamic_CheckedChanged);
             // 
-            // tabPage3
-            // 
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(690, 209);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "tabPage3";
-            this.tabPage3.UseVisualStyleBackColor = true;
-            // 
             // btnClose
             // 
             this.btnClose.Location = new System.Drawing.Point(552, 253);
@@ -440,7 +428,6 @@
         private System.Windows.Forms.ListView lvGroupsSelected;
         private System.Windows.Forms.ListView lvGroupsNotSelected;
         private System.Windows.Forms.CheckBox cbDynamic;
-        private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.Button btLoadGroups;
         private System.Windows.Forms.Label lblSelected;
         private System.Windows.Forms.Label lblNotSelected;

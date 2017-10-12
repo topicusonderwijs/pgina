@@ -9,9 +9,7 @@
     using log4net;
     using LDAP;
     using LDAP.Model;
-    using Newtonsoft.Json;
     using Settings;
-    using Settings.ImportExport;
     using Settings.Model;
 
     public partial class Configuration : Form
@@ -179,7 +177,6 @@
                 using (var ldap = new LdapServer(this.topicusKeyHubSettings.GetConnectionSettings))
                 {
                     ldap.BindForSearch();
-                    ldap.Close();
                 }
                 MessageBox.Show("Connection OK");
             }
@@ -249,7 +246,6 @@
                     }
                     this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsNotSelected);
                     this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsSelected);
-                    ldap.Close();
                 }
             }
             catch (Exception exception)

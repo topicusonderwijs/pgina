@@ -14,7 +14,6 @@
     using Shared.Interfaces;
     using Shared.Types;
 
-
     public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginAuthorization, IPluginImportExport
     {
         private readonly ILog logger = LogManager.GetLogger("TopicusKeyHubPlugin");
@@ -23,7 +22,7 @@
 
         public TopicusKeyHubPlugin()
         {
-            using(Process me = Process.GetCurrentProcess())
+            using(var me = Process.GetCurrentProcess())
             {
                 this.logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
                 this.settings = SettingsProvider.GetInstance(TopicusKeyHubUuid).GetSettings();
@@ -118,6 +117,8 @@
                 {
                     if (ldapServer.PasswordCheck(user, userInfo.Password))
                     {
+                        userInfo.Fullname = user.CommonName;
+                        userInfo.Email = user.Mail;
                         properties.AddTrackedSingle<KeyHubUser>(user);
                         this.logger.InfoFormat("Authenticated user: {0}", userInfo.Username);
                         return new BooleanResult { Success = true };
@@ -166,13 +167,13 @@
             try
             {
                 var connectionSettings = SettingsProvider.GetInstance(TopicusKeyHubUuid).GetSettings().GetConnectionSettings;
-                LdapServer ldapServer = new LdapServer(connectionSettings);
+                var ldapServer = new LdapServer(connectionSettings);
                 ldapServer.BindForSearch();
                 props.AddTrackedSingle<LdapServer>(ldapServer);
             }
             catch (Exception e)
             {
-                logger.ErrorFormat("Failed to create LdapServer: {0}", e);
+                this.logger.ErrorFormat("Failed to create LdapServer: {0}", e);
                 props.AddTrackedSingle<LdapServer>(null);
             }
         }
@@ -181,7 +182,10 @@
         {
             this.logger.Debug("EndChain");
             var serv = props.GetTrackedSingle<LdapServer>();
-            if (serv != null) serv.Close();
+            if (serv != null)
+            {
+                serv.Dispose();
+            }
         }
 
         public void Import(JToken pluginSettings)

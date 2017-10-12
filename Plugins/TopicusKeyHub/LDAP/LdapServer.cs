@@ -15,7 +15,6 @@
     {
         private readonly ILog logger = LogManager.GetLogger("LdapServer");
 
-        // tijdelijk public voor testen
         private LdapConnection ldapconnection;
         private LdapDirectoryIdentifier serverIdentifier;
         private X509Certificate2 cert;        
@@ -33,7 +32,7 @@
             this.Close();
         }
 
-        public void Close()
+        internal void Close()
         {
             if (this.ldapconnection != null)
             {
@@ -44,7 +43,7 @@
             }
         }
 
-        public IEnumerable<KeyHubGroup> GetGroups(string distinguishedName)
+        internal IEnumerable<KeyHubGroup> GetGroups(string distinguishedName)
         {
             var searchRequest = new SearchRequest
             (distinguishedName,
@@ -63,7 +62,7 @@
             return list;
         }
 
-        public KeyHubUser GetUser(string rootdistributionName, string commonName)
+        internal KeyHubUser GetUser(string rootdistributionName, string commonName)
         {
             var searchRequest = new SearchRequest(rootdistributionName,
                 string.Format("(&(objectclass=keyhubUser)(cn={0}))",commonName),
@@ -79,13 +78,14 @@
 
         private KeyHubUser CreateKeyHubUser(SearchResultEntry searchResultEntry)
         {
-            var commonname = searchResultEntry.Attributes["cn"][0].ToString();            
+            var commonname = searchResultEntry.Attributes["cn"][0].ToString();
+            var mail = searchResultEntry.Attributes["mail"][0].ToString();
             var displayName = searchResultEntry.Attributes["displayName"][0].ToString();
             var memberoflist = GetListOfAttribute(searchResultEntry.Attributes, "memberOf");
-            return new KeyHubUser(searchResultEntry.DistinguishedName, commonname, displayName, memberoflist);
+            return new KeyHubUser(searchResultEntry.DistinguishedName, commonname, displayName, mail, memberoflist);
         }
 
-        public bool UserIsInGroup(KeyHubUser user, KeyHubGroup groep)
+        internal bool UserIsInGroup(KeyHubUser user, KeyHubGroup groep)
         {
             if (user.MemberOflist == null || groep == null)
             {
@@ -93,36 +93,8 @@
             }
             return user.MemberOflist.Any(b => b.ToLower().Equals(groep.DistinguishedName.ToLower()));
         }
-
-        public IEnumerable<KeyHubUserWithGroups> GetAllUsersWithGroups(string rootDistributionName,
-            IEnumerable<KeyHubGroup> groups)
-        {
-            var users = new List<KeyHubUserWithGroups>();
-            var searchRequest = new SearchRequest(rootDistributionName,
-                "(objectclass=keyhubUser)",
-                SearchScope.Subtree,
-                "*");
-
-            var searchResponse = (SearchResponse) this.ldapconnection.SendRequest(searchRequest);
-
-            foreach (SearchResultEntry searchResponseEntry in searchResponse.Entries)
-            {
-                var userWithGroups = new KeyHubUserWithGroups(this.CreateKeyHubUser(searchResponseEntry));
-                users.Add(userWithGroups);
-                foreach (var group in groups)
-                {
-                    if (this.UserIsInGroup(userWithGroups.KeyHubUser, group))
-                    {
-                        userWithGroups.AddGroup(group);
-                    }
-                }
-            }
-
-            return users;
-        }
-
-        // private na testen
-        public static IEnumerable<string> GetListOfAttribute(SearchResultAttributeCollection searchResultAttributeCollection, string attributename)
+        
+        private static IEnumerable<string> GetListOfAttribute(SearchResultAttributeCollection searchResultAttributeCollection, string attributename)
         {
             if (searchResultAttributeCollection[attributename] != null)
             {
@@ -136,9 +108,8 @@
                 }
             }
         }
-
-        // deze moet private worden
-        public bool PasswordCheck(KeyHubUser user, string password)
+        
+        internal bool PasswordCheck(KeyHubUser user, string password)
         {
             var valuepassword = System.Text.Encoding.ASCII.GetBytes(password);
             var compareRequest = new CompareRequest(user.DistinguishedName, "userPassword", valuepassword);
@@ -146,7 +117,7 @@
             return compareResponse.ResultCode == ResultCode.CompareTrue;
         }
 
-        public IEnumerable<KeyHubNamingContexts> GetTopNamingContexts()
+        internal IEnumerable<KeyHubNamingContexts> GetTopNamingContexts()
         {
             var searchRequest = new SearchRequest
             (null,
@@ -181,7 +152,7 @@
         /// Try to bind to the LDAP server with credentials.  This uses
         /// basic authentication.  Throws LdapException if the bind fails.
         /// </summary>
-        public void BindForSearch()
+        internal void BindForSearch()
         {
             NetworkCredential creds = new NetworkCredential(this.connectionsettings.SearchDN, this.connectionsettings.SearchPW);
 
