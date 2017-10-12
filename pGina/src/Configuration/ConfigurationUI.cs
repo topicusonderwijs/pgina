@@ -94,8 +94,6 @@ namespace pGina.Configuration
         public ConfigurationUI()
         {
             VerifyRegistryAccess();
-            Framework.Init();
-
             InitializeComponent();
             InitOptionsTabs();
             InitPluginsDGV();
