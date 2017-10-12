@@ -74,6 +74,12 @@
     <Compile Include="ConfigurationUI.Designer.cs">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImportExportReportWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportExportReportWindow.Designer.cs">
+      <DependentUpon>ImportExportReportWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="LogViewWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -84,6 +90,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConfigurationUI.resx">
       <DependentUpon>ConfigurationUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportExportReportWindow.resx">
+      <DependentUpon>ImportExportReportWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LogViewWindow.resx">
       <DependentUpon>LogViewWindow.cs</DependentUpon>

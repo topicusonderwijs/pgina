@@ -1,9 +1,11 @@
 ﻿using log4net;
+using Newtonsoft.Json.Linq;
 using pGina.Shared.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace pGina.Core.ImportExport
 {
@@ -11,19 +13,30 @@ namespace pGina.Core.ImportExport
     {
         private static ILog m_logger = LogManager.GetLogger("ImportExportHelper");
 
-        public static bool SetImportExportSettings(ImportExportSettings importExportSettings)
+        public static ImportExportReport SetImportExportSettings(ImportExportSettings importExportSettings)
         {
-            var importerror = false;
+            var report = new ImportExportReport() { Rows = new List<ImportExportReportRow>() };
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Import started")));
             var allplugins = PluginLoader.AllPlugins;
+            if (!Assembly.GetExecutingAssembly().GetName().Version.ToString().Equals(importExportSettings.Version))
+            {
+                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Warning, string.Format("pGina Version mismatch import version: {0}, pGina version: {1} ", importExportSettings.Version, Assembly.GetExecutingAssembly().GetName().Version.ToString())));
+            }
             if (importExportSettings.GeneralSettings != null)
             {
+                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Importing GeneralSettings")));
                 if (File.Exists(importExportSettings.GeneralSettings.TileImage))
                 {
                     Settings.Get.TileImage = importExportSettings.GeneralSettings.TileImage;
                 }
+                else
+                {
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("TileImage not set, File does not exists on this system {0}", importExportSettings.GeneralSettings.TileImage)));
+                }
 
                 if (importExportSettings.GeneralSettings.MOTDSettings != null)
                 {
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Importing GeneralSettings.MOTD")));
                     // MOTD stuff
                     Settings.Get.EnableMotd = importExportSettings.GeneralSettings.MOTDSettings.Enable;
                     Settings.Get.Motd = importExportSettings.GeneralSettings.MOTDSettings.Text;
@@ -41,11 +54,12 @@ namespace pGina.Core.ImportExport
                 Settings.Get.PreferLocalAuthentication = importExportSettings.GeneralSettings.PreferLocalAuthentication;
 
                 // ntp server
-                string[] ntpservers = importExportSettings.GeneralSettings.NTPServers.ToArray();                
+                string[] ntpservers = importExportSettings.GeneralSettings.NTPServers.ToArray();
                 Settings.Get.ntpservers = ntpservers;
 
                 if (importExportSettings.GeneralSettings.EmailNotificationSettings != null)
                 {
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Importing GeneralSettings.EmailNotificationSettings")));
                     // email notification
                     Settings.Get.notify_smtp = importExportSettings.GeneralSettings.EmailNotificationSettings.SMTP;
                     Settings.Get.notify_email = importExportSettings.GeneralSettings.EmailNotificationSettings.Email;
@@ -56,14 +70,84 @@ namespace pGina.Core.ImportExport
                 }
             }
 
+            if (importExportSettings.PluginSettings != null && importExportSettings.PluginSettings.Any())
+            {
+                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Importing PluginsSettings")));
+            }
+            foreach (var plugin in allplugins)
+            {
+                try
+                {
+                    // There are plugins settings
+                    if (importExportSettings.PluginSettings != null)
+                    {
+                        var importplugin = importExportSettings.PluginSettings.FirstOrDefault(b => b.Uuid == plugin.Uuid);
+                        if (importplugin != null)
+                        {
+                            if (!plugin.Version.Equals(importplugin.Version))
+                            {
+                                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Warning, string.Format("Plugin Version mismatch import version: {0}, plugin version: {1} ", importplugin.Version, plugin.Version)));
+                            }
+                            PluginSettings.SetMask(plugin.Uuid, importplugin.AuthenticateEnabled, importplugin.AuthorizeEnabled,
+                                importplugin.GatewayEnabled, importplugin.NotificationEnabled, importplugin.ChangePasswordEnabled);
+                            if (plugin is IPluginImportExport)
+                            {
+                                var pluginImportExport = (IPluginImportExport)plugin;
+                                pluginImportExport.Import(importplugin.Settings);
+                                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Import succeeded for plugin: {0}/{1}", plugin.Uuid, plugin.Name)));
+                            }
+                            else
+                            {
+                                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Warning, string.Format("Plugin has no Import/Export fuction, plugin: {0}/{1}", plugin.Uuid, plugin.Name)));
+                            }
+                        }
+                        else if (importExportSettings.DisableNonExportedPlugins)
+                        {
+                            // Only enable exported plugins
+                            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Disable plugin {0} / {1}", plugin.Uuid, plugin.Name)));
+                            PluginSettings.SetMask(plugin.Uuid, false, false, false, false, false);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Error, string.Format("Import malfunction for plugin: {0}/{1}, Error: {2}", plugin.Uuid, plugin.Name, e)));
+                }
+            }
+
+            if ((importExportSettings.AuthenticatePluginOrder != null && importExportSettings.AuthenticatePluginOrder.Any())
+                ||
+                (importExportSettings.AuthorizePluginOrder != null && importExportSettings.AuthorizePluginOrder.Any())
+                ||
+                (importExportSettings.GatewayPluginOrder != null && importExportSettings.GatewayPluginOrder.Any())
+                ||
+                (importExportSettings.NotificationPluginOrder != null && importExportSettings.NotificationPluginOrder.Any())
+                ||
+                (importExportSettings.ChangePasswordPluginOrder != null && importExportSettings.ChangePasswordPluginOrder.Any()))
+            {
+                report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Importing PluginOrder")));
+
+            }
+
+            SavePluginOrder(importExportSettings.AuthenticatePluginOrder, typeof(IPluginAuthentication));
+            SavePluginOrder(importExportSettings.AuthorizePluginOrder, typeof(IPluginAuthorization));
+            SavePluginOrder(importExportSettings.GatewayPluginOrder, typeof(IPluginAuthenticationGateway));
+            SavePluginOrder(importExportSettings.NotificationPluginOrder, typeof(IPluginEventNotifications));
+            SavePluginOrder(importExportSettings.ChangePasswordPluginOrder, typeof(IPluginChangePassword));
+
             if (importExportSettings.DisabledCredentialProviders != null)
             {
+                if (importExportSettings.DisabledCredentialProviders.Any())
+                {
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Importing DisabledCredentialProviders")));
+                }
                 var credentialProviders = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
                 foreach (var credentialProvider in credentialProviders)
                 {
                     var importCredentialProvider = importExportSettings.DisabledCredentialProviders.FirstOrDefault(b => b.Uuid.Equals(credentialProvider.Uuid));
                     if (importCredentialProvider != null)
                     {
+                        report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Disabling CredentialProvider {0}", credentialProvider.Name)));
                         credentialProvider.FilterChangePass = importCredentialProvider.FilterChangePass;
                         credentialProvider.FilterCredUI = importCredentialProvider.FilterCredUI;
                         credentialProvider.FilterLogon = importCredentialProvider.FilterLogon;
@@ -80,59 +164,45 @@ namespace pGina.Core.ImportExport
                 CredProvFilterConfig.SaveFilterSettings(credentialProviders);
             }
 
-            foreach (var plugin in allplugins)
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Import finished")));
+            return report;
+        }
+
+        private static ImportExportReportRow LogMessage(ImportExportReportMessageLevel level, string message)
+        {
+            switch (level)
             {
-                if (plugin is IPluginImportExport)
-                {
-                    try
-                    {
-                        // There are plugins settings
-                        if (importExportSettings.PluginSettings != null)
-                        {
-                            var pluginsettings = importExportSettings.PluginSettings.FirstOrDefault(b => b.Uuid == plugin.Uuid);
-
-                            if (pluginsettings != null)
-                            {
-                                PluginSettings.SetMask(plugin.Uuid, pluginsettings.AuthenticateEnabled, pluginsettings.AuthorizeEnabled,
-                                    pluginsettings.GatewayEnabled, pluginsettings.NotificationEnabled, pluginsettings.ChangePasswordEnabled);
-                                var importplugin = (IPluginImportExport)plugin;
-                                importplugin.Import(pluginsettings.Settings);
-                                m_logger.ErrorFormat("Import succeeded for plugin: {0}/{1}", plugin.Uuid, plugin.Name);
-                            }
-                            else if (importExportSettings.DisableNonExportedPlugins)
-                            {
-                                // Only enable exported plugins
-                                PluginSettings.SetMask(plugin.Uuid, false, false, false, false, false);
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        importerror = true;
-                        m_logger.ErrorFormat("Import malfunction for plugin: {0}/{1}", plugin.Uuid, plugin.Name);
-                    }
-                }
+                case ImportExportReportMessageLevel.Info:
+                    m_logger.Info(message);
+                    return new ImportExportReportRow { MessageLevel = level, Message = message };
+                case ImportExportReportMessageLevel.Warning:
+                    m_logger.Warn(message);
+                    return new ImportExportReportRow { MessageLevel = level, Message = message };
+                default:
+                    m_logger.Error(message);
+                    return new ImportExportReportRow { MessageLevel = level, Message = message };
             }
-
-            SavePluginOrder(importExportSettings.AuthenticatePluginOrder, typeof(IPluginAuthentication));
-            SavePluginOrder(importExportSettings.AuthorizePluginOrder, typeof(IPluginAuthorization));
-            SavePluginOrder(importExportSettings.GatewayPluginOrder, typeof(IPluginAuthenticationGateway));
-            SavePluginOrder(importExportSettings.NotificationPluginOrder, typeof(IPluginEventNotifications));
-            SavePluginOrder(importExportSettings.ChangePasswordPluginOrder, typeof(IPluginChangePassword));
-
-            return importerror;
         }
 
         private static void SavePluginOrder(List<Guid> listOfPluginUuid, Type type)
         {
-            PluginSettings.SavePluginOrder(listOfPluginUuid, type);
+            if (listOfPluginUuid != null)
+            {
+                PluginSettings.SavePluginOrder(listOfPluginUuid, type);
+            }
         }
 
-        public static ImportExportSettings GetImportExportSettings()
+        public static ExportResponse GetImportExportSettings()
         {
+            var report = new ImportExportReport() { Rows = new List<ImportExportReportRow>() };
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Export started")));
             var exportsettings = new ImportExportSettings { PluginSettings = new List<ImportExportPluginSetting>(), DisableNonExportedPlugins = true };
 
+
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Exporting GeneralSettings")));
             string[] ntpservers = Settings.Get.ntpservers;
+
+            exportsettings.Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             exportsettings.GeneralSettings = new ImportExportGeneralSettings
             {
@@ -158,68 +228,81 @@ namespace pGina.Core.ImportExport
                 }
             };
 
-            exportsettings.DisabledCredentialProviders = new List<ImportExportDisabledCredentialProvider>();
-            var credentialProviders = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
-            foreach (var credentialProvider in credentialProviders)
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Exporting PluginsSettings")));
+            foreach (var plugin in PluginLoader.AllPlugins)
             {
-                if (credentialProvider.FilterEnabled())
+                try
                 {
-                    exportsettings.DisabledCredentialProviders.Add(new ImportExportDisabledCredentialProvider {
-                        Uuid = credentialProvider.Uuid,
-                        Name = credentialProvider.Name,
-                        FilterChangePass = credentialProvider.FilterChangePass,
-                        FilterCredUI = credentialProvider.FilterCredUI,
-                        FilterLogon = credentialProvider.FilterLogon,
-                        FilterUnlock = credentialProvider.FilterUnlock });
+                    int pluginMask = Settings.Get.GetSetting(plugin.Uuid.ToString());
+
+                    var authenticateEnabled = PluginLoader.IsEnabledFor<IPluginAuthentication>(pluginMask);
+                    var authorizeEnabled = PluginLoader.IsEnabledFor<IPluginAuthorization>(pluginMask);
+                    var changePasswordEnabled = PluginLoader.IsEnabledFor<IPluginChangePassword>(pluginMask);
+                    var gatewayEnabled = PluginLoader.IsEnabledFor<IPluginAuthenticationGateway>(pluginMask);
+                    var notificationEnabled = PluginLoader.IsEnabledFor<IPluginEventNotifications>(pluginMask);
+
+                    // Only export enabled plugin-settings
+                    if (authenticateEnabled || authorizeEnabled || changePasswordEnabled || gatewayEnabled || notificationEnabled)
+                    {
+                        JToken settings = null;
+                        if (plugin is IPluginImportExport)
+                        {
+                            settings = ((IPluginImportExport)plugin).Export();
+                            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Plugin exporting with settings, plugin: {0}/{1}", plugin.Uuid, plugin.Name)));
+                        }
+                        else
+                        {
+                            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Warning, string.Format("Plugin exporting without settings, plugin: {0}/{1}", plugin.Uuid, plugin.Name)));
+                        }
+                        exportsettings.PluginSettings.Add(new ImportExportPluginSetting
+                        {
+                            Name = plugin.Name,
+                            Version = plugin.Version,
+                            Uuid = plugin.Uuid,
+                            Settings = settings,
+                            AuthenticateEnabled = authenticateEnabled,
+                            AuthorizeEnabled = authorizeEnabled,
+                            ChangePasswordEnabled = changePasswordEnabled,
+                            GatewayEnabled = gatewayEnabled,
+                            NotificationEnabled = notificationEnabled
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Error, string.Format("Export malfunction for plugin: {0}/{1}, Error: {2}", plugin.Uuid, plugin.Name, e)));
                 }
             }
 
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Exporting PluginOrders")));
             exportsettings.AuthenticatePluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>().Select(b => b.Uuid).ToList();
             exportsettings.AuthorizePluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>().Select(b => b.Uuid).ToList();
             exportsettings.GatewayPluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginAuthenticationGateway>().Select(b => b.Uuid).ToList();
             exportsettings.NotificationPluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginEventNotifications>().Select(b => b.Uuid).ToList();
             exportsettings.ChangePasswordPluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginChangePassword>().Select(b => b.Uuid).ToList();
 
-            foreach (var plugin in PluginLoader.AllPlugins)
+            exportsettings.DisabledCredentialProviders = new List<ImportExportDisabledCredentialProvider>();
+            var credentialProviders = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
+            foreach (var credentialProvider in credentialProviders)
             {
-                if (plugin is IPluginImportExport)
+                if (credentialProvider.FilterEnabled())
                 {
-                    try
+                    report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Exporting Settings Disabled CredentialProvider: {0}", credentialProvider.Name)));
+                    exportsettings.DisabledCredentialProviders.Add(new ImportExportDisabledCredentialProvider
                     {
-                        var exportplugin = (IPluginImportExport)plugin;
-
-                        int pluginMask = Settings.Get.GetSetting(exportplugin.Uuid.ToString());
-
-                        var authenticateEnabled = PluginLoader.IsEnabledFor<IPluginAuthentication>(pluginMask);
-                        var authorizeEnabled = PluginLoader.IsEnabledFor<IPluginAuthorization>(pluginMask);
-                        var changePasswordEnabled = PluginLoader.IsEnabledFor<IPluginChangePassword>(pluginMask);
-                        var gatewayEnabled = PluginLoader.IsEnabledFor<IPluginAuthenticationGateway>(pluginMask);
-                        var notificationEnabled = PluginLoader.IsEnabledFor<IPluginEventNotifications>(pluginMask);
-
-                        // Only export enabled plugin-settings
-                        if (authenticateEnabled || authorizeEnabled || changePasswordEnabled || gatewayEnabled || notificationEnabled)
-                        {
-                            exportsettings.PluginSettings.Add(new ImportExportPluginSetting
-                            {
-                                Name = exportplugin.Name,
-                                Uuid = exportplugin.Uuid,
-                                Settings = exportplugin.Export(),
-                                AuthenticateEnabled = authenticateEnabled,
-                                AuthorizeEnabled = authorizeEnabled,
-                                ChangePasswordEnabled = changePasswordEnabled,
-                                GatewayEnabled = gatewayEnabled,
-                                NotificationEnabled = notificationEnabled
-                            });
-                        }
-                    }
-                    catch
-                    {
-                        m_logger.ErrorFormat("Export malfunction for plugin: {0}/{1}", plugin.Uuid, plugin.Name);
-                    }
+                        Uuid = credentialProvider.Uuid,
+                        Name = credentialProvider.Name,
+                        FilterChangePass = credentialProvider.FilterChangePass,
+                        FilterCredUI = credentialProvider.FilterCredUI,
+                        FilterLogon = credentialProvider.FilterLogon,
+                        FilterUnlock = credentialProvider.FilterUnlock
+                    });
                 }
             }
 
-            return exportsettings;
+            report.Rows.Add(LogMessage(ImportExportReportMessageLevel.Info, string.Format("Export finished")));
+
+            return new ExportResponse { Settings = exportsettings, Report = report };
         }
     }
 }

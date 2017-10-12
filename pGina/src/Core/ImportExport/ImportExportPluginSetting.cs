@@ -9,6 +9,8 @@ namespace pGina.Core.ImportExport
 
         public string Name { get; set; }
 
+        public string Version { get; set; }
+
         public JToken Settings { get; set; }
 
         public bool AuthenticateEnabled { get; set; }

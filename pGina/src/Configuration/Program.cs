@@ -50,7 +50,6 @@ namespace pGina.Configuration
             if (args.Count() == 1 && File.Exists(args[0]))
             {
                 m_logger.InfoFormat("One argument found, it is a filename. Trying to import settings: {0}", args[0]);
-                var importerror = false;
                 var importend = false;
                 try
                 {
@@ -58,16 +57,12 @@ namespace pGina.Configuration
                     var settingsstring = sr.ReadToEnd();
                     sr.Close();
                     ImportExportSettings importsettings = JsonConvert.DeserializeObject<ImportExportSettings>(settingsstring);
-                    importerror = ImportExportHelper.SetImportExportSettings(importsettings);
+                    var importReport = ImportExportHelper.SetImportExportSettings(importsettings);
                     importend = true;
                 }
-                catch
+                catch (Exception e)
                 {
-                    m_logger.InfoFormat("Overal import malfunction");
-                }
-                if (importerror)
-                {
-                    m_logger.InfoFormat("A part of the import has malfunctioned");
+                    m_logger.InfoFormat("Overal import malfunction: {0}", e);
                 }
                 if (importend)
                 {
