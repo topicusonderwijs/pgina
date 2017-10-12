@@ -5,6 +5,8 @@ namespace pGina.Core.ImportExport
 {
     public class ImportExportSettings
     {
+        public string Version { get; set; }
+
         public ImportExportGeneralSettings GeneralSettings { get; set; }
 
         public List<ImportExportPluginSetting> PluginSettings { get; set; }

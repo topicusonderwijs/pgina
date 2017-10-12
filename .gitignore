@@ -26,3 +26,4 @@ Installer/PreprocessedpGina0.iss
 /Plugins/*/packages/*
 /Plugins/*/.vs/*
 /Plugins/**/Release/**/*.log
+/Plugins/**/*.log

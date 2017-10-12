@@ -90,6 +90,7 @@ namespace pGina.Configuration
         private const string CPF_CP_UUID_COLUMN = "Uuid";
 
         private LogViewWindow logWindow = null;
+        private ImportExportReportWindow importExportReportWindow = null;
 
         public ConfigurationUI()
         {
@@ -1620,10 +1621,20 @@ namespace pGina.Configuration
             System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation.html");
         }
 
+        private void ShowImportExportReport(ImportExportReport report)
+        {
+            importExportReportWindow = new ImportExportReportWindow();
+            foreach (var reportrow in report.Rows)
+            {
+                importExportReportWindow.LogTextBox.AppendText(string.Format("{0}: {1} \n", reportrow.MessageLevel, reportrow.Message));
+            }
+            importExportReportWindow.Visible = true;
+        }
+
         private void ImportButton_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog { Filter = "JSON File | *.json" };
-            var importerror = false;
+            
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -1632,16 +1643,14 @@ namespace pGina.Configuration
                     var settingsstring = sr.ReadToEnd();
                     sr.Close();
                     ImportExportSettings importsettings = JsonConvert.DeserializeObject<ImportExportSettings>(settingsstring);
-                    importerror = ImportExportHelper.SetImportExportSettings(importsettings);
+                    var report = ImportExportHelper.SetImportExportSettings(importsettings);
+                    ShowImportExportReport(report);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    m_logger.Error(ex);
                     MessageBox.Show("Overal import malfunction");
                 }
-            }
-            if (importerror)
-            {
-                MessageBox.Show("A part of the import has malfunctioned");
             }
             LoadGeneralSettings();
             LoadPluginOrderListsFromReg();
@@ -1653,8 +1662,6 @@ namespace pGina.Configuration
         {
             if (SaveSettings())
             {
-                var exportsettings = ImportExportHelper.GetImportExportSettings();
-                var json = JsonConvert.SerializeObject(exportsettings);
                 var saveFileDialog = new SaveFileDialog
                 {
                     FileName = "pGinaSettings.json",
@@ -1662,10 +1669,13 @@ namespace pGina.Configuration
                 };
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    var exportresponse = ImportExportHelper.GetImportExportSettings();
+                    var json = JsonConvert.SerializeObject(exportresponse.Settings);
                     var writer = new StreamWriter(saveFileDialog.OpenFile());
                     writer.WriteLine(json);
                     writer.Dispose();
                     writer.Close();
+                    ShowImportExportReport(exportresponse.Report);
                 }
             }
         }
