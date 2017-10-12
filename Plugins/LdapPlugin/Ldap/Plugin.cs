@@ -34,10 +34,11 @@ using log4net;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.Ldap
 {
-    public class LdapPlugin : IStatefulPlugin, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginChangePassword
+    public class LdapPlugin : IStatefulPlugin, IPluginAuthentication, IPluginAuthorization, IPluginAuthenticationGateway, IPluginConfiguration, IPluginChangePassword, IPluginImportExport
     {
         public static readonly Guid LdapUuid = new Guid("{0F52390B-C781-43AE-BD62-553C77FA4CF7}");
         private ILog m_logger = LogManager.GetLogger("LdapPlugin");
@@ -423,6 +424,79 @@ namespace pGina.Plugin.Ldap
             {
                 m_logger.DebugFormat("Using authentication credentials for LDAP search.");
             }
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            // ServerSettings
+            Settings.Store.AttribConv = importSettings.ServerSettings.AttribConv;
+            Settings.Store.LdapHost = importSettings.ServerSettings.LdapHost;
+            Settings.Store.LdapPort = importSettings.ServerSettings.LdapPort;
+            Settings.Store.LdapTimeout = importSettings.ServerSettings.LdapTimeout;
+            Settings.Store.RequireCert = importSettings.ServerSettings.RequireCert;
+            Settings.Store.SearchDN = importSettings.ServerSettings.SearchDN;
+            Settings.Store.SetEncryptedSetting("SearchPW", importSettings.ServerSettings.SearchPW);
+            Settings.Store.ServerCertFile = importSettings.ServerSettings.ServerCertFile;
+            Settings.Store.UseAuthBindForAuthzAndGateway = importSettings.ServerSettings.UseAuthBindForAuthzAndGateway;
+            Settings.Store.UseSsl = importSettings.ServerSettings.UseSsl;
+            Settings.Store.UseTls = importSettings.ServerSettings.UseTls;
+
+            // AuthenticationSettings
+            Settings.Store.AllowEmptyPasswords = importSettings.AuthenticationSettings.AllowEmptyPasswords;
+            Settings.Store.DnPattern = importSettings.AuthenticationSettings.DnPattern;
+            Settings.Store.DoSearch = importSettings.AuthenticationSettings.DoSearch;
+            Settings.Store.SearchContexts = importSettings.AuthenticationSettings.SearchContexts;
+            Settings.Store.SearchFilter = importSettings.AuthenticationSettings.SearchFilter;
+
+            // AuthorizationSettings
+            Settings.Store.AuthzAllowOnError = importSettings.AuthorizationSettings.AuthzAllowOnError;
+            Settings.Store.AuthzDefault = importSettings.AuthorizationSettings.AuthzDefault;
+            Settings.Store.AuthzRequireAuth = importSettings.AuthorizationSettings.AuthzRequireAuth;
+            Settings.Store.GroupAuthzRules = importSettings.AuthorizationSettings.GroupAuthzRules;
+
+            // 
+            Settings.Store.ChangePasswordAttributes = importSettings.ChangePasswordAttributes;
+            Settings.Store.GroupGatewayRules = importSettings.GroupGatewayRules;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                ServerSettings = new ImportExportServerSettings
+                {
+                    AttribConv = Settings.Store.AttribConv,
+                    LdapHost = Settings.Store.LdapHost,
+                    LdapPort = Settings.Store.LdapPort,
+                    LdapTimeout = Settings.Store.LdapTimeout,
+                    RequireCert = Settings.Store.RequireCert,
+                    SearchDN = Settings.Store.SearchDN,
+                    SearchPW = Settings.Store.GetEncryptedSetting("SearchPW"),
+                    ServerCertFile = Settings.Store.ServerCertFile,
+                    UseAuthBindForAuthzAndGateway = Settings.Store.UseAuthBindForAuthzAndGateway,
+                    UseSsl = Settings.Store.UseSsl,
+                    UseTls = Settings.Store.UseTls
+                },
+                AuthenticationSettings = new ImportExportAuthenticationSettings
+                {
+                    AllowEmptyPasswords = Settings.Store.AllowEmptyPasswords,
+                    DnPattern = Settings.Store.DnPattern,
+                    DoSearch = Settings.Store.DoSearch,
+                    SearchContexts = Settings.Store.SearchContexts,
+                    SearchFilter = Settings.Store.SearchFilter,
+                },
+                AuthorizationSettings = new ImportExportAuthorizationSettings
+                {
+                    AuthzAllowOnError = Settings.Store.AuthzAllowOnError,
+                    AuthzDefault = Settings.Store.AuthzDefault,
+                    AuthzRequireAuth = Settings.Store.AuthzRequireAuth,
+                    GroupAuthzRules = Settings.Store.GroupAuthzRules,
+                },
+                ChangePasswordAttributes = Settings.Store.ChangePasswordAttributes,
+                GroupGatewayRules = Settings.Store.GroupGatewayRules
+            };
+            return JToken.FromObject(exportsettings);
         }
     }
 }

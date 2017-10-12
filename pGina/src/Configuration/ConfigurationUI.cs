@@ -46,6 +46,7 @@ using Abstractions.Pipes;
 using log4net;
 using pGina.Shared.Types;
 using Newtonsoft.Json;
+using pGina.Core.ImportExport;
 
 namespace pGina.Configuration
 {
@@ -93,8 +94,6 @@ namespace pGina.Configuration
         public ConfigurationUI()
         {
             VerifyRegistryAccess();
-            Framework.Init();
-
             InitializeComponent();
             InitOptionsTabs();
             InitPluginsDGV();
@@ -284,6 +283,7 @@ namespace pGina.Configuration
             if (m_pGinaServiceController != null)
             {
                 // Setup the timer that checks the service status periodically
+                m_serviceTimer = new System.Timers.Timer();
                 m_serviceTimer.Interval = 1500;
                 m_serviceTimer.SynchronizingObject = this.serviceStatusTB;
                 m_serviceTimer.AutoReset = true;
@@ -865,7 +865,7 @@ namespace pGina.Configuration
                 try
                 {
                     IPluginBase p = m_plugins[(string)row.Cells[PLUGIN_UUID_COLUMN].Value];
-                    SetPluginMask(p.Uuid, Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value),
+                    PluginSettings.SetMask(p.Uuid, Convert.ToBoolean(row.Cells[AUTHENTICATION_COLUMN].Value),
                         Convert.ToBoolean(row.Cells[AUTHORIZATION_COLUMN].Value),
                         Convert.ToBoolean(row.Cells[GATEWAY_COLUMN].Value),
                         Convert.ToBoolean(row.Cells[NOTIFICATION_COLUMN].Value),
@@ -888,14 +888,13 @@ namespace pGina.Configuration
         }
 
         private void SavePluginOrder(DataGridView grid, Type pluginType)
-        {
-            string setting = pluginType.Name + "_Order";
-            List<string> orderedList = new List<string>();
+        {                        
+            List<Guid> orderedList = new List<Guid>();
             foreach (DataGridViewRow row in grid.Rows)
-            {
-                orderedList.Add((string)row.Cells[PLUGIN_UUID_COLUMN].Value);
+            {                
+                orderedList.Add(Guid.Parse((string)row.Cells[PLUGIN_UUID_COLUMN].Value));
             }
-            Settings.Get.SetSetting(setting, orderedList.ToArray<string>());
+            PluginSettings.SavePluginOrder(orderedList, pluginType);
         }
 
         private bool CheckPluginSettings()
@@ -1621,61 +1620,19 @@ namespace pGina.Configuration
             System.Diagnostics.Process.Start("http://mutonufoai.github.io/pgina/documentation.html");
         }
 
-        private void SetPluginMask(Guid pluginUuid, bool authenticateEnabled, bool authorizeEnabled, 
-            bool gatewayEnabled, bool notificationEnabled, bool changePasswordEnabled)
-        {
-            int mask = 0;
-            if (authenticateEnabled)
-                mask |= (int)Core.PluginLoader.State.AuthenticateEnabled;
-            if (authorizeEnabled)
-                mask |= (int)Core.PluginLoader.State.AuthorizeEnabled;
-            if (gatewayEnabled)
-                mask |= (int)Core.PluginLoader.State.GatewayEnabled;
-            if (notificationEnabled)
-                mask |= (int)Core.PluginLoader.State.NotificationEnabled;
-            if (changePasswordEnabled)
-                mask |= (int)Core.PluginLoader.State.ChangePasswordEnabled;
-
-            Core.Settings.Get.SetSetting(pluginUuid.ToString(), mask);
-        }
-
         private void ImportButton_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog { Filter = "JSON File | *.json" };
-            var settingsstring = "";
             var importerror = false;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
                     StreamReader sr = new StreamReader(openFileDialog.FileName);
-                    settingsstring = sr.ReadToEnd();
+                    var settingsstring = sr.ReadToEnd();
                     sr.Close();
-                    List<pGinaImportExportPluginSetting> importsettings = JsonConvert.DeserializeObject<List<pGinaImportExportPluginSetting>>(settingsstring);
-                    foreach (var plugin in m_plugins)
-                    {
-                        if (plugin.Value is IPluginImportExport)
-                        {
-                            try
-                            {
-                                var pluginsettings = importsettings.FirstOrDefault(b => b.Uuid == plugin.Value.Uuid);
-
-                                if (pluginsettings != null)
-                                {
-                                    SetPluginMask(plugin.Value.Uuid, pluginsettings.AuthenticateEnabled, pluginsettings.AuthorizeEnabled,
-                                        pluginsettings.GatewayEnabled, pluginsettings.NotificationEnabled, pluginsettings.ChangePasswordEnabled);
-                                    var importplugin = (IPluginImportExport)plugin.Value;
-                                    importplugin.Import(pluginsettings.Settings);
-                                    m_logger.ErrorFormat("Import succeeded for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
-                                }
-                            }
-                            catch
-                            {
-                                importerror = true;
-                                m_logger.ErrorFormat("Import malfunction for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
-                            }
-                        }
-                    }
+                    ImportExportSettings importsettings = JsonConvert.DeserializeObject<ImportExportSettings>(settingsstring);
+                    importerror = ImportExportHelper.SetImportExportSettings(importsettings);
                 }
                 catch
                 {
@@ -1684,58 +1641,32 @@ namespace pGina.Configuration
             }
             if (importerror)
             {
-                MessageBox.Show("An import of a plugin malfunction");
+                MessageBox.Show("A part of the import has malfunctioned");
             }
+            LoadGeneralSettings();
+            LoadPluginOrderListsFromReg();
             RefreshPluginLists();
+            dgvCredProvFilter.DataSource = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
         }
-       
+
         private void ExportButton_Click(object sender, EventArgs e)
         {
-            var exportsettings = new List<pGinaImportExportPluginSetting>();
-            var exporterror = false;
-            foreach (var plugin in m_plugins)
+            if (SaveSettings())
             {
-                if (plugin.Value is IPluginImportExport)
+                var exportsettings = ImportExportHelper.GetImportExportSettings();
+                var json = JsonConvert.SerializeObject(exportsettings);
+                var saveFileDialog = new SaveFileDialog
                 {
-                    try
-                    {
-                        var exportplugin = (IPluginImportExport)plugin.Value;
-
-                        int pluginMask = Settings.Get.GetSetting(exportplugin.Uuid.ToString());
-                        exportsettings.Add(new pGinaImportExportPluginSetting {
-                            Name = exportplugin.Name,
-                            Uuid = exportplugin.Uuid,
-                            Settings = exportplugin.Export(),
-                            AuthenticateEnabled = PluginLoader.IsEnabledFor<IPluginAuthentication>(pluginMask),
-                            AuthorizeEnabled = PluginLoader.IsEnabledFor<IPluginAuthorization>(pluginMask),
-                            ChangePasswordEnabled = PluginLoader.IsEnabledFor<IPluginChangePassword>(pluginMask),
-                            GatewayEnabled = PluginLoader.IsEnabledFor<IPluginAuthenticationGateway>(pluginMask),
-                            NotificationEnabled = PluginLoader.IsEnabledFor<IPluginEventNotifications>(pluginMask)
-                        });
-                    }
-                    catch
-                    {
-                        exporterror = true;
-                        m_logger.ErrorFormat("Export malfunction for plugin: {0}/{1}", plugin.Value.Uuid, plugin.Value.Name);
-                    }
+                    FileName = "pGinaSettings.json",
+                    Filter = "JSON File | *.json"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var writer = new StreamWriter(saveFileDialog.OpenFile());
+                    writer.WriteLine(json);
+                    writer.Dispose();
+                    writer.Close();
                 }
-            }
-            var json = JsonConvert.SerializeObject(exportsettings);
-            var saveFileDialog = new SaveFileDialog
-            {
-                FileName = "pGinaPluginSettings.json",
-                Filter = "JSON File | *.json"
-            };
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var writer = new StreamWriter(saveFileDialog.OpenFile());
-                writer.WriteLine(json);
-                writer.Dispose();
-                writer.Close();
-            }
-            if (exporterror)
-            {
-                MessageBox.Show("An export of a plugin malfunction");
             }
         }
     }
