@@ -81,7 +81,6 @@
     <Compile Include="LogViewWindow.Designer.cs">
       <DependentUpon>LogViewWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="pGinaImportExportPluginSetting.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConfigurationUI.resx">
