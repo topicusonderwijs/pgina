@@ -45,12 +45,11 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
-
-
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.Email
 {
-    public class EmailAuthPlugin : IPluginConfiguration, IPluginAuthentication
+    public class EmailAuthPlugin : IPluginConfiguration, IPluginAuthentication, IPluginImportExport
     {
         private ILog m_logger = LogManager.GetLogger("EmailAuthPlugin");
         public static Guid SimpleUuid = new Guid("{EC3221A6-621F-44CE-B77B-E074298D6B4E}");
@@ -353,6 +352,32 @@ namespace pGina.Plugin.Email
             }
         }
 
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            Settings.Store.Server = importSettings.Server;
+            Settings.Store.UseSsl = importSettings.UseSsl;
+            Settings.Store.Protocol = importSettings.Protocol;
+            Settings.Store.Port = importSettings.Port;
+            Settings.Store.AppendDomain = importSettings.AppendDomain;
+            Settings.Store.Domain = importSettings.Domain;
+            Settings.Store.NetworkTimeout = importSettings.NetworkTimeout;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                Server = Settings.Store.Server,
+                UseSsl = Settings.Store.UseSsl,
+                Protocol = Settings.Store.Protocol,
+                Port = Settings.Store.Port,
+                AppendDomain = Settings.Store.AppendDomain,
+                Domain = Settings.Store.Domain,
+                NetworkTimeout = Settings.Store.NetworkTimeout,
+            };
+            return JToken.FromObject(exportsettings);
+        }
     }
 
     public class EMailAuthException : Exception

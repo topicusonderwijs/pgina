@@ -5,10 +5,11 @@ using System.Diagnostics;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using log4net;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.HttpAuth
 {
-    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthenticationGateway, IPluginChangePassword
+    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthenticationGateway, IPluginChangePassword, IPluginImportExport
     {
         private static ILog m_logger = LogManager.GetLogger("HttpAuth");
 
@@ -108,6 +109,21 @@ namespace pGina.Plugin.HttpAuth
             }
 
             return HttpAccessor.getPwChangeResponse(userInfo.Username, userInfo.Password, userInfo.oldPassword);
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            Settings.Store.Loginserver = importSettings.Loginserver;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                Loginserver = Settings.Store.Loginserver,
+            };
+            return JToken.FromObject(exportsettings);
         }
     }
 }
