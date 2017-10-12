@@ -20,5 +20,7 @@ namespace pGina.Core.ImportExport
         public List<Guid> GatewayPluginOrder { get; set; }
 
         public List<Guid> NotificationPluginOrder { get; set; }
+
+        public List<ImportExportDisabledCredentialProvider> DisabledCredentialProviders { get; set; }
     }
 }

@@ -20,26 +20,4 @@ namespace pGina.Core.ImportExport
 
         public ImportExportEmailNotificationSettings EmailNotificationSettings { get; set; }
     }
-
-    public class ImportExportMOTDSettings
-    {
-        public bool Enable { get; set; }
-
-        public string Text { get; set; }
-    }
-
-    public class ImportExportEmailNotificationSettings
-    {
-        public string SMTP { get; set; }
-
-        public string Email { get; set; }
-
-        public string User { get; set; }
-
-        public string Password { get; set; }
-
-        public bool UseCredentials { get; set; }
-
-        public bool UseSSL { get; set; }
-    }
 }

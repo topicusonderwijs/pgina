@@ -1648,6 +1648,7 @@ namespace pGina.Configuration
             LoadGeneralSettings();
             LoadPluginOrderListsFromReg();
             RefreshPluginLists();
+            dgvCredProvFilter.DataSource = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
         }
 
         private void ExportButton_Click(object sender, EventArgs e)

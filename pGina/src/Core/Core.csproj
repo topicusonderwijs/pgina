@@ -50,8 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CredProvFilterConfig.cs" />
+    <Compile Include="ImportExport\ImportExportDisabledCredentialProvider.cs" />
+    <Compile Include="ImportExport\ImportExportEmailNotificationSettings.cs" />
     <Compile Include="ImportExport\ImportExportGeneralSettings.cs" />
     <Compile Include="ImportExport\ImportExportHelper.cs" />
+    <Compile Include="ImportExport\ImportExportMOTDSettings.cs" />
     <Compile Include="ImportExport\ImportExportSettings.cs" />
     <Compile Include="ImportExport\ImportExportPluginSetting.cs" />
     <Compile Include="Messages\ChangePasswordRequestMessage.cs" />

@@ -55,6 +55,31 @@ namespace pGina.Core.ImportExport
                     Settings.Get.notify_ssl = importExportSettings.GeneralSettings.EmailNotificationSettings.UseSSL;
                 }
             }
+
+            if (importExportSettings.DisabledCredentialProviders != null)
+            {
+                var credentialProviders = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
+                foreach (var credentialProvider in credentialProviders)
+                {
+                    var importCredentialProvider = importExportSettings.DisabledCredentialProviders.FirstOrDefault(b => b.Uuid.Equals(credentialProvider.Uuid));
+                    if (importCredentialProvider != null)
+                    {
+                        credentialProvider.FilterChangePass = importCredentialProvider.FilterChangePass;
+                        credentialProvider.FilterCredUI = importCredentialProvider.FilterCredUI;
+                        credentialProvider.FilterLogon = importCredentialProvider.FilterLogon;
+                        credentialProvider.FilterUnlock = importCredentialProvider.FilterUnlock;
+                    }
+                    else
+                    {
+                        credentialProvider.FilterChangePass = false;
+                        credentialProvider.FilterCredUI = false;
+                        credentialProvider.FilterLogon = false;
+                        credentialProvider.FilterUnlock = false;
+                    }
+                }
+                CredProvFilterConfig.SaveFilterSettings(credentialProviders);
+            }
+
             foreach (var plugin in allplugins)
             {
                 if (plugin is IPluginImportExport)
@@ -132,6 +157,22 @@ namespace pGina.Core.ImportExport
                     UseSSL = Settings.Get.notify_ssl
                 }
             };
+
+            exportsettings.DisabledCredentialProviders = new List<ImportExportDisabledCredentialProvider>();
+            var credentialProviders = CredProvFilterConfig.LoadCredProvsAndFilterSettings();
+            foreach (var credentialProvider in credentialProviders)
+            {
+                if (credentialProvider.FilterEnabled())
+                {
+                    exportsettings.DisabledCredentialProviders.Add(new ImportExportDisabledCredentialProvider {
+                        Uuid = credentialProvider.Uuid,
+                        Name = credentialProvider.Name,
+                        FilterChangePass = credentialProvider.FilterChangePass,
+                        FilterCredUI = credentialProvider.FilterCredUI,
+                        FilterLogon = credentialProvider.FilterLogon,
+                        FilterUnlock = credentialProvider.FilterUnlock });
+                }
+            }
 
             exportsettings.AuthenticatePluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginAuthentication>().Select(b => b.Uuid).ToList();
             exportsettings.AuthorizePluginOrder = PluginLoader.GetOrderedPluginsOfType<IPluginAuthorization>().Select(b => b.Uuid).ToList();
