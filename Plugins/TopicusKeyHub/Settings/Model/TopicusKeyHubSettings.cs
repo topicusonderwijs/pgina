@@ -1,5 +1,7 @@
 ﻿namespace pGina.Plugin.TopicusKeyHub.Settings.Model
 {
+    using Shared;
+
     public class TopicusKeyHubSettings
     {
         // The dynamic settings are from pGina. The magic is happing only here.
@@ -18,10 +20,6 @@
                 _instance = new TopicusKeyHubSettings(ref settings);
             }
             return _instance;
-        }
-
-        public bool ShowDescription {
-            get { return this.settings.ShowDescription; }
         }
 
         public ConnectionSettings GetConnectionSettings
@@ -43,12 +41,12 @@
         public void SetConnectionSettings(ConnectionSettings connectionSettings)
         {
             this.settings.LdapTimeout = connectionSettings.LdapTimeout;
-            this.settings.LdapHost = connectionSettings.LdapHosts;
+            this.settings.LdapHost = connectionSettings.LdapHosts.EmptyStringArrayIfNull();
             this.settings.LdapPort = connectionSettings.LdapPort;
             this.settings.RequireCert = connectionSettings.RequireCert;
-            this.settings.ServerCertFile = connectionSettings.ServerCertFile;
-            this.settings.SearchDN = connectionSettings.SearchDN;
-            this.settings.SetEncryptedSetting("SearchPW",connectionSettings.SearchPW);
+            this.settings.ServerCertFile = connectionSettings.ServerCertFile.EmptyStringIfNull();
+            this.settings.SearchDN = connectionSettings.SearchDN.EmptyStringIfNull();
+            this.settings.SetEncryptedSetting("SearchPW",connectionSettings.SearchPW.EmptyStringIfNull());
         }
 
         public GroupSettings GetGroupSettings
@@ -63,7 +61,7 @@
 
         public void SetGroupsSettings(GroupSettings groupSettings)
         {
-            this.settings.Groups = groupSettings.Groups;
+            this.settings.Groups = groupSettings.Groups.EmptyStringArrayIfNull();
             this.settings.Dynamic = groupSettings.Dynamic;
         }
     }
