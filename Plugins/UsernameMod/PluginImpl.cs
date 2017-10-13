@@ -34,6 +34,7 @@ using pGina.Shared.Types;
 using pGina.Shared.Settings;
 using pGina.Plugin.UsernameMod.Rules;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.UsernameMod
 {
@@ -261,16 +262,16 @@ namespace pGina.Plugin.UsernameMod
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            m_settings.Store.ShowDescription = importSettings.ShowDescription;
-            m_settings.Store.Description = importSettings.Description;
+            m_settings.ShowDescription = importSettings.ShowDescription;
+            m_settings.Description = importSettings.Description.EmptyStringIfNull();
         }
 
         public JToken Export()
         {
             var exportsettings = new ImportExportSettings
             {
-                ShowDescription = m_settings.Store.ShowDescription,
-                Description = m_settings.Store.Description
+                ShowDescription = m_settings.ShowDescription,
+                Description = m_settings.Description
             };
             return JToken.FromObject(exportsettings);
         }

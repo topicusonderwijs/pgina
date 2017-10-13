@@ -36,6 +36,7 @@ using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.Sample
 {
@@ -124,16 +125,16 @@ namespace pGina.Plugin.Sample
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            m_settings.Store.Description = importSettings.Description;
-            m_settings.Store.ShowDescription = importSettings.ShowDescription;
+            m_settings.Description = importSettings.Description.EmptyStringIfNull();
+            m_settings.ShowDescription = importSettings.ShowDescription;
         }
 
         public JToken Export()
         {
             var exportsettings = new ImportExportSettings
             {
-                Description = m_settings.Store.Description,
-                ShowDescription = m_settings.Store.ShowDescription,
+                Description = m_settings.Description,
+                ShowDescription = m_settings.ShowDescription,
             };
             return JToken.FromObject(exportsettings);
         }

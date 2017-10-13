@@ -6,6 +6,7 @@ using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using log4net;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.HttpAuth
 {
@@ -114,7 +115,7 @@ namespace pGina.Plugin.HttpAuth
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.Loginserver = importSettings.Loginserver;
+            Settings.Store.Loginserver = importSettings.Loginserver.EmptyStringIfNull();
         }
 
         public JToken Export()

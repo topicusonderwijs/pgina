@@ -38,6 +38,7 @@ using pGina.Shared.Types;
 using Abstractions.WindowsApi;
 using Abstractions.Windows;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.pgSMB2
 {
@@ -531,22 +532,23 @@ namespace pGina.Plugin.pgSMB2
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.SMBshare = importSettings.SMBshare;
-            Settings.Store.RoamingSource = importSettings.RoamingSource;
-            Settings.Store.Filename = importSettings.Filename;
-            Settings.Store.TempComp = importSettings.TempComp;
+            Settings.Store.SMBshare = importSettings.SMBshare.EmptyStringIfNull();
+            Settings.Store.RoamingSource = importSettings.RoamingSource.EmptyStringIfNull();
+            Settings.Store.Filename = importSettings.Filename.EmptyStringIfNull();
+            Settings.Store.TempComp = importSettings.TempComp.EmptyStringIfNull();
             Settings.Store.ConnectRetry = importSettings.ConnectRetry;
-            Settings.Store.Compressor = importSettings.Compressor;
-            Settings.Store.CompressCLI = importSettings.CompressCLI;
-            Settings.Store.UncompressCLI = importSettings.UncompressCLI;
+            Settings.Store.Compressor = importSettings.Compressor.EmptyStringIfNull();
+            Settings.Store.CompressCLI = importSettings.CompressCLI.EmptyStringIfNull();
+            Settings.Store.UncompressCLI = importSettings.UncompressCLI.EmptyStringIfNull();
 
-            Settings.Store.HomeDir = importSettings.HomeDir;
-            Settings.Store.HomeDirDrive = importSettings.HomeDirDrive;
-            Settings.Store.ScriptPath = importSettings.ScriptPath;
+            Settings.Store.HomeDir = importSettings.HomeDir.EmptyStringIfNull();
+            Settings.Store.HomeDirDrive = importSettings.HomeDirDrive.EmptyStringIfNull();
+            Settings.Store.ScriptPath = importSettings.ScriptPath.EmptyStringIfNull();
             Settings.Store.MaxStore = importSettings.MaxStore;
-            Settings.Store.MaxStoreExclude = importSettings.MaxStoreExclude;
-            Settings.Store.MaxStoreText = importSettings.MaxStoreText;
-            Settings.Store.ACE = importSettings.ACE;
+
+            Settings.StoreGlobal.MaxStoreExclude = importSettings.MaxStoreExclude.EmptyStringIfNull();
+            Settings.StoreGlobal.MaxStoreText = importSettings.MaxStoreText.EmptyStringIfNull();
+            Settings.StoreGlobal.ACE = importSettings.ACE.EmptyStringIfNull();
         }
 
         public JToken Export()
@@ -566,9 +568,10 @@ namespace pGina.Plugin.pgSMB2
                 HomeDirDrive = Settings.Store.HomeDirDrive,
                 ScriptPath = Settings.Store.ScriptPath,
                 MaxStore = Settings.Store.MaxStore,
-                MaxStoreExclude = Settings.Store.MaxStoreExclude,
-                MaxStoreText = Settings.Store.MaxStoreText,
-                ACE = Settings.Store.ACE,
+
+                MaxStoreExclude = Settings.StoreGlobal.MaxStoreExclude,
+                MaxStoreText = Settings.StoreGlobal.MaxStoreText,
+                ACE = Settings.StoreGlobal.ACE,
             };
             return JToken.FromObject(exportsettings);
         }

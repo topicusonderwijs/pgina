@@ -9,6 +9,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.SSHAuth
 {
@@ -95,8 +96,8 @@ namespace pGina.Plugin.SSHAuth
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.Host = importSettings.Host;
-            Settings.Store.Port = importSettings.Port;
+            Settings.Store.Host = importSettings.Host.EmptyStringIfNull();
+            Settings.Store.Port = importSettings.Port.EmptyStringIfNull();
         }
 
         public JToken Export()

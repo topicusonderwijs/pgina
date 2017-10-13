@@ -37,6 +37,7 @@ using Newtonsoft.Json.Linq;
 
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using pGina.Shared;
 
 namespace pGina.Plugin.LocalMachine
 {    
@@ -715,15 +716,15 @@ namespace pGina.Plugin.LocalMachine
             Settings.Store.AlwaysAuthenticate = importSettings.AlwaysAuthenticate;
             Settings.Store.AuthzApplyToAllUsers = importSettings.AuthzApplyToAllUsers;
             Settings.Store.AuthzLocalAdminsOnly = importSettings.AuthzLocalAdminsOnly;
-            Settings.Store.AuthzLocalGroups = importSettings.AuthzLocalGroups;
+            Settings.Store.AuthzLocalGroups = importSettings.AuthzLocalGroups.EmptyStringArrayIfNull();
             Settings.Store.BackgroundTimerSeconds = importSettings.BackgroundTimerSeconds;
-            Settings.Store.CleanupUsers = importSettings.CleanupUsers;
+            Settings.Store.CleanupUsers = importSettings.CleanupUsers.EmptyStringArrayIfNull();
             Settings.Store.GroupCreateFailIsFail = importSettings.GroupCreateFailIsFail;
-            Settings.Store.MandatoryGroups = importSettings.MandatoryGroups;
+            Settings.Store.MandatoryGroups = importSettings.MandatoryGroups.EmptyStringArrayIfNull();
             Settings.Store.MirrorGroupsForAuthdUsers = importSettings.MirrorGroupsForAuthdUsers;
             Settings.Store.RemoveProfiles = importSettings.RemoveProfiles;            
             Settings.Store.ScramblePasswords = importSettings.ScramblePasswords;
-            Settings.Store.ScramblePasswordsExceptions = importSettings.ScramblePasswordsExceptions;
+            Settings.Store.ScramblePasswordsExceptions = importSettings.ScramblePasswordsExceptions.EmptyStringArrayIfNull();
             Settings.Store.ScramblePasswordsWhenLMAuthFails = importSettings.ScramblePasswordsWhenLMAuthFails;            
         }
 

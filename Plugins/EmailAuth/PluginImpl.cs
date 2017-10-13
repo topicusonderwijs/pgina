@@ -46,6 +46,7 @@ using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.Email
 {
@@ -355,12 +356,12 @@ namespace pGina.Plugin.Email
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.Server = importSettings.Server;
+            Settings.Store.Server = importSettings.Server.EmptyStringIfNull();
             Settings.Store.UseSsl = importSettings.UseSsl;
-            Settings.Store.Protocol = importSettings.Protocol;
+            Settings.Store.Protocol = importSettings.Protocol.EmptyStringIfNull();
             Settings.Store.Port = importSettings.Port;
             Settings.Store.AppendDomain = importSettings.AppendDomain;
-            Settings.Store.Domain = importSettings.Domain;
+            Settings.Store.Domain = importSettings.Domain.EmptyStringIfNull();
             Settings.Store.NetworkTimeout = importSettings.NetworkTimeout;
         }
 

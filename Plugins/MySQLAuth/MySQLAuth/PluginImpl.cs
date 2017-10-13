@@ -26,8 +26,6 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using log4net;
 
 using pGina.Shared.Interfaces;
@@ -35,6 +33,7 @@ using pGina.Shared.Types;
 
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.MySQLAuth
 {
@@ -286,37 +285,37 @@ namespace pGina.Plugin.MySQLAuth
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
             //Connection
-            Settings.Store.Host = importSettings.Host;
+            Settings.Store.Host = importSettings.Host.EmptyStringIfNull();
             Settings.Store.Port = importSettings.Port;
             Settings.Store.UseSsl = importSettings.UseSsl;
-            Settings.Store.User = importSettings.User;
-            Settings.Store.SetEncryptedSetting("Password",importSettings.Password);
-            Settings.Store.Database = importSettings.Database;
+            Settings.Store.User = importSettings.User.EmptyStringIfNull();
+            Settings.Store.SetEncryptedSetting("Password",importSettings.Password.EmptyStringIfNull());
+            Settings.Store.Database = importSettings.Database.EmptyStringIfNull();
 
             // User table
-            Settings.Store.Table = importSettings.Table;
+            Settings.Store.Table = importSettings.Table.EmptyStringIfNull();
             Settings.Store.HashEncoding = importSettings.HashEncoding;
-            Settings.Store.UsernameColumn = importSettings.UsernameColumn;
-            Settings.Store.HashMethodColumn = importSettings.HashMethodColumn;
-            Settings.Store.PasswordColumn = importSettings.PasswordColumn;
-            Settings.Store.UserTablePrimaryKeyColumn = importSettings.UserTablePrimaryKeyColumn;
+            Settings.Store.UsernameColumn = importSettings.UsernameColumn.EmptyStringIfNull();
+            Settings.Store.HashMethodColumn = importSettings.HashMethodColumn.EmptyStringIfNull();
+            Settings.Store.PasswordColumn = importSettings.PasswordColumn.EmptyStringIfNull();
+            Settings.Store.UserTablePrimaryKeyColumn = importSettings.UserTablePrimaryKeyColumn.EmptyStringIfNull();
 
             // Group table
-            Settings.Store.GroupTableName = importSettings.GroupTableName;
-            Settings.Store.GroupNameColumn = importSettings.GroupNameColumn;
-            Settings.Store.GroupTablePrimaryKeyColumn = importSettings.GroupTablePrimaryKeyColumn;
+            Settings.Store.GroupTableName = importSettings.GroupTableName.EmptyStringIfNull();
+            Settings.Store.GroupNameColumn = importSettings.GroupNameColumn.EmptyStringIfNull();
+            Settings.Store.GroupTablePrimaryKeyColumn = importSettings.GroupTablePrimaryKeyColumn.EmptyStringIfNull();
 
             // User-Group table
-            Settings.Store.UserGroupTableName = importSettings.UserGroupTableName;
-            Settings.Store.UserForeignKeyColumn = importSettings.UserForeignKeyColumn;
-            Settings.Store.GroupForeignKeyColumn = importSettings.GroupForeignKeyColumn;
+            Settings.Store.UserGroupTableName = importSettings.UserGroupTableName.EmptyStringIfNull();
+            Settings.Store.UserForeignKeyColumn = importSettings.UserForeignKeyColumn.EmptyStringIfNull();
+            Settings.Store.GroupForeignKeyColumn = importSettings.GroupForeignKeyColumn.EmptyStringIfNull();
 
             // Authz Settings
-            Settings.Store.GroupAuthzRules = importSettings.GroupAuthzRules;
+            Settings.Store.GroupAuthzRules = importSettings.GroupAuthzRules.EmptyStringArrayIfNull();
             Settings.Store.AuthzRequireMySqlAuth = importSettings.AuthzRequireMySqlAuth;
 
             // Gateway settings
-            Settings.Store.GroupGatewayRules = importSettings.GroupGatewayRules;
+            Settings.Store.GroupGatewayRules = importSettings.GroupGatewayRules.EmptyStringArrayIfNull();
             Settings.Store.PreventLogonOnServerError = importSettings.PreventLogonOnServerError;
         }
 

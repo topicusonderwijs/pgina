@@ -44,6 +44,7 @@ using pGina.Shared.Types;
 
 using log4net;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.MultiEmail
 {
@@ -404,9 +405,9 @@ namespace pGina.Plugin.MultiEmail
 
         public void Import(JToken pluginSettings)
         {
-            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>( );
             Settings.Store.ShowDescription = importSettings.ShowDescription;
-            Settings.Store.Servers = importSettings.Servers;
+            Settings.Store.Servers = importSettings.Servers.EmptyStringIfNull();
         }
 
         public JToken Export()

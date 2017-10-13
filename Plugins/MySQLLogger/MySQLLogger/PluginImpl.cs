@@ -39,6 +39,7 @@ using log4net;
 
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.MySqlLogger
 {
@@ -83,12 +84,12 @@ namespace pGina.Plugin.MySqlLogger
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
             Settings.Store.EventMode = importSettings.EventMode;
             Settings.Store.SessionMode = importSettings.SessionMode;
-            Settings.Store.Host = importSettings.Host;
+            Settings.Store.Host = importSettings.Host.EmptyStringIfNull();
             Settings.Store.Port = importSettings.Port;
-            Settings.Store.User = importSettings.User;
-            Settings.Store.SetEncryptedSetting("Password", importSettings.Password);
-            Settings.Store.SessionTable = importSettings.SessionTable;
-            Settings.Store.EventTable = importSettings.EventTable;
+            Settings.Store.User = importSettings.User.EmptyStringIfNull();
+            Settings.Store.SetEncryptedSetting("Password", importSettings.Password.EmptyStringIfNull());
+            Settings.Store.SessionTable = importSettings.SessionTable.EmptyStringIfNull();
+            Settings.Store.EventTable = importSettings.EventTable.EmptyStringIfNull();
 
             Settings.Store.EvtLogon = importSettings.EvtLogon;
             Settings.Store.EvtLogoff = importSettings.EvtLogoff;
