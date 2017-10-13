@@ -37,10 +37,11 @@ using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using Abstractions.WindowsApi;
 using Abstractions.Windows;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.pgSMB2
 {
-    public class PluginImpl : IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime
+    public class PluginImpl : IPluginAuthenticationGateway, IPluginConfiguration, IPluginEventNotifications, IPluginLogoffRequestAddTime, IPluginImportExport
     {
         private ILog m_logger = LogManager.GetLogger("pgSMB2");
 
@@ -525,6 +526,51 @@ namespace pGina.Plugin.pgSMB2
             {
                 Locker.ExitWriteLock();
             }
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            Settings.Store.SMBshare = importSettings.SMBshare;
+            Settings.Store.RoamingSource = importSettings.RoamingSource;
+            Settings.Store.Filename = importSettings.Filename;
+            Settings.Store.TempComp = importSettings.TempComp;
+            Settings.Store.ConnectRetry = importSettings.ConnectRetry;
+            Settings.Store.Compressor = importSettings.Compressor;
+            Settings.Store.CompressCLI = importSettings.CompressCLI;
+            Settings.Store.UncompressCLI = importSettings.UncompressCLI;
+
+            Settings.Store.HomeDir = importSettings.HomeDir;
+            Settings.Store.HomeDirDrive = importSettings.HomeDirDrive;
+            Settings.Store.ScriptPath = importSettings.ScriptPath;
+            Settings.Store.MaxStore = importSettings.MaxStore;
+            Settings.Store.MaxStoreExclude = importSettings.MaxStoreExclude;
+            Settings.Store.MaxStoreText = importSettings.MaxStoreText;
+            Settings.Store.ACE = importSettings.ACE;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                SMBshare = Settings.Store.SMBshare,
+                RoamingSource = Settings.Store.RoamingSource,
+                Filename = Settings.Store.Filename,
+                TempComp = Settings.Store.TempComp,
+                ConnectRetry = Settings.Store.ConnectRetry,
+                Compressor = Settings.Store.Compressor,
+                CompressCLI = Settings.Store.CompressCLI,
+                UncompressCLI = Settings.Store.UncompressCLI,
+
+                HomeDir = Settings.Store.HomeDir,
+                HomeDirDrive = Settings.Store.HomeDirDrive,
+                ScriptPath = Settings.Store.ScriptPath,
+                MaxStore = Settings.Store.MaxStore,
+                MaxStoreExclude = Settings.Store.MaxStoreExclude,
+                MaxStoreText = Settings.Store.MaxStoreText,
+                ACE = Settings.Store.ACE,
+            };
+            return JToken.FromObject(exportsettings);
         }
     }
 }

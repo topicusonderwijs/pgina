@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using pGina.Shared.Types;
 using log4net;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.scripting
 {
-    public class PluginImpl : pGina.Shared.Interfaces.IPluginAuthentication, pGina.Shared.Interfaces.IPluginAuthorization, pGina.Shared.Interfaces.IPluginAuthenticationGateway, pGina.Shared.Interfaces.IPluginChangePassword, pGina.Shared.Interfaces.IPluginEventNotifications, pGina.Shared.Interfaces.IPluginConfiguration
+    public class PluginImpl : pGina.Shared.Interfaces.IPluginAuthentication, pGina.Shared.Interfaces.IPluginAuthorization, pGina.Shared.Interfaces.IPluginAuthenticationGateway, pGina.Shared.Interfaces.IPluginChangePassword, pGina.Shared.Interfaces.IPluginEventNotifications, pGina.Shared.Interfaces.IPluginConfiguration, pGina.Shared.Interfaces.IPluginImportExport
     {
         private ILog m_logger = LogManager.GetLogger("scripting");
 
@@ -312,6 +311,33 @@ namespace pGina.Plugin.scripting
             // the change password plugin chain will end as soon as one plugin failed
             // no special treatment needed
             return new BooleanResult { Success = true };
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            Settings.Store.authe_sys = importSettings.AutheSys;
+            Settings.Store.autho_sys = importSettings.Authosys;
+            Settings.Store.gateway_sys = importSettings.GatewaySys;
+            Settings.Store.notification_sys = importSettings.NotificationSys;
+            Settings.Store.notification_usr = importSettings.NotificationUsr;
+            Settings.Store.changepwd_sys = importSettings.ChangepwdSys;
+            Settings.Store.changepwd_usr = importSettings.ChangepwdUsr;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                AutheSys = Settings.Store.authe_sys,
+                Authosys = Settings.Store.autho_sys,
+                GatewaySys = Settings.Store.gateway_sys,
+                NotificationSys = Settings.Store.notification_sys,
+                NotificationUsr = Settings.Store.notification_usr,
+                ChangepwdSys = Settings.Store.changepwd_sys,
+                ChangepwdUsr = Settings.Store.changepwd_usr,
+            };
+            return JToken.FromObject(exportsettings);
         }
     }
 }

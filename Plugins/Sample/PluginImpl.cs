@@ -35,10 +35,11 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.Sample
 {
-    public class SimplePlugin : IPluginConfiguration, IPluginAuthentication, IPluginChangePassword
+    public class SimplePlugin : IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginImportExport
     {
         private ILog m_logger = LogManager.GetLogger("SimplePlugin");
         public static Guid SimpleUuid = new Guid("{16FC47C0-F17B-4D99-A820-EDBF0B0C764A}");
@@ -118,6 +119,23 @@ namespace pGina.Plugin.Sample
         public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
         {
             return new BooleanResult() { Success = true, Message = "Success from the sample plugin" };
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            m_settings.Store.Description = importSettings.Description;
+            m_settings.Store.ShowDescription = importSettings.ShowDescription;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                Description = m_settings.Store.Description,
+                ShowDescription = m_settings.Store.ShowDescription,
+            };
+            return JToken.FromObject(exportsettings);
         }
     }
 }
