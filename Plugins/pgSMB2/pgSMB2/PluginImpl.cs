@@ -547,7 +547,7 @@ namespace pGina.Plugin.pgSMB2
             Settings.Store.MaxStore = importSettings.MaxStore;
 
             Settings.StoreGlobal.MaxStoreExclude = importSettings.MaxStoreExclude.EmptyStringIfNull();
-            Settings.StoreGlobal.MaxStoreText = importSettings.MaxStoreText.EmptyStringIfNull();
+            Settings.StoreGlobal.MaxStoreText = importSettings.MaxStoreText.EmptyStringArrayIfNull();
             Settings.StoreGlobal.ACE = importSettings.ACE.EmptyStringIfNull();
         }
 
