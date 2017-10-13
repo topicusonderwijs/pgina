@@ -32,6 +32,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.SingleUser
 {
@@ -148,11 +149,11 @@ namespace pGina.Plugin.SingleUser
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.Username = importSettings.Username;
-            Settings.Store.Domain = importSettings.Domain;
-            Settings.Store.SetEncryptedSetting("Password", importSettings.Password);
+            Settings.Store.Username = importSettings.Username.EmptyStringIfNull();
+            Settings.Store.Domain = importSettings.Domain.EmptyStringIfNull();
+            Settings.Store.SetEncryptedSetting("Password", importSettings.Password.EmptyStringIfNull());
             Settings.Store.RequireAllPlugins = importSettings.RequireAllPlugins;
-            Settings.Store.RequiredPluginList = importSettings.RequiredPluginList;
+            Settings.Store.RequiredPluginList = importSettings.RequiredPluginList.EmptyStringArrayIfNull();
             Settings.Store.RequirePlugins = importSettings.RequirePlugins;
         }
 

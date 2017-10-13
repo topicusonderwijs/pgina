@@ -5,6 +5,7 @@ using pGina.Shared.Types;
 using log4net;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.scripting
 {
@@ -316,13 +317,13 @@ namespace pGina.Plugin.scripting
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.authe_sys = importSettings.AutheSys;
-            Settings.Store.autho_sys = importSettings.Authosys;
-            Settings.Store.gateway_sys = importSettings.GatewaySys;
-            Settings.Store.notification_sys = importSettings.NotificationSys;
-            Settings.Store.notification_usr = importSettings.NotificationUsr;
-            Settings.Store.changepwd_sys = importSettings.ChangepwdSys;
-            Settings.Store.changepwd_usr = importSettings.ChangepwdUsr;
+            Settings.Store.authe_sys = importSettings.AutheSys.EmptyStringArrayIfNull();
+            Settings.Store.autho_sys = importSettings.Authosys.EmptyStringArrayIfNull();
+            Settings.Store.gateway_sys = importSettings.GatewaySys.EmptyStringArrayIfNull();
+            Settings.Store.notification_sys = importSettings.NotificationSys.EmptyStringArrayIfNull();
+            Settings.Store.notification_usr = importSettings.NotificationUsr.EmptyStringArrayIfNull();
+            Settings.Store.changepwd_sys = importSettings.ChangepwdSys.EmptyStringArrayIfNull();
+            Settings.Store.changepwd_usr = importSettings.ChangepwdUsr.EmptyStringArrayIfNull();
         }
 
         public JToken Export()

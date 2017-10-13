@@ -41,6 +41,7 @@ using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using pGina.Shared.Settings;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.RADIUS
 {
@@ -555,18 +556,18 @@ namespace pGina.Plugin.RADIUS
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
             Settings.Store.EnableAuth = importSettings.EnableAuth;
             Settings.Store.EnableAcct = importSettings.EnableAcct;
-            Settings.Store.Server = importSettings.Server;
+            Settings.Store.Server = importSettings.Server.EmptyStringIfNull();
             Settings.Store.AuthPort = importSettings.AuthPort;
             Settings.Store.AcctPort = importSettings.AcctPort;
-            Settings.Store.SetEncryptedSetting("SharedSecret", importSettings.SharedSecret);
+            Settings.Store.SetEncryptedSetting("SharedSecret", importSettings.SharedSecret.EmptyStringIfNull());
             Settings.Store.Timeout = importSettings.Timeout;
             Settings.Store.Retry = importSettings.Retry;
 
             Settings.Store.SendNASIPAddress = importSettings.SendNASIPAddress;
             Settings.Store.SendNASIdentifier = importSettings.SendNASIdentifier;
-            Settings.Store.NASIdentifier = importSettings.NASIdentifier;
+            Settings.Store.NASIdentifier = importSettings.NASIdentifier.EmptyStringIfNull();
             Settings.Store.SendCalledStationID = importSettings.SendCalledStationID;
-            Settings.Store.CalledStationID = importSettings.CalledStationID;
+            Settings.Store.CalledStationID = importSettings.CalledStationID.EmptyStringIfNull();
 
             Settings.Store.AcctingForAllUsers = importSettings.AcctingForAllUsers;
             Settings.Store.SendInterimUpdates = importSettings.SendInterimUpdates;
@@ -577,7 +578,7 @@ namespace pGina.Plugin.RADIUS
             Settings.Store.WisprSessionTerminate = importSettings.WisprSessionTerminate;
 
             Settings.Store.UseModifiedName = importSettings.UseModifiedName;
-            Settings.Store.IPSuggestion = importSettings.IPSuggestion;
+            Settings.Store.IPSuggestion = importSettings.IPSuggestion.EmptyStringIfNull();
         }
 
         public JToken Export()

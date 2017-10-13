@@ -35,6 +35,7 @@ using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.Ldap
 {
@@ -430,34 +431,34 @@ namespace pGina.Plugin.Ldap
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
             // ServerSettings
-            Settings.Store.AttribConv = importSettings.ServerSettings.AttribConv;
-            Settings.Store.LdapHost = importSettings.ServerSettings.LdapHost;
+            Settings.Store.AttribConv = importSettings.ServerSettings.AttribConv.EmptyStringArrayIfNull();
+            Settings.Store.LdapHost = importSettings.ServerSettings.LdapHost.EmptyStringArrayIfNull();
             Settings.Store.LdapPort = importSettings.ServerSettings.LdapPort;
             Settings.Store.LdapTimeout = importSettings.ServerSettings.LdapTimeout;
             Settings.Store.RequireCert = importSettings.ServerSettings.RequireCert;
-            Settings.Store.SearchDN = importSettings.ServerSettings.SearchDN;
-            Settings.Store.SetEncryptedSetting("SearchPW", importSettings.ServerSettings.SearchPW);
-            Settings.Store.ServerCertFile = importSettings.ServerSettings.ServerCertFile;
+            Settings.Store.SearchDN = importSettings.ServerSettings.SearchDN.EmptyStringIfNull();
+            Settings.Store.SetEncryptedSetting("SearchPW", importSettings.ServerSettings.SearchPW.EmptyStringIfNull());
+            Settings.Store.ServerCertFile = importSettings.ServerSettings.ServerCertFile.EmptyStringIfNull();
             Settings.Store.UseAuthBindForAuthzAndGateway = importSettings.ServerSettings.UseAuthBindForAuthzAndGateway;
             Settings.Store.UseSsl = importSettings.ServerSettings.UseSsl;
             Settings.Store.UseTls = importSettings.ServerSettings.UseTls;
 
             // AuthenticationSettings
             Settings.Store.AllowEmptyPasswords = importSettings.AuthenticationSettings.AllowEmptyPasswords;
-            Settings.Store.DnPattern = importSettings.AuthenticationSettings.DnPattern;
+            Settings.Store.DnPattern = importSettings.AuthenticationSettings.DnPattern.EmptyStringIfNull();
             Settings.Store.DoSearch = importSettings.AuthenticationSettings.DoSearch;
-            Settings.Store.SearchContexts = importSettings.AuthenticationSettings.SearchContexts;
-            Settings.Store.SearchFilter = importSettings.AuthenticationSettings.SearchFilter;
+            Settings.Store.SearchContexts = importSettings.AuthenticationSettings.SearchContexts.EmptyStringArrayIfNull();
+            Settings.Store.SearchFilter = importSettings.AuthenticationSettings.SearchFilter.EmptyStringIfNull();
 
             // AuthorizationSettings
             Settings.Store.AuthzAllowOnError = importSettings.AuthorizationSettings.AuthzAllowOnError;
             Settings.Store.AuthzDefault = importSettings.AuthorizationSettings.AuthzDefault;
             Settings.Store.AuthzRequireAuth = importSettings.AuthorizationSettings.AuthzRequireAuth;
-            Settings.Store.GroupAuthzRules = importSettings.AuthorizationSettings.GroupAuthzRules;
+            Settings.Store.GroupAuthzRules = importSettings.AuthorizationSettings.GroupAuthzRules.EmptyStringArrayIfNull();
 
             // 
-            Settings.Store.ChangePasswordAttributes = importSettings.ChangePasswordAttributes;
-            Settings.Store.GroupGatewayRules = importSettings.GroupGatewayRules;
+            Settings.Store.ChangePasswordAttributes = importSettings.ChangePasswordAttributes.EmptyStringArrayIfNull();
+            Settings.Store.GroupGatewayRules = importSettings.GroupGatewayRules.EmptyStringArrayIfNull();
         }
 
         public JToken Export()

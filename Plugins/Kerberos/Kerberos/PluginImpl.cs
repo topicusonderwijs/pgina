@@ -8,6 +8,7 @@ using System.Diagnostics;
 using log4net;
 using pGina.Shared.Interfaces;
 using Newtonsoft.Json.Linq;
+using pGina.Shared;
 
 namespace pGina.Plugin.Kerberos
 {
@@ -125,7 +126,7 @@ namespace pGina.Plugin.Kerberos
         public void Import(JToken pluginSettings)
         {
             var importSettings = pluginSettings.ToObject<ImportExportSettings>();
-            Settings.Store.Realm = importSettings.Realm;
+            Settings.Store.Realm = importSettings.Realm.EmptyStringIfNull();
         }
 
         public JToken Export()
