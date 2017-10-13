@@ -8,10 +8,11 @@ using System.Runtime.InteropServices;
 using log4net;
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.SSHAuth
 {
-    public class PluginImpl : IPluginAuthentication, IPluginConfiguration
+    public class PluginImpl : IPluginAuthentication, IPluginConfiguration, IPluginImportExport
     {
         private ILog m_logger = LogManager.GetLogger("SSHAuth");
 
@@ -89,6 +90,23 @@ namespace pGina.Plugin.SSHAuth
             }
             // Authentication failure
             return new BooleanResult() { Success = false, Message = errsb.ToString() };
+        }
+
+        public void Import(JToken pluginSettings)
+        {
+            var importSettings = pluginSettings.ToObject<ImportExportSettings>();
+            Settings.Store.Host = importSettings.Host;
+            Settings.Store.Port = importSettings.Port;
+        }
+
+        public JToken Export()
+        {
+            var exportsettings = new ImportExportSettings
+            {
+                Port = Settings.Store.Port,
+                Host = Settings.Store.Host,
+            };
+            return JToken.FromObject(exportsettings);
         }
     }
 }
