@@ -16,8 +16,13 @@
     public partial class Configuration : Form
     {
         private readonly TopicusKeyHubSettings topicusKeyHubSettings;
-        private readonly SettingsProvider settingsProvider = SettingsProvider.GetInstance(TopicusKeyHubPlugin.TopicusKeyHubUuid);
+
+        private readonly SettingsProvider settingsProvider =
+            SettingsProvider.GetInstance(TopicusKeyHubPlugin.TopicusKeyHubUuid);
+
         private readonly ILog logger = LogManager.GetLogger("ConfigurationKeyHub");
+        private List<GatewayRule> gatewayrules = new List<GatewayRule>();
+        private List<KeyHubGroup> keyHubGroups;
 
         public Configuration()
         {
@@ -49,14 +54,18 @@
 
             // Groups 
             var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
-            this.SetColumnHeaderGroups(this.lvGroupsNotSelected);
-            this.SetColumnHeaderGroups(this.lvGroupsSelected);            
+            this.SetColumnHeaderGroups(this.lvKeyHubGroupsNotSelected);
+            this.SetColumnHeaderGroups(this.lvKeyHubGroupsSelected);
             this.cbDynamic.Checked = groupsettings.Dynamic;
             var loadGroupsBackground = new Thread(() =>
             {
                 try
                 {
-                    this.LoadGroupsTask(true);
+                    this.LoadKeyHubGroupsTask(true);
+                    // if groups are loaded, gateway can be showed
+                    // Gateway
+                    this.FillGatewayrules(this.topicusKeyHubSettings.GetGatewaySettings.Rules);
+                    this.ReloadDisplayGatewayRules();
                 }
                 catch (Exception e)
                 {
@@ -64,23 +73,76 @@
                 }
             });
             loadGroupsBackground.Start();
-            this.lvGroupsNotSelected.Sorting = SortOrder.Ascending;
-            this.lvGroupsSelected.Sorting = SortOrder.Ascending;
-            this.cbDynamic.CheckedChanged += this.cbDynamic_CheckedChanged;
+            this.lvKeyHubGroupsNotSelected.Sorting = SortOrder.Ascending;
+            this.lvKeyHubGroupsSelected.Sorting = SortOrder.Ascending;
+            this.cbDynamic.CheckedChanged += this.cbDynamic_CheckedChanged;            
+        }
 
-            // Gateway
+
+        private void FillGatewayrules(string[] gatewayrulessettings)
+        {
+            this.gatewayrules = new List<GatewayRule>();
+            if (this.keyHubGroups != null)
+            {
+                foreach (var gatewayrulessetting in gatewayrulessettings)
+                {
+                    var splitRule = gatewayrulessetting.Split('*');
+                    var keyHubGroup = this.keyHubGroups.SingleOrDefault(b => b.CommonName == splitRule[0]);
+                    this.gatewayrules.Add(new GatewayRule
+                    {
+                        LocalMachineGroupName = splitRule[1],
+                        KeyHubGroupCommonName = splitRule[0],
+                        KeyHubGroupDistinguishedName = keyHubGroup == null ? null : keyHubGroup.DistinguishedName,
+                        ErrorRemove = keyHubGroup == null
+                    });
+                }
+            }
+        }
+
+        private void ReloadDisplayGatewayRules()
+        {
+            this.lvGatewayRules.Items.Clear();
+            foreach (var rule in this.gatewayrules.OrderBy(b => b.KeyHubGroupCommonName).ThenBy(b => b.LocalMachineGroupName))
+            {
+                var message = "";
+                var name = string.Format("{0}*{1}", rule.KeyHubGroupDistinguishedName, rule.LocalMachineGroupName);
+                if (rule.ErrorRemove)
+                {
+                    message = " (a error occurred, rule will be delete)";
+                    name = "delete";
+                }
+                this.lvGatewayRules.Items.Add(new ListViewItem
+                {
+                    Text = string.Format("{0} => {1}{2}", rule.KeyHubGroupCommonName, rule.LocalMachineGroupName, message),
+                    Name = name
+                });
+            }
+        }
+
+        private void UpdateGatewaySettings()
+        {
+            var newgatewaysettings = new List<string>();
+            foreach (ListView item in this.lvGatewayRules.Items)
+            {
+                if (item.Name != "delete")
+                {
+                    newgatewaysettings.Add(item.Name);
+                }
+            }
+            this.topicusKeyHubSettings.SetGatewaySettings(new GatewaySettings(newgatewaysettings.ToArray()));
         }
 
         private void UpdateSettings()
         {
             this.UpdateConnectionSettings();
             this.UpdateGroupSettings();
+            this.UpdateGatewaySettings();
         }
 
         private void UpdateGroupSettings()
         {
             var selectedgroups = new List<string>();
-            foreach (ListViewItem item in this.lvGroupsSelected.Items)
+            foreach (ListViewItem item in this.lvKeyHubGroupsSelected.Items)
             {
                 selectedgroups.Add(item.Name);
             }
@@ -146,7 +208,7 @@
             if (this.ValidateInput())
             {
                 this.UpdateSettings();
-            }     
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -205,26 +267,30 @@
 
         private void SetColumnHeaderGroups(ListView listView)
         {
-            listView.View = View.Details;            
+            listView.View = View.Details;
             listView.Columns.Add(new ColumnHeader());
             listView.Columns[0].Text = "Groups";
             listView.Columns[0].Width = 240;
         }
 
-        private void LoadGroupsTask(bool init)
+        private void LoadKeyHubGroupsTask(bool init)
         {
             Cursor.Current = Cursors.WaitCursor;
             using (var ldap = new LdapServer(this.topicusKeyHubSettings.GetConnectionSettings))
             {
                 ldap.BindForSearch();
                 var contexts = ldap.GetTopNamingContexts();
-                var groups = ldap.GetGroups(contexts.Single(b => b.Dynamic == this.cbDynamic.Checked).DistributionName).OrderBy(c => c.CommonName);
+                var groups = ldap.GetGroups(contexts.Single(b => b.Dynamic == this.cbDynamic.Checked).DistributionName)
+                    .OrderBy(c => c.CommonName);
+                this.keyHubGroups = groups.ToList();
                 var index = 0;
                 if (init)
                 {
-                    this.lvGroupsNotSelected.Items.Clear();
-                    this.lvGroupsSelected.Items.Clear();
-                    // Add all groups in selection
+                    this.cbKeyhubGroups.Items.Clear();
+
+                    this.lvKeyHubGroupsNotSelected.Items.Clear();
+                    this.lvKeyHubGroupsSelected.Items.Clear();
+                    // Add all groups in selection Authorization
                     var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
                     foreach (var keyHubGroup in groups.Where(b => groupsettings.Groups.Contains(b.DistinguishedName)))
                     {
@@ -233,16 +299,16 @@
                         {
                             Name = keyHubGroup.DistinguishedName
                         };
-                        this.lvGroupsSelected.Items.Add(item);
+                        this.lvKeyHubGroupsSelected.Items.Add(item);
                         index++;
                     }
                 }
-                index = 0;
+
                 foreach (var keyHubGroup in groups)
                 {
                     // Only add groups with are not in al ListView yet.
-                    bool add = !(this.GroupInListView(keyHubGroup, this.lvGroupsNotSelected) != null ||
-                                 this.GroupInListView(keyHubGroup, this.lvGroupsSelected) != null);
+                    bool add = !(this.GroupInListView(keyHubGroup, this.lvKeyHubGroupsNotSelected) != null ||
+                                 this.GroupInListView(keyHubGroup, this.lvKeyHubGroupsSelected) != null);
                     if (add)
                     {
                         this.logger.DebugFormat("add item {0}", keyHubGroup.CommonName);
@@ -250,20 +316,41 @@
                         {
                             Name = keyHubGroup.DistinguishedName
                         };
-                        this.lvGroupsNotSelected.Items.Add(item);
-                        index++;
+
+                        this.lvKeyHubGroupsNotSelected.Items.Add(item);
+
+                        this.cbKeyhubGroups.Items.Add(new ComboBoxItem(keyHubGroup.CommonName,
+                            keyHubGroup.DistinguishedName));
                     }
                 }
-                this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsNotSelected);
-                this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsSelected);
+                this.RemoveNotExistingGroupsFromListView(groups, this.lvKeyHubGroupsNotSelected);
+                this.RemoveNotExistingGroupsFromListView(groups, this.lvKeyHubGroupsSelected);
             }
         }
 
-        private void LoadGroups()
+        public class ComboBoxItem
+        {
+            public ComboBoxItem(string text, string value)
+            {
+                this.Text = text;
+                this.Value = value;
+            }
+
+            public string Text { get; set; }
+            public object Value { get; set; }
+
+            public override string ToString()
+            {
+                return Text;
+            }
+        }
+
+
+        private void LoadKeyHubGroups()
         {
             try
             {
-                this.LoadGroupsTask(false);
+                this.LoadKeyHubGroupsTask(false);
             }
             catch (Exception exception)
             {
@@ -277,7 +364,7 @@
 
         private void btLoadGroups_Click(object sender, EventArgs e)
         {
-            this.LoadGroups();
+            this.LoadKeyHubGroups();
         }
 
         private void RemoveNotExistingGroupsFromListView(IEnumerable<KeyHubGroup> keyHubGroups, ListView listView)
@@ -285,7 +372,7 @@
             foreach (ListViewItem item in listView.Items)
             {
                 if (keyHubGroups.FirstOrDefault(b => b.CommonName == item.Text) == null)
-                {                    
+                {
                     listView.Items.Remove(item);
                 }
             }
@@ -306,51 +393,94 @@
 
         private void btAdd_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in this.lvGroupsNotSelected.Items)
+            foreach (ListViewItem item in this.lvKeyHubGroupsNotSelected.Items)
             {
                 if (item.Selected)
-                {                    
-                    this.lvGroupsNotSelected.Items.Remove(item);
-                    this.lvGroupsSelected.Items.Add(item);
+                {
+                    this.lvKeyHubGroupsNotSelected.Items.Remove(item);
+                    this.lvKeyHubGroupsSelected.Items.Add(item);
                 }
             }
         }
 
         private void btRemove_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in this.lvGroupsSelected.Items)
+            foreach (ListViewItem item in this.lvKeyHubGroupsSelected.Items)
             {
                 if (item.Selected)
                 {
-                    this.lvGroupsSelected.Items.Remove(item);
-                    this.lvGroupsNotSelected.Items.Add(item);                    
+                    this.lvKeyHubGroupsSelected.Items.Remove(item);
+                    this.lvKeyHubGroupsNotSelected.Items.Add(item);
                 }
             }
         }
 
         private void cbDynamic_CheckedChanged(object sender, EventArgs e)
         {
-            this.LoadGroups();
+            this.LoadKeyHubGroups();
         }
 
         private void lvGroupsNotSelected_DoubleClicked(object sender, EventArgs e)
         {
-            if (this.lvGroupsNotSelected.SelectedItems.Count == 1)
+            if (this.lvKeyHubGroupsNotSelected.SelectedItems.Count == 1)
             {
-                var item = this.lvGroupsNotSelected.SelectedItems[0];
-                this.lvGroupsNotSelected.Items.Remove(item);
-                this.lvGroupsSelected.Items.Add(item);                
-            }            
+                var item = this.lvKeyHubGroupsNotSelected.SelectedItems[0];
+                this.lvKeyHubGroupsNotSelected.Items.Remove(item);
+                this.lvKeyHubGroupsSelected.Items.Add(item);
+            }
         }
 
         private void lvGroupsSelected_DoubleClicked(object sender, EventArgs e)
         {
-            if (this.lvGroupsSelected.SelectedItems.Count == 1)
+            if (this.lvKeyHubGroupsSelected.SelectedItems.Count == 1)
             {
-                var item = this.lvGroupsSelected.SelectedItems[0];
-                this.lvGroupsSelected.Items.Remove(item);
-                this.lvGroupsNotSelected.Items.Add(item);
+                var item = this.lvKeyHubGroupsSelected.SelectedItems[0];
+                this.lvKeyHubGroupsSelected.Items.Remove(item);
+                this.lvKeyHubGroupsNotSelected.Items.Add(item);
             }
+        }
+
+        private void lbLoadgroups_Click(object sender, EventArgs e)
+        {
+            this.LoadKeyHubGroups();
+            this.LoadMachineGroups();
+            this.ReloadDisplayGatewayRules();
+        }
+
+        private void LoadMachineGroups()
+        {
+            this.cbLocalMachineGroups.Items.Clear();
+            var localMachineGroups = Abstractions.Windows.Group.GetLocalMachineGroups();
+            foreach (var localMachineGroup in localMachineGroups)
+            {
+                this.cbLocalMachineGroups.Items.Add(new ComboBoxItem(localMachineGroup, localMachineGroup));
+            }
+        }
+
+        private void btAddGatewayRule_Click(object sender, EventArgs e)
+        {
+            var localgroup = (ComboBoxItem) this.cbLocalMachineGroups.SelectedItem;
+            var keyHubgroep = (ComboBoxItem) this.cbKeyhubGroups.SelectedItem;
+            if (localgroup != null && keyHubgroep != null)
+            {
+                this.gatewayrules.Add(new GatewayRule
+                {
+                    KeyHubGroupCommonName = keyHubgroep.Text,
+                    KeyHubGroupDistinguishedName = (string)keyHubgroep.Value,
+                    LocalMachineGroupName = (string)localgroup.Value
+                });
+            }
+        }
+
+        private class GatewayRule
+        {
+            public string KeyHubGroupDistinguishedName { get; set; }
+
+            public string KeyHubGroupCommonName { get; set; }        
+
+            public string LocalMachineGroupName { get; set; }
+
+            public bool ErrorRemove { get; set; }
         }
     }
 }

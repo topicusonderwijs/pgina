@@ -13,8 +13,9 @@
     using Settings.Model;
     using Shared.Interfaces;
     using Shared.Types;
+    using System.Collections.Generic;
 
-    public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginAuthorization, IPluginImportExport
+    public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginAuthorization, IPluginImportExport, IPluginAuthenticationGateway
     {
         private readonly ILog logger = LogManager.GetLogger("TopicusKeyHubPlugin");
         public static Guid TopicusKeyHubUuid = new Guid("{EF869D73-8C63-4A93-B952-B94E52BAFB13}");
@@ -50,6 +51,76 @@
         public Guid Uuid
         {
             get { return TopicusKeyHubUuid; }
+        }
+
+        public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
+        {
+            this.logger.Debug("LDAP Plugin Gateway");
+            var addedGroups = new List<string>();
+
+            var ldapServer = properties.GetTrackedSingle<LdapServer>();
+
+            // If the server is unavailable, we go ahead and succeed anyway.
+            if (ldapServer == null)
+            {
+                this.logger.ErrorFormat("AuthenticatedUserGateway: Internal error, LdapServer object not available.");
+                return new BooleanResult
+                {
+                    Success = false,
+                    Message = "LDAP server not available"
+                };
+            }
+            try
+            {
+                var userInfo = properties.GetTrackedSingle<UserInformation>();
+                var context = properties.GetTrackedSingle<KeyHubNamingContexts>();
+                if (context == null)
+                {
+                    this.logger.Debug("No KeyHubNamingContexts");
+                    return new BooleanResult { Message = "No KeyHubNamingContexts", Success = false };
+                }
+                var user = properties.GetTrackedSingle<KeyHubUser>();
+                if (user == null)
+                {
+                    this.logger.Debug("No User");
+                    return new BooleanResult { Message = "No KeyHubUser", Success = false };
+                }
+                var groupsettings = properties.GetTrackedSingle<GroupSettings>();
+                if (groupsettings == null)
+                {
+                    this.logger.Debug("No GroupSettings");
+                    return new BooleanResult { Message = "No GroupSettings", Success = false };
+                }
+                var groups = ldapServer.GetGroups(context.DistributionName);
+                var rules = this.settings.GetGatewaySettings.Rules;
+                foreach (var rule in rules)
+                {
+                    var rulevalues = rule.Split('*');
+                    // Group still exists and user is in the group.
+                    if (groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0]) != null && ldapServer.UserIsInGroup(user, groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0])))
+                    {
+
+                            logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"", userInfo.Username, rulevalues[1], rule);
+                            addedGroups.Add(rulevalues[1]);
+                            userInfo.AddGroup(new GroupInformation { Name = rulevalues[1] });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                this.logger.ErrorFormat("Error during gateway: {0}", e);
+
+                // Error does not cause failure
+                return new BooleanResult { Success = true, Message = e.Message };
+            }
+
+            string message = "";
+            if (addedGroups.Count > 0)
+                message = string.Format("Added to groups: {0}", string.Join(", ", addedGroups));
+            else
+                message = "No groups added.";
+
+            return new BooleanResult { Success = true, Message = message };
         }
 
         public BooleanResult AuthorizeUser(SessionProperties properties)

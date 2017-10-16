@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -63,6 +64,7 @@
     <Compile Include="Settings\DynamicSetting.cs" />
     <Compile Include="Settings\DynamicSettings.cs" />
     <Compile Include="WindowsApi\pInvokes.cs" />
+    <Compile Include="Windows\Group.cs" />
     <Compile Include="Windows\Networking.cs" />
     <Compile Include="Windows\OsInfo.cs" />
     <Compile Include="Windows\Security.cs" />

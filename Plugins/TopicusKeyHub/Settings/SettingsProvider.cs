@@ -23,6 +23,8 @@
             // Groups Set default values for settings (if not already set)
             this.settings.SetDefault("Groups", new string[] {});
             this.settings.SetDefault("Dynamic", true);
+            // Gateway
+            this.settings.SetDefault("GatewayRules", new string[] { });
         }
 
         internal static SettingsProvider GetInstance(Guid settingsGuid)

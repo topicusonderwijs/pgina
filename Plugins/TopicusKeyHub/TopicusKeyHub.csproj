@@ -71,6 +71,7 @@
     <Compile Include="LDAP\Model\KeyHubGroup.cs" />
     <Compile Include="LDAP\Model\KeyHubNamingContexts.cs" />
     <Compile Include="LDAP\Model\KeyHubUserWithGroups.cs" />
+    <Compile Include="Settings\Model\GatewaySettings.cs" />
     <Compile Include="Settings\Model\GroupSettings.cs" />
     <Compile Include="Settings\Model\ConnectionSettings.cs" />
     <Compile Include="Settings\Model\TopicusKeyHubSettings.cs" />

@@ -64,5 +64,19 @@
             this.settings.Groups = groupSettings.Groups.EmptyStringArrayIfNull();
             this.settings.Dynamic = groupSettings.Dynamic;
         }
+
+        public GatewaySettings GetGatewaySettings
+        {
+            get
+            {
+                string[] rules = this.settings.GatewayRules;
+                return new GatewaySettings(rules);
+            }
+        }
+
+        public void SetGatewaySettings(GatewaySettings gatewaySettings)
+        {
+            this.settings.GatewayRules = gatewaySettings.Rules.EmptyStringArrayIfNull();            
+        }
     }
 }
