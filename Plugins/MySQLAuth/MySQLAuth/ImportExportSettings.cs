@@ -3,37 +3,37 @@
     internal class ImportExportSettings
     {
         //Connection
-        public string Host { get; internal set; }
-        public int Port { get; internal set; }
-        public bool UseSsl { get; internal set; }
-        public string User { get; internal set; }
-        public string Password { get; internal set; }
-        public string Database { get; internal set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public bool UseSsl { get; set; }
+        public string User { get; set; }
+        public string Password { get; set; }
+        public string Database { get; set; }
 
         // User table
-        public string Table { get; internal set; }
-        public int HashEncoding { get; internal set; }
-        public string UsernameColumn { get; internal set; }
-        public string HashMethodColumn { get; internal set; }
-        public string PasswordColumn { get; internal set; }
-        public string UserTablePrimaryKeyColumn { get; internal set; }
+        public string Table { get; set; }
+        public int HashEncoding { get; set; }
+        public string UsernameColumn { get; set; }
+        public string HashMethodColumn { get; set; }
+        public string PasswordColumn { get; set; }
+        public string UserTablePrimaryKeyColumn { get; set; }
 
         // Group table
-        public string GroupTableName { get; internal set; }
-        public string GroupNameColumn { get; internal set; }
-        public string GroupTablePrimaryKeyColumn { get; internal set; }
+        public string GroupTableName { get; set; }
+        public string GroupNameColumn { get; set; }
+        public string GroupTablePrimaryKeyColumn { get; set; }
 
         // User-Group table
-        public string UserGroupTableName { get; internal set; }
-        public string UserForeignKeyColumn { get; internal set; }
-        public string GroupForeignKeyColumn { get; internal set; }
+        public string UserGroupTableName { get; set; }
+        public string UserForeignKeyColumn { get; set; }
+        public string GroupForeignKeyColumn { get; set; }
 
         // Authz Settings
-        public string[] GroupAuthzRules { get; internal set; }
-        public bool AuthzRequireMySqlAuth { get; internal set; }
+        public string[] GroupAuthzRules { get; set; }
+        public bool AuthzRequireMySqlAuth { get; set; }
 
         // Gateway settings
-        public string[] GroupGatewayRules { get; internal set; }
-        public bool PreventLogonOnServerError { get; internal set; }
+        public string[] GroupGatewayRules { get; set; }
+        public bool PreventLogonOnServerError { get; set; }
     }
 }

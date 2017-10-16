@@ -2,16 +2,16 @@
 {
     internal class ImportExportSettings
     {
-        public string Username { get; internal set; }
+        public string Username { get; set; }
 
-        public string Domain { get; internal set; }
+        public string Domain { get; set; }
 
-        public string Password { get; internal set; }
+        public string Password { get; set; }
 
-        public bool RequirePlugins { get; internal set; }
+        public bool RequirePlugins { get; set; }
 
-        public bool RequireAllPlugins { get; internal set; }
+        public bool RequireAllPlugins { get; set; }
 
-        public string[] RequiredPluginList { get; internal set; }
+        public string[] RequiredPluginList { get; set; }
     }
 }
