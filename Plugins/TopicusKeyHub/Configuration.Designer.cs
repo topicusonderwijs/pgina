@@ -365,7 +365,6 @@
             this.cbDynamic.TabIndex = 0;
             this.cbDynamic.Text = "dynamic";
             this.cbDynamic.UseVisualStyleBackColor = true;
-            this.cbDynamic.CheckedChanged += new System.EventHandler(this.cbDynamic_CheckedChanged);
             // 
             // btnClose
             // 

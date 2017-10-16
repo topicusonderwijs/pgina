@@ -6,6 +6,7 @@
     using System.Windows.Forms;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Threading;
     using log4net;
     using LDAP;
     using LDAP.Model;
@@ -14,7 +15,7 @@
 
     public partial class Configuration : Form
     {
-        private TopicusKeyHubSettings topicusKeyHubSettings;
+        private readonly TopicusKeyHubSettings topicusKeyHubSettings;
         private readonly SettingsProvider settingsProvider = SettingsProvider.GetInstance(TopicusKeyHubPlugin.TopicusKeyHubUuid);
         private readonly ILog logger = LogManager.GetLogger("ConfigurationKeyHub");
 
@@ -51,9 +52,21 @@
             this.SetColumnHeaderGroups(this.lvGroupsNotSelected);
             this.SetColumnHeaderGroups(this.lvGroupsSelected);            
             this.cbDynamic.Checked = groupsettings.Dynamic;
-            this.LoadGroups(true);
+            var loadGroupsBackground = new Thread(() =>
+            {
+                try
+                {
+                    this.LoadGroupsTask(true);
+                }
+                catch (Exception e)
+                {
+                    this.logger.InfoFormat("Load groups in background failt: {0}", e);
+                }
+            });
+            loadGroupsBackground.Start();
             this.lvGroupsNotSelected.Sorting = SortOrder.Ascending;
             this.lvGroupsSelected.Sorting = SortOrder.Ascending;
+            this.cbDynamic.CheckedChanged += this.cbDynamic_CheckedChanged;
 
             // Gateway
         }
@@ -110,11 +123,11 @@
             try
             {
                 int timeout = Convert.ToInt32(this.timeoutTextBox.Text.Trim());
-                if (timeout <= 0) throw new FormatException();
+                if (timeout <= 0 || timeout > 10) throw new FormatException();
             }
             catch (FormatException)
             {
-                MessageBox.Show("The timout be a positive integer > 0.");
+                MessageBox.Show("The timout be a positive 10 > 0.");
                 return false;
             }
 
@@ -198,55 +211,59 @@
             listView.Columns[0].Width = 240;
         }
 
+        private void LoadGroupsTask(bool init)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            using (var ldap = new LdapServer(this.topicusKeyHubSettings.GetConnectionSettings))
+            {
+                ldap.BindForSearch();
+                var contexts = ldap.GetTopNamingContexts();
+                var groups = ldap.GetGroups(contexts.Single(b => b.Dynamic == this.cbDynamic.Checked).DistributionName).OrderBy(c => c.CommonName);
+                var index = 0;
+                if (init)
+                {
+                    this.lvGroupsNotSelected.Items.Clear();
+                    this.lvGroupsSelected.Items.Clear();
+                    // Add all groups in selection
+                    var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
+                    foreach (var keyHubGroup in groups.Where(b => groupsettings.Groups.Contains(b.DistinguishedName)))
+                    {
+                        this.logger.DebugFormat("init item {0}", keyHubGroup.CommonName);
+                        var item = new ListViewItem(keyHubGroup.CommonName, index)
+                        {
+                            Name = keyHubGroup.DistinguishedName
+                        };
+                        this.lvGroupsSelected.Items.Add(item);
+                        index++;
+                    }
+                }
+                index = 0;
+                foreach (var keyHubGroup in groups)
+                {
+                    // Only add groups with are not in al ListView yet.
+                    bool add = !(this.GroupInListView(keyHubGroup, this.lvGroupsNotSelected) != null ||
+                                 this.GroupInListView(keyHubGroup, this.lvGroupsSelected) != null);
+                    if (add)
+                    {
+                        this.logger.DebugFormat("add item {0}", keyHubGroup.CommonName);
+                        var item = new ListViewItem(keyHubGroup.CommonName, index)
+                        {
+                            Name = keyHubGroup.DistinguishedName
+                        };
+                        this.lvGroupsNotSelected.Items.Add(item);
+                        index++;
+                    }
+                }
+                this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsNotSelected);
+                this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsSelected);
+            }
+        }
 
-        private void LoadGroups(bool init)
+        private void LoadGroups()
         {
             try
             {
-                Cursor.Current = Cursors.WaitCursor;
-                using (var ldap = new LdapServer(this.topicusKeyHubSettings.GetConnectionSettings))
-                {
-                    ldap.BindForSearch();
-                    var contexts = ldap.GetTopNamingContexts();
-                    var groups = ldap.GetGroups(contexts.Single(b => b.Dynamic == this.cbDynamic.Checked).DistributionName).OrderBy(c => c.CommonName);
-                    var index = 0;
-                    if (init)
-                    {
-                        this.lvGroupsNotSelected.Items.Clear();
-                        this.lvGroupsSelected.Items.Clear();
-                        // Add all groups in selection
-                        var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
-                        foreach (var keyHubGroup in groups.Where(b => groupsettings.Groups.Contains(b.DistinguishedName)))
-                        {
-                            this.logger.DebugFormat("init item {0}", keyHubGroup.CommonName);
-                            var item = new ListViewItem(keyHubGroup.CommonName, index)
-                            {
-                                Name = keyHubGroup.DistinguishedName
-                            };
-                            this.lvGroupsSelected.Items.Add(item);
-                            index++;
-                        }
-                    }
-                    index = 0;
-                    foreach (var keyHubGroup in groups)
-                    {
-                        // Only add groups with are not in al ListView yet.
-                        bool add = !(this.GroupInListView(keyHubGroup, this.lvGroupsNotSelected) != null ||
-                                     this.GroupInListView(keyHubGroup, this.lvGroupsSelected) != null);
-                        if (add)
-                        {
-                            this.logger.DebugFormat("add item {0}", keyHubGroup.CommonName);
-                            var item = new ListViewItem(keyHubGroup.CommonName, index)
-                            {
-                                Name = keyHubGroup.DistinguishedName
-                            };
-                            this.lvGroupsNotSelected.Items.Add(item);
-                            index++;
-                        }
-                    }
-                    this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsNotSelected);
-                    this.RemoveNotExistingGroupsFromListView(groups, this.lvGroupsSelected);
-                }
+                this.LoadGroupsTask(false);
             }
             catch (Exception exception)
             {
@@ -260,7 +277,7 @@
 
         private void btLoadGroups_Click(object sender, EventArgs e)
         {
-            this.LoadGroups(false);
+            this.LoadGroups();
         }
 
         private void RemoveNotExistingGroupsFromListView(IEnumerable<KeyHubGroup> keyHubGroups, ListView listView)
@@ -313,7 +330,7 @@
 
         private void cbDynamic_CheckedChanged(object sender, EventArgs e)
         {
-            this.LoadGroups(false);
+            this.LoadGroups();
         }
 
         private void lvGroupsNotSelected_DoubleClicked(object sender, EventArgs e)
