@@ -50,7 +50,7 @@
             this.ldapHostTextBox = new System.Windows.Forms.TextBox();
             this.ldapPortLabel = new System.Windows.Forms.Label();
             this.ldapHostDescriptionLabel = new System.Windows.Forms.Label();
-            this.tpGroups = new System.Windows.Forms.TabPage();
+            this.tpAuthorization = new System.Windows.Forms.TabPage();
             this.lblSelected = new System.Windows.Forms.Label();
             this.lblNotSelected = new System.Windows.Forms.Label();
             this.btLoadGroups = new System.Windows.Forms.Button();
@@ -59,11 +59,21 @@
             this.lvGroupsSelected = new System.Windows.Forms.ListView();
             this.lvGroupsNotSelected = new System.Windows.Forms.ListView();
             this.cbDynamic = new System.Windows.Forms.CheckBox();
+            this.tbGateway = new System.Windows.Forms.TabPage();
+            this.lbGatewayRules = new System.Windows.Forms.Label();
+            this.listView1 = new System.Windows.Forms.ListView();
             this.btnClose = new System.Windows.Forms.Button();
+            this.lbLoadgroups = new System.Windows.Forms.Button();
+            this.cbKeyhubGroups = new System.Windows.Forms.ComboBox();
+            this.lbKeyhubGroup = new System.Windows.Forms.Label();
+            this.lbWindowsGroups = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.btAddGatewayRule = new System.Windows.Forms.Button();
             this.tcPluginSettings.SuspendLayout();
             this.tpLDAPServer.SuspendLayout();
             this.ldapServerGroupBox.SuspendLayout();
-            this.tpGroups.SuspendLayout();
+            this.tpAuthorization.SuspendLayout();
+            this.tbGateway.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
@@ -89,7 +99,8 @@
             // tcPluginSettings
             // 
             this.tcPluginSettings.Controls.Add(this.tpLDAPServer);
-            this.tcPluginSettings.Controls.Add(this.tpGroups);
+            this.tcPluginSettings.Controls.Add(this.tpAuthorization);
+            this.tcPluginSettings.Controls.Add(this.tbGateway);
             this.tcPluginSettings.Location = new System.Drawing.Point(12, 12);
             this.tcPluginSettings.Name = "tcPluginSettings";
             this.tcPluginSettings.SelectedIndex = 0;
@@ -272,45 +283,45 @@
             this.ldapHostDescriptionLabel.TabIndex = 0;
             this.ldapHostDescriptionLabel.Text = "LDAP Host(s)";
             // 
-            // tpGroups
+            // tpAuthorization
             // 
-            this.tpGroups.Controls.Add(this.lblSelected);
-            this.tpGroups.Controls.Add(this.lblNotSelected);
-            this.tpGroups.Controls.Add(this.btLoadGroups);
-            this.tpGroups.Controls.Add(this.btRemove);
-            this.tpGroups.Controls.Add(this.btAdd);
-            this.tpGroups.Controls.Add(this.lvGroupsSelected);
-            this.tpGroups.Controls.Add(this.lvGroupsNotSelected);
-            this.tpGroups.Controls.Add(this.cbDynamic);
-            this.tpGroups.Location = new System.Drawing.Point(4, 22);
-            this.tpGroups.Name = "tpGroups";
-            this.tpGroups.Padding = new System.Windows.Forms.Padding(3);
-            this.tpGroups.Size = new System.Drawing.Size(690, 209);
-            this.tpGroups.TabIndex = 1;
-            this.tpGroups.Text = "Groups";
-            this.tpGroups.UseVisualStyleBackColor = true;
+            this.tpAuthorization.Controls.Add(this.lblSelected);
+            this.tpAuthorization.Controls.Add(this.lblNotSelected);
+            this.tpAuthorization.Controls.Add(this.btLoadGroups);
+            this.tpAuthorization.Controls.Add(this.btRemove);
+            this.tpAuthorization.Controls.Add(this.btAdd);
+            this.tpAuthorization.Controls.Add(this.lvGroupsSelected);
+            this.tpAuthorization.Controls.Add(this.lvGroupsNotSelected);
+            this.tpAuthorization.Controls.Add(this.cbDynamic);
+            this.tpAuthorization.Location = new System.Drawing.Point(4, 22);
+            this.tpAuthorization.Name = "tpAuthorization";
+            this.tpAuthorization.Padding = new System.Windows.Forms.Padding(3);
+            this.tpAuthorization.Size = new System.Drawing.Size(690, 209);
+            this.tpAuthorization.TabIndex = 1;
+            this.tpAuthorization.Text = "Authorization";
+            this.tpAuthorization.UseVisualStyleBackColor = true;
             // 
             // lblSelected
             // 
             this.lblSelected.AutoSize = true;
             this.lblSelected.Location = new System.Drawing.Point(441, 12);
             this.lblSelected.Name = "lblSelected";
-            this.lblSelected.Size = new System.Drawing.Size(49, 13);
+            this.lblSelected.Size = new System.Drawing.Size(57, 13);
             this.lblSelected.TabIndex = 7;
-            this.lblSelected.Text = "Selected";
+            this.lblSelected.Text = "Authorized";
             // 
             // lblNotSelected
             // 
             this.lblNotSelected.AutoSize = true;
             this.lblNotSelected.Location = new System.Drawing.Point(165, 12);
             this.lblNotSelected.Name = "lblNotSelected";
-            this.lblNotSelected.Size = new System.Drawing.Size(69, 13);
+            this.lblNotSelected.Size = new System.Drawing.Size(76, 13);
             this.lblNotSelected.TabIndex = 6;
-            this.lblNotSelected.Text = "Not Selected";
+            this.lblNotSelected.Text = "Not authorized";
             // 
             // btLoadGroups
             // 
-            this.btLoadGroups.Location = new System.Drawing.Point(30, 180);
+            this.btLoadGroups.Location = new System.Drawing.Point(7, 180);
             this.btLoadGroups.Name = "btLoadGroups";
             this.btLoadGroups.Size = new System.Drawing.Size(96, 23);
             this.btLoadGroups.TabIndex = 5;
@@ -366,6 +377,41 @@
             this.cbDynamic.Text = "dynamic";
             this.cbDynamic.UseVisualStyleBackColor = true;
             // 
+            // tbGateway
+            // 
+            this.tbGateway.Controls.Add(this.btAddGatewayRule);
+            this.tbGateway.Controls.Add(this.lbWindowsGroups);
+            this.tbGateway.Controls.Add(this.comboBox1);
+            this.tbGateway.Controls.Add(this.lbKeyhubGroup);
+            this.tbGateway.Controls.Add(this.cbKeyhubGroups);
+            this.tbGateway.Controls.Add(this.lbLoadgroups);
+            this.tbGateway.Controls.Add(this.lbGatewayRules);
+            this.tbGateway.Controls.Add(this.listView1);
+            this.tbGateway.Location = new System.Drawing.Point(4, 22);
+            this.tbGateway.Name = "tbGateway";
+            this.tbGateway.Padding = new System.Windows.Forms.Padding(3);
+            this.tbGateway.Size = new System.Drawing.Size(690, 209);
+            this.tbGateway.TabIndex = 2;
+            this.tbGateway.Text = "Gateway";
+            this.tbGateway.UseVisualStyleBackColor = true;
+            // 
+            // lbGatewayRules
+            // 
+            this.lbGatewayRules.AutoSize = true;
+            this.lbGatewayRules.Location = new System.Drawing.Point(441, 12);
+            this.lbGatewayRules.Name = "lbGatewayRules";
+            this.lbGatewayRules.Size = new System.Drawing.Size(79, 13);
+            this.lbGatewayRules.TabIndex = 9;
+            this.lbGatewayRules.Text = "Gateway Rules";
+            // 
+            // listView1
+            // 
+            this.listView1.Location = new System.Drawing.Point(251, 31);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(433, 172);
+            this.listView1.TabIndex = 8;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            // 
             // btnClose
             // 
             this.btnClose.Location = new System.Drawing.Point(552, 253);
@@ -375,6 +421,58 @@
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // lbLoadgroups
+            // 
+            this.lbLoadgroups.Location = new System.Drawing.Point(6, 180);
+            this.lbLoadgroups.Name = "lbLoadgroups";
+            this.lbLoadgroups.Size = new System.Drawing.Size(96, 23);
+            this.lbLoadgroups.TabIndex = 10;
+            this.lbLoadgroups.Text = "Load Groups";
+            this.lbLoadgroups.UseVisualStyleBackColor = true;
+            // 
+            // cbKeyhubGroups
+            // 
+            this.cbKeyhubGroups.FormattingEnabled = true;
+            this.cbKeyhubGroups.Location = new System.Drawing.Point(24, 47);
+            this.cbKeyhubGroups.Name = "cbKeyhubGroups";
+            this.cbKeyhubGroups.Size = new System.Drawing.Size(209, 21);
+            this.cbKeyhubGroups.TabIndex = 11;
+            // 
+            // lbKeyhubGroup
+            // 
+            this.lbKeyhubGroup.AutoSize = true;
+            this.lbKeyhubGroup.Location = new System.Drawing.Point(21, 31);
+            this.lbKeyhubGroup.Name = "lbKeyhubGroup";
+            this.lbKeyhubGroup.Size = new System.Drawing.Size(80, 13);
+            this.lbKeyhubGroup.TabIndex = 12;
+            this.lbKeyhubGroup.Text = "Keyhub Groups";
+            // 
+            // lbWindowsGroups
+            // 
+            this.lbWindowsGroups.AutoSize = true;
+            this.lbWindowsGroups.Location = new System.Drawing.Point(22, 80);
+            this.lbWindowsGroups.Name = "lbWindowsGroups";
+            this.lbWindowsGroups.Size = new System.Drawing.Size(88, 13);
+            this.lbWindowsGroups.TabIndex = 14;
+            this.lbWindowsGroups.Text = "Windows Groups";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(25, 96);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(209, 21);
+            this.comboBox1.TabIndex = 13;
+            // 
+            // btAddGatewayRule
+            // 
+            this.btAddGatewayRule.Location = new System.Drawing.Point(159, 123);
+            this.btAddGatewayRule.Name = "btAddGatewayRule";
+            this.btAddGatewayRule.Size = new System.Drawing.Size(75, 23);
+            this.btAddGatewayRule.TabIndex = 15;
+            this.btAddGatewayRule.Text = "Add";
+            this.btAddGatewayRule.UseVisualStyleBackColor = true;
             // 
             // Configuration
             // 
@@ -392,8 +490,10 @@
             this.tpLDAPServer.ResumeLayout(false);
             this.ldapServerGroupBox.ResumeLayout(false);
             this.ldapServerGroupBox.PerformLayout();
-            this.tpGroups.ResumeLayout(false);
-            this.tpGroups.PerformLayout();
+            this.tpAuthorization.ResumeLayout(false);
+            this.tpAuthorization.PerformLayout();
+            this.tbGateway.ResumeLayout(false);
+            this.tbGateway.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -403,7 +503,7 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.TabControl tcPluginSettings;
         private System.Windows.Forms.TabPage tpLDAPServer;
-        private System.Windows.Forms.TabPage tpGroups;
+        private System.Windows.Forms.TabPage tpAuthorization;
         private System.Windows.Forms.GroupBox ldapServerGroupBox;
         private System.Windows.Forms.CheckBox showPwCB;
         private System.Windows.Forms.TextBox timeoutTextBox;
@@ -430,5 +530,14 @@
         private System.Windows.Forms.Button btLoadGroups;
         private System.Windows.Forms.Label lblSelected;
         private System.Windows.Forms.Label lblNotSelected;
+        private System.Windows.Forms.TabPage tbGateway;
+        private System.Windows.Forms.Label lbGatewayRules;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.Button lbLoadgroups;
+        private System.Windows.Forms.Label lbWindowsGroups;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Label lbKeyhubGroup;
+        private System.Windows.Forms.ComboBox cbKeyhubGroups;
+        private System.Windows.Forms.Button btAddGatewayRule;
     }
 }
