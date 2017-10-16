@@ -2,25 +2,25 @@
 {
     internal class ImportExportSettings
     {
-        public bool EventMode { get; internal set; }
-        public bool SessionMode { get; internal set; }
-        public string Host { get; internal set; }
-        public int Port { get; internal set; }
-        public string User { get; internal set; }
-        public string Password { get; internal set; }
-        public string SessionTable { get; internal set; }
-        public string EventTable { get; internal set; }
+        public bool EventMode { get; set; }
+        public bool SessionMode { get; set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public string User { get; set; }
+        public string Password { get; set; }
+        public string SessionTable { get; set; }
+        public string EventTable { get; set; }
 
-        public bool EvtLogon { get; internal set; }
-        public bool EvtLogoff { get; internal set; }
-        public bool EvtLock { get; internal set; }
-        public bool EvtUnlock { get; internal set; }
-        public bool EvtConsoleConnect { get; internal set; }
-        public bool EvtConsoleDisconnect { get; internal set; }
-        public bool EvtRemoteControl { get; internal set; }
-        public bool EvtRemoteConnect { get; internal set; }
-        public bool EvtRemoteDisconnect { get; internal set; }
+        public bool EvtLogon { get; set; }
+        public bool EvtLogoff { get; set; }
+        public bool EvtLock { get; set; }
+        public bool EvtUnlock { get; set; }
+        public bool EvtConsoleConnect { get; set; }
+        public bool EvtConsoleDisconnect { get; set; }
+        public bool EvtRemoteControl { get; set; }
+        public bool EvtRemoteConnect { get; set; }
+        public bool EvtRemoteDisconnect { get; set; }
 
-        public bool UseModifiedName { get; internal set; }
+        public bool UseModifiedName { get; set; }
     }
 }

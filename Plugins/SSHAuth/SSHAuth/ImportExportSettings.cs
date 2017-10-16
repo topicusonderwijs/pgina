@@ -2,8 +2,8 @@
 {
     internal class ImportExportSettings
     {
-        public string Host { get; internal set; }
+        public string Host { get; set; }
 
-        public string Port { get; internal set; }
+        public string Port { get; set; }
     }
 }

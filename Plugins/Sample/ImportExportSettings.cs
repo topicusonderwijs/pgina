@@ -2,7 +2,7 @@
 {
     internal class ImportExportSettings
     {
-        public string Description { get; internal set; }
-        public bool ShowDescription { get; internal set; }
+        public string Description { get; set; }
+        public bool ShowDescription { get; set; }
     }
 }

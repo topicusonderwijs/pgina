@@ -2,6 +2,6 @@
 {
     internal class ImportExportSettings
     {
-        public int GlobalLimit { get; internal set; }
+        public int GlobalLimit { get; set; }
     }
 }
