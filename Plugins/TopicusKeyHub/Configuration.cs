@@ -278,7 +278,6 @@
 
         private void RefresfKeyhubGroups(bool init)
         {
-            this.cbKeyhubGroups.Items.Clear();
             var index = 0;
             if (init)
             {
@@ -315,6 +314,18 @@
                     this.lvKeyHubGroupsNotSelected.Items.Add(item);
                     index++;
                 }
+
+            }
+            this.RemoveNotExistingGroupsFromListView(this.keyHubGroups, this.lvKeyHubGroupsNotSelected);
+            this.RemoveNotExistingGroupsFromListView(this.keyHubGroups, this.lvKeyHubGroupsSelected);
+            this.RefresfKeyhubGroupsGatewayRules();
+        }
+
+        public void RefresfKeyhubGroupsGatewayRules()
+        {
+            this.cbKeyhubGroups.Items.Clear();
+            foreach (var keyHubGroup in this.keyHubGroups)
+            {
                 if (this.GroupInListView(keyHubGroup, this.lvKeyHubGroupsSelected) != null)
                 {
                     // Only Authorized users in gateway selectbox.
@@ -322,8 +333,6 @@
                         keyHubGroup.DistinguishedName));
                 }
             }
-            this.RemoveNotExistingGroupsFromListView(this.keyHubGroups, this.lvKeyHubGroupsNotSelected);
-            this.RemoveNotExistingGroupsFromListView(this.keyHubGroups, this.lvKeyHubGroupsSelected);
             this.ReloadDisplayGatewayRules();
         }
 
@@ -402,6 +411,7 @@
                     this.lvKeyHubGroupsSelected.Items.Add(item);
                 }
             }
+            this.RefresfKeyhubGroupsGatewayRules();
         }
 
         private void btRemove_Click(object sender, EventArgs e)
@@ -414,11 +424,13 @@
                     this.lvKeyHubGroupsNotSelected.Items.Add(item);
                 }
             }
+            this.RefresfKeyhubGroupsGatewayRules();
         }
 
         private void cbDynamic_CheckedChanged(object sender, EventArgs e)
         {
             this.LoadKeyHubGroups();
+            this.gatewayrules.Clear();
         }
 
         private void lvGroupsNotSelected_DoubleClicked(object sender, EventArgs e)
@@ -429,6 +441,7 @@
                 this.lvKeyHubGroupsNotSelected.Items.Remove(item);
                 this.lvKeyHubGroupsSelected.Items.Add(item);
             }
+            this.RefresfKeyhubGroupsGatewayRules();
         }
 
         private void lvGroupsSelected_DoubleClicked(object sender, EventArgs e)
@@ -439,6 +452,7 @@
                 this.lvKeyHubGroupsSelected.Items.Remove(item);
                 this.lvKeyHubGroupsNotSelected.Items.Add(item);
             }
+            this.RefresfKeyhubGroupsGatewayRules();
         }
 
         private void lbLoadgroups_Click(object sender, EventArgs e)
