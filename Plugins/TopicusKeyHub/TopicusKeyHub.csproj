@@ -65,6 +65,7 @@
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.cs</DependentUpon>
     </Compile>
+    <Compile Include="GroupConfigurationHelper.cs" />
     <Compile Include="Settings\ImportExport\TopicusKeyHubSettingsConverter.cs" />
     <Compile Include="LDAP\LdapServer.cs" />
     <Compile Include="LDAP\Model\KeyHubUser.cs" />

@@ -15,7 +15,7 @@
     using Shared.Types;
     using System.Collections.Generic;
 
-    public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginChangePassword, IPluginAuthorization, IPluginImportExport, IPluginAuthenticationGateway
+    public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginAuthorization, IPluginImportExport, IPluginAuthenticationGateway
     {
         private readonly ILog logger = LogManager.GetLogger("TopicusKeyHubPlugin");
         public static Guid TopicusKeyHubUuid = new Guid("{EF869D73-8C63-4A93-B952-B94E52BAFB13}");
@@ -60,14 +60,14 @@
 
             var ldapServer = properties.GetTrackedSingle<LdapServer>();
 
-            // If the server is unavailable, we go ahead and succeed anyway.
+            // If the server is unavailable, we stop here!
             if (ldapServer == null)
             {
                 this.logger.ErrorFormat("AuthenticatedUserGateway: Internal error, LdapServer object not available.");
                 return new BooleanResult
                 {
                     Success = false,
-                    Message = "LDAP server not available"
+                    Message = "Topicus KeyHub LDAP server not available"
                 };
             }
             try
@@ -100,7 +100,7 @@
                     if (groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0]) != null && ldapServer.UserIsInGroup(user, groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0])))
                     {
 
-                            logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"", userInfo.Username, rulevalues[1], rule);
+                            this.logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"", userInfo.Username, rulevalues[1], rule);
                             addedGroups.Add(rulevalues[1]);
                             userInfo.AddGroup(new GroupInformation { Name = rulevalues[1] });
                     }
@@ -114,7 +114,7 @@
                 return new BooleanResult { Success = true, Message = e.Message };
             }
 
-            string message = "";
+            string message;
             if (addedGroups.Count > 0)
                 message = string.Format("Added to groups: {0}", string.Join(", ", addedGroups));
             else
@@ -222,15 +222,6 @@
 
         public void Starting() { }
         public void Stopping() { }
-        public BooleanResult ChangePassword(SessionProperties props, ChangePasswordPluginActivityInfo pluginInfo)
-        {
-            return new BooleanResult
-            {
-                Success = false,
-                Message = "Password change not possible"
-            };
-        }
-
 
         public void BeginChain(SessionProperties props)
         {

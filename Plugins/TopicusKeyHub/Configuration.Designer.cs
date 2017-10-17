@@ -60,6 +60,7 @@
             this.lvKeyHubGroupsNotSelected = new System.Windows.Forms.ListView();
             this.cbDynamic = new System.Windows.Forms.CheckBox();
             this.tbGateway = new System.Windows.Forms.TabPage();
+            this.lvGatewayRules = new System.Windows.Forms.ListView();
             this.btAddGatewayRule = new System.Windows.Forms.Button();
             this.lbWindowsGroups = new System.Windows.Forms.Label();
             this.cbLocalMachineGroups = new System.Windows.Forms.ComboBox();
@@ -68,7 +69,7 @@
             this.lbLoadgroups = new System.Windows.Forms.Button();
             this.lbGatewayRules = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.lvGatewayRules = new System.Windows.Forms.ListView();
+            this.btDeleteGatewayRule = new System.Windows.Forms.Button();
             this.tcPluginSettings.SuspendLayout();
             this.tpLDAPServer.SuspendLayout();
             this.ldapServerGroupBox.SuspendLayout();
@@ -376,9 +377,11 @@
             this.cbDynamic.TabIndex = 0;
             this.cbDynamic.Text = "dynamic";
             this.cbDynamic.UseVisualStyleBackColor = true;
+            this.cbDynamic.CheckedChanged += new System.EventHandler(this.cbDynamic_CheckedChanged);
             // 
             // tbGateway
             // 
+            this.tbGateway.Controls.Add(this.btDeleteGatewayRule);
             this.tbGateway.Controls.Add(this.lvGatewayRules);
             this.tbGateway.Controls.Add(this.btAddGatewayRule);
             this.tbGateway.Controls.Add(this.lbWindowsGroups);
@@ -394,6 +397,14 @@
             this.tbGateway.TabIndex = 2;
             this.tbGateway.Text = "Gateway";
             this.tbGateway.UseVisualStyleBackColor = true;
+            // 
+            // lvGatewayRules
+            // 
+            this.lvGatewayRules.Location = new System.Drawing.Point(240, 31);
+            this.lvGatewayRules.Name = "lvGatewayRules";
+            this.lvGatewayRules.Size = new System.Drawing.Size(444, 143);
+            this.lvGatewayRules.TabIndex = 16;
+            this.lvGatewayRules.UseCompatibleStateImageBehavior = false;
             // 
             // btAddGatewayRule
             // 
@@ -468,13 +479,15 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // lvGatewayRules
+            // btDeleteGatewayRule
             // 
-            this.lvGatewayRules.Location = new System.Drawing.Point(240, 31);
-            this.lvGatewayRules.Name = "lvGatewayRules";
-            this.lvGatewayRules.Size = new System.Drawing.Size(444, 172);
-            this.lvGatewayRules.TabIndex = 16;
-            this.lvGatewayRules.UseCompatibleStateImageBehavior = false;
+            this.btDeleteGatewayRule.Location = new System.Drawing.Point(609, 180);
+            this.btDeleteGatewayRule.Name = "btDeleteGatewayRule";
+            this.btDeleteGatewayRule.Size = new System.Drawing.Size(75, 23);
+            this.btDeleteGatewayRule.TabIndex = 17;
+            this.btDeleteGatewayRule.Text = "Delete";
+            this.btDeleteGatewayRule.UseVisualStyleBackColor = true;
+            this.btDeleteGatewayRule.Click += new System.EventHandler(this.btDeleteGatewayRule_Click);
             // 
             // Configuration
             // 
@@ -541,5 +554,6 @@
         private System.Windows.Forms.ComboBox cbKeyhubGroups;
         private System.Windows.Forms.Button btAddGatewayRule;
         private System.Windows.Forms.ListView lvGatewayRules;
+        private System.Windows.Forms.Button btDeleteGatewayRule;
     }
 }
