@@ -32,6 +32,7 @@ using System.Security.Principal;
 using Microsoft.Win32;
 using Abstractions.WindowsApi;
 using Abstractions.Logging;
+using System.DirectoryServices.AccountManagement;
 
 namespace Abstractions.Windows
 {
@@ -314,6 +315,19 @@ namespace Abstractions.Windows
             }
 
             return true;
+        }
+
+        public static bool ChangeLocalUserPassword(string username, string password)
+        {
+            PrincipalContext ctx = new PrincipalContext(ContextType.Machine);
+            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, username);
+            if (user != null)
+            {
+                user.SetPassword(password);
+                user.Save();
+                return true;
+            }
+            return false;
         }
     }
 }
