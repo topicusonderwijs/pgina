@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
+using pGina.Plugin.TopicusKeyHub.LDAP;
+using pGina.Plugin.TopicusKeyHub.LDAP.Model;
+using pGina.Plugin.TopicusKeyHub.Settings.Model;
 
 namespace pGina.Plugin.TopicusKeyHub
 {
-    using LDAP;
-    using LDAP.Model;
-    using Settings.Model;
-
     public class GroupConfigurationHelper
     {
         internal List<KeyHubGroup> GetKeyHubGroups(ConnectionSettings settings, bool dynamic)
         {
             using (var ldap = new LdapServer(settings))
             {
-                ldap.BindForSearch();
                 var contexts = ldap.GetTopNamingContexts();
                 var groups = ldap.GetGroups(contexts.Single(b => b.Dynamic == dynamic).DistributionName)
                     .OrderBy(c => c.CommonName);

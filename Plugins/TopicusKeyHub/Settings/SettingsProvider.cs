@@ -17,6 +17,7 @@
             this.settings.SetDefault("LdapPort", 389);
             this.settings.SetDefault("LdapTimeout", 10);
             this.settings.SetDefault("RequireCert", true);
+            this.settings.SetDefault("DNSCheck", true);
             this.settings.SetDefault("ServerCertFile", "");
             this.settings.SetDefault("SearchDN", "");
             this.settings.SetDefaultEncryptedSetting("SearchPW", "");

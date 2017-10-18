@@ -1,10 +1,10 @@
-﻿namespace pGina.Plugin.TopicusKeyHub.Settings.ImportExport
-{
-    using System;
-    using Model;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using pGina.Plugin.TopicusKeyHub.Settings.Model;
 
+namespace pGina.Plugin.TopicusKeyHub.Settings.ImportExport
+{
     internal class TopicusKeyHubSettingsConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

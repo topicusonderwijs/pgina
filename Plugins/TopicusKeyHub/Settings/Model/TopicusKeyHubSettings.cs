@@ -1,7 +1,7 @@
-﻿namespace pGina.Plugin.TopicusKeyHub.Settings.Model
-{
-    using Shared;
+﻿using pGina.Shared;
 
+namespace pGina.Plugin.TopicusKeyHub.Settings.Model
+{
     public class TopicusKeyHubSettings
     {
         // The dynamic settings are from pGina. The magic is happing only here.
@@ -33,8 +33,9 @@
                 string searchDN = this.settings.SearchDN;
                 string searchPw = this.settings.GetEncryptedSetting("SearchPW");
                 string serverCertFile = this.settings.ServerCertFile;
+                bool dnsCheck = this.settings.DNSCheck;
                 return new ConnectionSettings(ldapHost, ldapPort, ldapTimeout, requireCert, serverCertFile, searchDN,
-                    searchPw);
+                    searchPw, dnsCheck);
             }
         }
 
@@ -44,6 +45,7 @@
             this.settings.LdapHost = connectionSettings.LdapHosts.EmptyStringArrayIfNull();
             this.settings.LdapPort = connectionSettings.LdapPort;
             this.settings.RequireCert = connectionSettings.RequireCert;
+            this.settings.DNSCheck = connectionSettings.DNSCheck;
             this.settings.ServerCertFile = connectionSettings.ServerCertFile.EmptyStringIfNull();
             this.settings.SearchDN = connectionSettings.SearchDN.EmptyStringIfNull();
             this.settings.SetEncryptedSetting("SearchPW",connectionSettings.SearchPW.EmptyStringIfNull());

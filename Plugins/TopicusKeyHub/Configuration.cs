@@ -1,18 +1,19 @@
-﻿namespace pGina.Plugin.TopicusKeyHub
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Windows.Forms;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using log4net;
-    using LDAP;
-    using LDAP.Model;
-    using Settings;
-    using Settings.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
+using System.Linq;
+using System.Text.RegularExpressions;
+using log4net;
 
+using pGina.Plugin.TopicusKeyHub.Settings.Model;
+using pGina.Plugin.TopicusKeyHub.Settings;
+using pGina.Plugin.TopicusKeyHub.LDAP.Model;
+using pGina.Plugin.TopicusKeyHub.LDAP;
+
+namespace pGina.Plugin.TopicusKeyHub
+{
     public partial class Configuration : Form
     {
         private readonly TopicusKeyHubSettings topicusKeyHubSettings;
@@ -51,9 +52,11 @@
             this.ldapPortTextBox.Text = connectionSettings.LdapPort.ToString();
             this.timeoutTextBox.Text = connectionSettings.LdapTimeout.ToString();
             this.validateServerCertCheckBox.Checked = connectionSettings.RequireCert;
+            this.validateServerDNSCheckBox.Checked = connectionSettings.DNSCheck;
             this.sslCertFileTextBox.Text = connectionSettings.ServerCertFile;
-            this.searchDnTextBox.Text = connectionSettings.SearchDN;
-            this.searchPassTextBox.Text = connectionSettings.SearchPW;
+            this.tbBindDnTextBox.Text = connectionSettings.SearchDN;
+            this.tbBindPassTextBox.Text = connectionSettings.SearchPW;
+            this.SetDNSCheckCheckBox();
 
             // Groups 
             var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
@@ -162,8 +165,9 @@
                 int.Parse(this.timeoutTextBox.Text),
                 this.validateServerCertCheckBox.Checked,
                 this.sslCertFileTextBox.Text,
-                this.searchDnTextBox.Text,
-                this.searchPassTextBox.Text));
+                this.tbBindDnTextBox.Text,
+                this.tbBindPassTextBox.Text,
+                this.validateServerDNSCheckBox.Checked));
         }
 
         private bool ValidateInput()
@@ -227,7 +231,7 @@
 
         private void showPwCB_CheckedChanged(object sender, EventArgs e)
         {
-            this.searchPassTextBox.UseSystemPasswordChar = !this.showPwCB.Checked;
+            this.tbBindPassTextBox.UseSystemPasswordChar = !this.showPwCB.Checked;
         }
 
         private void sslCertFileBrowseButton_Click(object sender, EventArgs e)
@@ -254,7 +258,6 @@
                 this.UpdateConnectionSettings();
                 using (var ldap = new LdapServer(this.topicusKeyHubSettings.GetConnectionSettings))
                 {
-                    ldap.BindForSearch();
                 }
                 MessageBox.Show("Connection OK");
             }
@@ -336,24 +339,6 @@
             this.ReloadDisplayGatewayRules();
         }
 
-        public class ComboBoxItem
-        {
-            public ComboBoxItem(string text, string value)
-            {
-                this.Text = text;
-                this.Value = value;
-            }
-
-            public string Text { get; set; }
-            public object Value { get; set; }
-
-            public override string ToString()
-            {
-                return Text;
-            }
-        }
-
-
         private void LoadKeyHubGroups()
         {
             Cursor.Current = Cursors.WaitCursor;
@@ -397,11 +382,42 @@
                     return item;
                 }
             }
-
             return null;
         }
 
+        private void cbDynamic_CheckedChanged(object sender, EventArgs e)
+        {
+            this.LoadKeyHubGroups();
+            this.gatewayrules.Clear();
+        }
+
         private void btAdd_Click(object sender, EventArgs e)
+        {
+            this.AddAuthorizedItems();
+        }
+
+        private void btRemove_Click(object sender, EventArgs e)
+        {
+            this.RemoveAuthorizedItems();
+        }
+
+        private void lvGroupsNotSelected_DoubleClicked(object sender, EventArgs e)
+        {
+            if (this.lvKeyHubGroupsNotSelected.SelectedItems.Count == 1)
+            {
+                this.AddAuthorizedItems();
+            }
+        }
+
+        private void lvGroupsSelected_DoubleClicked(object sender, EventArgs e)
+        {
+            if (this.lvKeyHubGroupsSelected.SelectedItems.Count == 1)
+            {
+                this.RemoveAuthorizedItems();
+            }
+        }
+
+        private void AddAuthorizedItems()
         {
             foreach (ListViewItem item in this.lvKeyHubGroupsNotSelected.Items)
             {
@@ -414,7 +430,7 @@
             this.RefresfKeyhubGroupsGatewayRules();
         }
 
-        private void btRemove_Click(object sender, EventArgs e)
+        private void RemoveAuthorizedItems()
         {
             foreach (ListViewItem item in this.lvKeyHubGroupsSelected.Items)
             {
@@ -423,34 +439,6 @@
                     this.lvKeyHubGroupsSelected.Items.Remove(item);
                     this.lvKeyHubGroupsNotSelected.Items.Add(item);
                 }
-            }
-            this.RefresfKeyhubGroupsGatewayRules();
-        }
-
-        private void cbDynamic_CheckedChanged(object sender, EventArgs e)
-        {
-            this.LoadKeyHubGroups();
-            this.gatewayrules.Clear();
-        }
-
-        private void lvGroupsNotSelected_DoubleClicked(object sender, EventArgs e)
-        {
-            if (this.lvKeyHubGroupsNotSelected.SelectedItems.Count == 1)
-            {
-                var item = this.lvKeyHubGroupsNotSelected.SelectedItems[0];
-                this.lvKeyHubGroupsNotSelected.Items.Remove(item);
-                this.lvKeyHubGroupsSelected.Items.Add(item);
-            }
-            this.RefresfKeyhubGroupsGatewayRules();
-        }
-
-        private void lvGroupsSelected_DoubleClicked(object sender, EventArgs e)
-        {
-            if (this.lvKeyHubGroupsSelected.SelectedItems.Count == 1)
-            {
-                var item = this.lvKeyHubGroupsSelected.SelectedItems[0];
-                this.lvKeyHubGroupsSelected.Items.Remove(item);
-                this.lvKeyHubGroupsNotSelected.Items.Add(item);
             }
             this.RefresfKeyhubGroupsGatewayRules();
         }
@@ -510,6 +498,20 @@
                 }
             }
             this.ReloadDisplayGatewayRules();
+        }
+
+        private void SetDNSCheckCheckBox()
+        {
+            this.validateServerDNSCheckBox.Enabled = this.validateServerCertCheckBox.Checked;
+            if (!this.validateServerCertCheckBox.Checked)
+            {
+                this.validateServerDNSCheckBox.Checked = false;
+            }
+        }
+
+        private void validateServerCertCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            this.SetDNSCheckCheckBox();
         }
     }
 }

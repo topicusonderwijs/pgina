@@ -1,16 +1,16 @@
-﻿namespace pGina.Plugin.TopicusKeyHub.LDAP
-{
-    using System;
-    using System.Collections.Generic;
-    using System.DirectoryServices.Protocols;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Security.Cryptography.X509Certificates;
-    using log4net;
-    using Model;
-    using Settings.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.DirectoryServices.Protocols;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using log4net;
+using pGina.Plugin.TopicusKeyHub.Settings.Model;
+using pGina.Plugin.TopicusKeyHub.LDAP.Model;
 
+namespace pGina.Plugin.TopicusKeyHub.LDAP
+{
     public class LdapServer : IDisposable
     {
         private readonly ILog logger = LogManager.GetLogger("LdapServer");
@@ -25,6 +25,7 @@
             this.ldapconnection = null;
             this.cert = null;
             this.Connect(connectionsettings);
+            this.BindForSearch();
         }
 
         public void Dispose()
@@ -152,7 +153,7 @@
         /// Try to bind to the LDAP server with credentials.  This uses
         /// basic authentication.  Throws LdapException if the bind fails.
         /// </summary>
-        internal void BindForSearch()
+        private void BindForSearch()
         {
             NetworkCredential creds = new NetworkCredential(this.connectionsettings.SearchDN, this.connectionsettings.SearchPW);
 
@@ -203,6 +204,18 @@
 
             // Convert to X509Certificate2
             X509Certificate2 serverCert = new X509Certificate2(servercert);
+
+            if (this.connectionsettings.DNSCheck)
+            {
+                // We check the dns name
+                string hostName = serverCert.GetNameInfo(X509NameType.DnsName, false);
+                if (!hostName.ToLower().Equals(ldapconn.SessionOptions.HostName.ToLower()))
+                {
+                    this.logger.ErrorFormat("Server hostname {0} is not the same as in certificate {1}", hostName.ToLower(), ldapconn.SessionOptions.HostName.ToLower());
+                    return false;
+                }
+                this.logger.Debug("Server hostname is the same as in certificate");
+            }
 
             // If we don't need to verify the cert, the verification succeeds
             if (!this.connectionsettings.RequireCert)

@@ -38,12 +38,12 @@
             this.showPwCB = new System.Windows.Forms.CheckBox();
             this.timeoutTextBox = new System.Windows.Forms.TextBox();
             this.timeoutLabel = new System.Windows.Forms.Label();
-            this.searchPassTextBox = new System.Windows.Forms.TextBox();
+            this.tbBindPassTextBox = new System.Windows.Forms.TextBox();
             this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.searchDnTextBox = new System.Windows.Forms.TextBox();
+            this.lblBindPassword = new System.Windows.Forms.Label();
+            this.tbBindDnTextBox = new System.Windows.Forms.TextBox();
             this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lblBindDN = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.validateServerCertCheckBox = new System.Windows.Forms.CheckBox();
             this.ldapPortTextBox = new System.Windows.Forms.TextBox();
@@ -60,6 +60,7 @@
             this.lvKeyHubGroupsNotSelected = new System.Windows.Forms.ListView();
             this.cbDynamic = new System.Windows.Forms.CheckBox();
             this.tbGateway = new System.Windows.Forms.TabPage();
+            this.btDeleteGatewayRule = new System.Windows.Forms.Button();
             this.lvGatewayRules = new System.Windows.Forms.ListView();
             this.btAddGatewayRule = new System.Windows.Forms.Button();
             this.lbWindowsGroups = new System.Windows.Forms.Label();
@@ -69,7 +70,7 @@
             this.lbLoadgroups = new System.Windows.Forms.Button();
             this.lbGatewayRules = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.btDeleteGatewayRule = new System.Windows.Forms.Button();
+            this.validateServerDNSCheckBox = new System.Windows.Forms.CheckBox();
             this.tcPluginSettings.SuspendLayout();
             this.tpLDAPServer.SuspendLayout();
             this.ldapServerGroupBox.SuspendLayout();
@@ -132,15 +133,16 @@
             // 
             // ldapServerGroupBox
             // 
+            this.ldapServerGroupBox.Controls.Add(this.validateServerDNSCheckBox);
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
             this.ldapServerGroupBox.Controls.Add(this.timeoutLabel);
-            this.ldapServerGroupBox.Controls.Add(this.searchPassTextBox);
+            this.ldapServerGroupBox.Controls.Add(this.tbBindPassTextBox);
             this.ldapServerGroupBox.Controls.Add(this.sslCertFileBrowseButton);
-            this.ldapServerGroupBox.Controls.Add(this.label3);
-            this.ldapServerGroupBox.Controls.Add(this.searchDnTextBox);
+            this.ldapServerGroupBox.Controls.Add(this.lblBindPassword);
+            this.ldapServerGroupBox.Controls.Add(this.tbBindDnTextBox);
             this.ldapServerGroupBox.Controls.Add(this.sslCertFileTextBox);
-            this.ldapServerGroupBox.Controls.Add(this.label2);
+            this.ldapServerGroupBox.Controls.Add(this.lblBindDN);
             this.ldapServerGroupBox.Controls.Add(this.label1);
             this.ldapServerGroupBox.Controls.Add(this.validateServerCertCheckBox);
             this.ldapServerGroupBox.Controls.Add(this.ldapPortTextBox);
@@ -181,13 +183,13 @@
             this.timeoutLabel.TabIndex = 4;
             this.timeoutLabel.Text = "Timeout";
             // 
-            // searchPassTextBox
+            // tbBindPassTextBox
             // 
-            this.searchPassTextBox.Location = new System.Drawing.Point(110, 123);
-            this.searchPassTextBox.Name = "searchPassTextBox";
-            this.searchPassTextBox.Size = new System.Drawing.Size(462, 20);
-            this.searchPassTextBox.TabIndex = 16;
-            this.searchPassTextBox.UseSystemPasswordChar = true;
+            this.tbBindPassTextBox.Location = new System.Drawing.Point(110, 123);
+            this.tbBindPassTextBox.Name = "tbBindPassTextBox";
+            this.tbBindPassTextBox.Size = new System.Drawing.Size(462, 20);
+            this.tbBindPassTextBox.TabIndex = 16;
+            this.tbBindPassTextBox.UseSystemPasswordChar = true;
             // 
             // sslCertFileBrowseButton
             // 
@@ -199,21 +201,21 @@
             this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
             this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
             // 
-            // label3
+            // lblBindPassword
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 126);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(90, 13);
-            this.label3.TabIndex = 15;
-            this.label3.Text = "Search Password";
+            this.lblBindPassword.AutoSize = true;
+            this.lblBindPassword.Location = new System.Drawing.Point(6, 126);
+            this.lblBindPassword.Name = "lblBindPassword";
+            this.lblBindPassword.Size = new System.Drawing.Size(77, 13);
+            this.lblBindPassword.TabIndex = 15;
+            this.lblBindPassword.Text = "Bind Password";
             // 
-            // searchDnTextBox
+            // tbBindDnTextBox
             // 
-            this.searchDnTextBox.Location = new System.Drawing.Point(110, 97);
-            this.searchDnTextBox.Name = "searchDnTextBox";
-            this.searchDnTextBox.Size = new System.Drawing.Size(462, 20);
-            this.searchDnTextBox.TabIndex = 13;
+            this.tbBindDnTextBox.Location = new System.Drawing.Point(110, 97);
+            this.tbBindDnTextBox.Name = "tbBindDnTextBox";
+            this.tbBindDnTextBox.Size = new System.Drawing.Size(462, 20);
+            this.tbBindDnTextBox.TabIndex = 13;
             // 
             // sslCertFileTextBox
             // 
@@ -222,14 +224,14 @@
             this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
             this.sslCertFileTextBox.TabIndex = 10;
             // 
-            // label2
+            // lblBindDN
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 100);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(60, 13);
-            this.label2.TabIndex = 12;
-            this.label2.Text = "Search DN";
+            this.lblBindDN.AutoSize = true;
+            this.lblBindDN.Location = new System.Drawing.Point(6, 100);
+            this.lblBindDN.Name = "lblBindDN";
+            this.lblBindDN.Size = new System.Drawing.Size(47, 13);
+            this.lblBindDN.TabIndex = 12;
+            this.lblBindDN.Text = "Bind DN";
             // 
             // label1
             // 
@@ -249,6 +251,7 @@
             this.validateServerCertCheckBox.TabIndex = 8;
             this.validateServerCertCheckBox.Text = "Validate Server Certificate";
             this.validateServerCertCheckBox.UseVisualStyleBackColor = true;
+            this.validateServerCertCheckBox.CheckedChanged += new System.EventHandler(this.validateServerCertCheckBox_CheckedChanged);
             // 
             // ldapPortTextBox
             // 
@@ -398,6 +401,16 @@
             this.tbGateway.Text = "Gateway";
             this.tbGateway.UseVisualStyleBackColor = true;
             // 
+            // btDeleteGatewayRule
+            // 
+            this.btDeleteGatewayRule.Location = new System.Drawing.Point(609, 180);
+            this.btDeleteGatewayRule.Name = "btDeleteGatewayRule";
+            this.btDeleteGatewayRule.Size = new System.Drawing.Size(75, 23);
+            this.btDeleteGatewayRule.TabIndex = 17;
+            this.btDeleteGatewayRule.Text = "Delete";
+            this.btDeleteGatewayRule.UseVisualStyleBackColor = true;
+            this.btDeleteGatewayRule.Click += new System.EventHandler(this.btDeleteGatewayRule_Click);
+            // 
             // lvGatewayRules
             // 
             this.lvGatewayRules.Location = new System.Drawing.Point(240, 31);
@@ -479,15 +492,15 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // btDeleteGatewayRule
+            // validateServerDNSCheckBox
             // 
-            this.btDeleteGatewayRule.Location = new System.Drawing.Point(609, 180);
-            this.btDeleteGatewayRule.Name = "btDeleteGatewayRule";
-            this.btDeleteGatewayRule.Size = new System.Drawing.Size(75, 23);
-            this.btDeleteGatewayRule.TabIndex = 17;
-            this.btDeleteGatewayRule.Text = "Delete";
-            this.btDeleteGatewayRule.UseVisualStyleBackColor = true;
-            this.btDeleteGatewayRule.Click += new System.EventHandler(this.btDeleteGatewayRule_Click);
+            this.validateServerDNSCheckBox.AutoSize = true;
+            this.validateServerDNSCheckBox.Location = new System.Drawing.Point(501, 48);
+            this.validateServerDNSCheckBox.Name = "validateServerDNSCheckBox";
+            this.validateServerDNSCheckBox.Size = new System.Drawing.Size(124, 17);
+            this.validateServerDNSCheckBox.TabIndex = 18;
+            this.validateServerDNSCheckBox.Text = "Validate Server DNS";
+            this.validateServerDNSCheckBox.UseVisualStyleBackColor = true;
             // 
             // Configuration
             // 
@@ -523,12 +536,12 @@
         private System.Windows.Forms.CheckBox showPwCB;
         private System.Windows.Forms.TextBox timeoutTextBox;
         private System.Windows.Forms.Label timeoutLabel;
-        private System.Windows.Forms.TextBox searchPassTextBox;
+        private System.Windows.Forms.TextBox tbBindPassTextBox;
         private System.Windows.Forms.Button sslCertFileBrowseButton;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox searchDnTextBox;
+        private System.Windows.Forms.Label lblBindPassword;
+        private System.Windows.Forms.TextBox tbBindDnTextBox;
         private System.Windows.Forms.TextBox sslCertFileTextBox;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblBindDN;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox validateServerCertCheckBox;
         private System.Windows.Forms.TextBox ldapPortTextBox;
@@ -555,5 +568,6 @@
         private System.Windows.Forms.Button btAddGatewayRule;
         private System.Windows.Forms.ListView lvGatewayRules;
         private System.Windows.Forms.Button btDeleteGatewayRule;
+        private System.Windows.Forms.CheckBox validateServerDNSCheckBox;
     }
 }

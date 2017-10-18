@@ -1,20 +1,21 @@
-﻿namespace pGina.Plugin.TopicusKeyHub
-{
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
-    using log4net;
-    using LDAP;
-    using LDAP.Model;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-    using Settings;
-    using Settings.ImportExport;
-    using Settings.Model;
-    using Shared.Interfaces;
-    using Shared.Types;
-    using System.Collections.Generic;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using pGina.Shared.Interfaces;
+using pGina.Shared.Types;
+using System.Collections.Generic;
 
+using pGina.Plugin.TopicusKeyHub.LDAP;
+using pGina.Plugin.TopicusKeyHub.LDAP.Model;
+using pGina.Plugin.TopicusKeyHub.Settings;
+using pGina.Plugin.TopicusKeyHub.Settings.ImportExport;
+using pGina.Plugin.TopicusKeyHub.Settings.Model;
+
+namespace pGina.Plugin.TopicusKeyHub
+{
     public class TopicusKeyHubPlugin : IStatefulPlugin, IPluginConfiguration, IPluginAuthentication, IPluginAuthorization, IPluginImportExport, IPluginAuthenticationGateway
     {
         private readonly ILog logger = LogManager.GetLogger("TopicusKeyHubPlugin");
@@ -91,18 +92,20 @@
                     this.logger.Debug("No GroupSettings");
                     return new BooleanResult { Message = "No GroupSettings", Success = false };
                 }
-                var groups = ldapServer.GetGroups(context.DistributionName);
+                var groups = ldapServer.GetGroups(context.DistributionName).ToList();
                 var rules = this.settings.GetGatewaySettings.Rules;
                 foreach (var rule in rules)
                 {
                     var rulevalues = rule.Split('*');
                     // Group still exists and user is in the group.
-                    if (groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0]) != null && ldapServer.UserIsInGroup(user, groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0])))
+                    if (groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0]) != null &&
+                        ldapServer.UserIsInGroup(user, groups.FirstOrDefault(b => b.DistinguishedName == rulevalues[0])))
                     {
 
-                            this.logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"", userInfo.Username, rulevalues[1], rule);
-                            addedGroups.Add(rulevalues[1]);
-                            userInfo.AddGroup(new GroupInformation { Name = rulevalues[1] });
+                        this.logger.InfoFormat("Adding user {0} to local group {1}, due to rule \"{2}\"",
+                            userInfo.Username, rulevalues[1], rule);
+                        addedGroups.Add(rulevalues[1]);
+                        userInfo.AddGroup(new GroupInformation {Name = rulevalues[1]});
                     }
                 }
             }
@@ -116,9 +119,13 @@
 
             string message;
             if (addedGroups.Count > 0)
+            {
                 message = string.Format("Added to groups: {0}", string.Join(", ", addedGroups));
+            }
             else
+            {
                 message = "No groups added.";
+            }
 
             return new BooleanResult { Success = true, Message = message };
         }
@@ -230,7 +237,6 @@
             {
                 var connectionSettings = SettingsProvider.GetInstance(TopicusKeyHubUuid).GetSettings().GetConnectionSettings;
                 var ldapServer = new LdapServer(connectionSettings);
-                ldapServer.BindForSearch();
                 props.AddTrackedSingle<LdapServer>(ldapServer);
             }
             catch (Exception e)

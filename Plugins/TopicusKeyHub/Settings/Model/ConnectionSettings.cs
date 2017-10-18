@@ -9,8 +9,9 @@
         private readonly int ldapPort;
         private readonly string searchDN;
         private readonly string searchPW;
+        private readonly bool dnsCheck;
 
-        public ConnectionSettings(string[] ldapHosts, int ldapPort,int ldapTimeout, bool requireCert, string serverCertFile, string searchDn, string searchPw)
+        public ConnectionSettings(string[] ldapHosts, int ldapPort,int ldapTimeout, bool requireCert, string serverCertFile, string searchDn, string searchPw, bool dnsCheck)
         {
             this.ldapTimeout = ldapTimeout;
             this.requireCert = requireCert;
@@ -19,6 +20,7 @@
             this.ldapPort = ldapPort;
             this.searchDN = searchDn;
             this.searchPW = searchPw;
+            this.dnsCheck = dnsCheck;
         }
 
         public int LdapTimeout {
@@ -54,5 +56,7 @@
         {
             get { return this.searchPW; }
         }
+
+        public bool DNSCheck { get { return this.dnsCheck; } }
     }
 }

@@ -1,7 +1,7 @@
-﻿namespace pGina.Plugin.TopicusKeyHub.LDAP.Model
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+namespace pGina.Plugin.TopicusKeyHub.LDAP.Model
+{
     public class KeyHubUserWithGroups
     {
         private IList<KeyHubGroup> keyHubGroups;
