@@ -18,6 +18,8 @@
 
         public bool RemoveProfiles { get; set; }
 
+        public bool DisableAccount { get; set; }
+
         public bool ScramblePasswords { get; set; }
 
         public bool ScramblePasswordsWhenLMAuthFails { get; set; }

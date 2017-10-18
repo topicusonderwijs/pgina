@@ -261,6 +261,8 @@ namespace pGina.Plugin.LocalMachine
                 {
                     userInfo.SID = user.Sid;
                     userInfo.Description = user.Description;
+                    user.Enabled = true; // if user is disabled, enabled him here.
+                    user.Save();
                 }
                 properties.AddTrackedSingle<UserInformation>(userInfo);
             }
@@ -622,6 +624,7 @@ namespace pGina.Plugin.LocalMachine
         {
             bool scramble = Settings.Store.ScramblePasswords;
             bool remove = Settings.Store.RemoveProfiles;
+            bool disable = Settings.Store.DisableAccount;
 
             while (true)
             {
@@ -682,6 +685,15 @@ namespace pGina.Plugin.LocalMachine
                     {
                         m_logger.DebugFormat("{0} not scramble password", userInfo.Username);
                     }
+                    if (disable && !remove)
+                    {
+                        m_logger.DebugFormat("{0} disable account", userInfo.Username);
+                        lo.EnableDisableAccount(userInfo.Username, false);
+                    }
+                    else
+                    {
+                        m_logger.DebugFormat("{0} not disable account", userInfo.Username);
+                    }
                     m_logger.DebugFormat("{0} cleanup done", userInfo.Username);
                 }
             }
@@ -722,7 +734,8 @@ namespace pGina.Plugin.LocalMachine
             Settings.Store.GroupCreateFailIsFail = importSettings.GroupCreateFailIsFail;
             Settings.Store.MandatoryGroups = importSettings.MandatoryGroups.EmptyStringArrayIfNull();
             Settings.Store.MirrorGroupsForAuthdUsers = importSettings.MirrorGroupsForAuthdUsers;
-            Settings.Store.RemoveProfiles = importSettings.RemoveProfiles;            
+            Settings.Store.RemoveProfiles = importSettings.RemoveProfiles;
+            Settings.Store.DisableAccount = importSettings.DisableAccount;
             Settings.Store.ScramblePasswords = importSettings.ScramblePasswords;
             Settings.Store.ScramblePasswordsExceptions = importSettings.ScramblePasswordsExceptions.EmptyStringArrayIfNull();
             Settings.Store.ScramblePasswordsWhenLMAuthFails = importSettings.ScramblePasswordsWhenLMAuthFails;            
@@ -742,6 +755,7 @@ namespace pGina.Plugin.LocalMachine
                 MandatoryGroups = Settings.Store.MandatoryGroups,
                 MirrorGroupsForAuthdUsers = Settings.Store.MirrorGroupsForAuthdUsers,
                 RemoveProfiles = Settings.Store.RemoveProfiles,
+                DisableAccount = Settings.Store.DisableAccount,
                 ScramblePasswords = Settings.Store.ScramblePasswords,
                 ScramblePasswordsExceptions = Settings.Store.ScramblePasswordsExceptions,
                 ScramblePasswordsWhenLMAuthFails = Settings.Store.ScramblePasswordsWhenLMAuthFails
