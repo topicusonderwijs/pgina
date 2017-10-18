@@ -863,7 +863,7 @@ namespace pGina.Plugin.LocalMachine
             catch
             {
                 // fallback for machine running pgina as local/machine admin and have groups from a domain.
-                // Failed to process gateway for bastopicus message: Unable to sync users local group membership: System.Runtime.InteropServices.COMException (0x80070035): The network path was not found.
+                // Failed to process gateway for ******* message: Unable to sync users local group membership: System.Runtime.InteropServices.COMException (0x80070035): The network path was not found.
                 sResult = user.GetGroups();
             }
 
