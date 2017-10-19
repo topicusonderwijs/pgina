@@ -24,10 +24,14 @@ namespace pGina.Plugin.TopicusKeyHub.Settings.ImportExport
             var objGetGroupSettings = jo["GetGroupSettings"];
             var groupSettings = objGetGroupSettings.ToObject<GroupSettings>();
 
+            var objGetGatewaySettings = jo["GetGatewaySettings"];
+            var gatewaySettings = objGetGatewaySettings.ToObject<GatewaySettings>();
+
             var settingsProvider = SettingsProvider.GetInstance(TopicusKeyHubPlugin.TopicusKeyHubUuid);
             var settings = settingsProvider.GetSettings();
             settings.SetConnectionSettings(connectionSettings);
             settings.SetGroupsSettings(groupSettings);
+            settings.SetGatewaySettings(gatewaySettings);
 
             return settings;
         }
