@@ -19,8 +19,11 @@
             this.settings.SetDefault("RequireCert", true);
             this.settings.SetDefault("DNSCheck", true);
             this.settings.SetDefault("ServerCertFile", "");
-            this.settings.SetDefault("SearchDN", "");
-            this.settings.SetDefaultEncryptedSetting("SearchPW", "");
+            this.settings.SetDefault("BindDN", "");
+            this.settings.SetDefaultEncryptedSetting("BindPW", "");
+            this.settings.SetDefault("CertSubjectBind", "");
+            this.settings.SetDefault("UseWindowsStoreBind", true);
+            this.settings.SetDefault("UseWindowsStoreConnection", true);
             // Groups Set default values for settings (if not already set)
             this.settings.SetDefault("Groups", new string[] {});
             this.settings.SetDefault("Dynamic", true);

@@ -33,19 +33,25 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.tcPluginSettings = new System.Windows.Forms.TabControl();
             this.tpLDAPServer = new System.Windows.Forms.TabPage();
+            this.certificateSettingsgroupBox = new System.Windows.Forms.GroupBox();
+            this.sslCertFileConnectionTextBox = new System.Windows.Forms.TextBox();
+            this.useWindowsStoreConnectionCheckBox = new System.Windows.Forms.CheckBox();
+            this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
+            this.lblCertificateFileConnection = new System.Windows.Forms.Label();
+            this.validateServerDNSCheckBox = new System.Windows.Forms.CheckBox();
+            this.validateServerCertCheckBox = new System.Windows.Forms.CheckBox();
             this.btnTestConnection = new System.Windows.Forms.Button();
             this.ldapServerGroupBox = new System.Windows.Forms.GroupBox();
+            this.useWindowsStoreBindcheckBox = new System.Windows.Forms.CheckBox();
+            this.lblBindCertificateStore = new System.Windows.Forms.Label();
+            this.certSubjectBindTextBox = new System.Windows.Forms.TextBox();
             this.showPwCB = new System.Windows.Forms.CheckBox();
             this.timeoutTextBox = new System.Windows.Forms.TextBox();
             this.timeoutLabel = new System.Windows.Forms.Label();
             this.tbBindPassTextBox = new System.Windows.Forms.TextBox();
-            this.sslCertFileBrowseButton = new System.Windows.Forms.Button();
             this.lblBindPassword = new System.Windows.Forms.Label();
             this.tbBindDnTextBox = new System.Windows.Forms.TextBox();
-            this.sslCertFileTextBox = new System.Windows.Forms.TextBox();
             this.lblBindDN = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.validateServerCertCheckBox = new System.Windows.Forms.CheckBox();
             this.ldapPortTextBox = new System.Windows.Forms.TextBox();
             this.ldapHostTextBox = new System.Windows.Forms.TextBox();
             this.ldapPortLabel = new System.Windows.Forms.Label();
@@ -70,9 +76,9 @@
             this.lbLoadgroups = new System.Windows.Forms.Button();
             this.lbGatewayRules = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.validateServerDNSCheckBox = new System.Windows.Forms.CheckBox();
             this.tcPluginSettings.SuspendLayout();
             this.tpLDAPServer.SuspendLayout();
+            this.certificateSettingsgroupBox.SuspendLayout();
             this.ldapServerGroupBox.SuspendLayout();
             this.tpAuthorization.SuspendLayout();
             this.tbGateway.SuspendLayout();
@@ -80,7 +86,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(471, 253);
+            this.btnOk.Location = new System.Drawing.Point(484, 406);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 4;
@@ -90,7 +96,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(633, 253);
+            this.btnCancel.Location = new System.Drawing.Point(646, 406);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -106,24 +112,97 @@
             this.tcPluginSettings.Location = new System.Drawing.Point(12, 12);
             this.tcPluginSettings.Name = "tcPluginSettings";
             this.tcPluginSettings.SelectedIndex = 0;
-            this.tcPluginSettings.Size = new System.Drawing.Size(698, 235);
+            this.tcPluginSettings.Size = new System.Drawing.Size(709, 388);
             this.tcPluginSettings.TabIndex = 9;
             // 
             // tpLDAPServer
             // 
+            this.tpLDAPServer.Controls.Add(this.certificateSettingsgroupBox);
             this.tpLDAPServer.Controls.Add(this.btnTestConnection);
             this.tpLDAPServer.Controls.Add(this.ldapServerGroupBox);
             this.tpLDAPServer.Location = new System.Drawing.Point(4, 22);
             this.tpLDAPServer.Name = "tpLDAPServer";
             this.tpLDAPServer.Padding = new System.Windows.Forms.Padding(3);
-            this.tpLDAPServer.Size = new System.Drawing.Size(690, 209);
+            this.tpLDAPServer.Size = new System.Drawing.Size(701, 362);
             this.tpLDAPServer.TabIndex = 0;
-            this.tpLDAPServer.Text = "LDAP Server";
+            this.tpLDAPServer.Text = " Server Connection";
             this.tpLDAPServer.UseVisualStyleBackColor = true;
+            // 
+            // certificateSettingsgroupBox
+            // 
+            this.certificateSettingsgroupBox.Controls.Add(this.sslCertFileConnectionTextBox);
+            this.certificateSettingsgroupBox.Controls.Add(this.useWindowsStoreConnectionCheckBox);
+            this.certificateSettingsgroupBox.Controls.Add(this.sslCertFileBrowseButton);
+            this.certificateSettingsgroupBox.Controls.Add(this.lblCertificateFileConnection);
+            this.certificateSettingsgroupBox.Controls.Add(this.validateServerDNSCheckBox);
+            this.certificateSettingsgroupBox.Controls.Add(this.validateServerCertCheckBox);
+            this.certificateSettingsgroupBox.Location = new System.Drawing.Point(6, 197);
+            this.certificateSettingsgroupBox.Name = "certificateSettingsgroupBox";
+            this.certificateSettingsgroupBox.Size = new System.Drawing.Size(691, 129);
+            this.certificateSettingsgroupBox.TabIndex = 20;
+            this.certificateSettingsgroupBox.TabStop = false;
+            this.certificateSettingsgroupBox.Text = "Server Certificate Settings";
+            // 
+            // sslCertFileConnectionTextBox
+            // 
+            this.sslCertFileConnectionTextBox.Location = new System.Drawing.Point(160, 88);
+            this.sslCertFileConnectionTextBox.Name = "sslCertFileConnectionTextBox";
+            this.sslCertFileConnectionTextBox.Size = new System.Drawing.Size(429, 20);
+            this.sslCertFileConnectionTextBox.TabIndex = 10;
+            // 
+            // useWindowsStoreConnectionCheckBox
+            // 
+            this.useWindowsStoreConnectionCheckBox.AutoSize = true;
+            this.useWindowsStoreConnectionCheckBox.Location = new System.Drawing.Point(6, 65);
+            this.useWindowsStoreConnectionCheckBox.Name = "useWindowsStoreConnectionCheckBox";
+            this.useWindowsStoreConnectionCheckBox.Size = new System.Drawing.Size(191, 17);
+            this.useWindowsStoreConnectionCheckBox.TabIndex = 19;
+            this.useWindowsStoreConnectionCheckBox.Text = "Use CertificateStore for connection";
+            this.useWindowsStoreConnectionCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // sslCertFileBrowseButton
+            // 
+            this.sslCertFileBrowseButton.Location = new System.Drawing.Point(602, 88);
+            this.sslCertFileBrowseButton.Name = "sslCertFileBrowseButton";
+            this.sslCertFileBrowseButton.Size = new System.Drawing.Size(80, 20);
+            this.sslCertFileBrowseButton.TabIndex = 11;
+            this.sslCertFileBrowseButton.Text = "Browse...";
+            this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
+            this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
+            // 
+            // lblCertificateFileConnection
+            // 
+            this.lblCertificateFileConnection.AutoSize = true;
+            this.lblCertificateFileConnection.Location = new System.Drawing.Point(6, 91);
+            this.lblCertificateFileConnection.Name = "lblCertificateFileConnection";
+            this.lblCertificateFileConnection.Size = new System.Drawing.Size(73, 13);
+            this.lblCertificateFileConnection.TabIndex = 9;
+            this.lblCertificateFileConnection.Text = "Certificate File";
+            // 
+            // validateServerDNSCheckBox
+            // 
+            this.validateServerDNSCheckBox.AutoSize = true;
+            this.validateServerDNSCheckBox.Location = new System.Drawing.Point(6, 42);
+            this.validateServerDNSCheckBox.Name = "validateServerDNSCheckBox";
+            this.validateServerDNSCheckBox.Size = new System.Drawing.Size(124, 17);
+            this.validateServerDNSCheckBox.TabIndex = 18;
+            this.validateServerDNSCheckBox.Text = "Validate Server DNS";
+            this.validateServerDNSCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // validateServerCertCheckBox
+            // 
+            this.validateServerCertCheckBox.AutoSize = true;
+            this.validateServerCertCheckBox.Location = new System.Drawing.Point(6, 19);
+            this.validateServerCertCheckBox.Name = "validateServerCertCheckBox";
+            this.validateServerCertCheckBox.Size = new System.Drawing.Size(148, 17);
+            this.validateServerCertCheckBox.TabIndex = 8;
+            this.validateServerCertCheckBox.Text = "Validate Server Certificate";
+            this.validateServerCertCheckBox.UseVisualStyleBackColor = true;
+            this.validateServerCertCheckBox.CheckedChanged += new System.EventHandler(this.validateServerCertCheckBox_CheckedChanged);
             // 
             // btnTestConnection
             // 
-            this.btnTestConnection.Location = new System.Drawing.Point(607, 163);
+            this.btnTestConnection.Location = new System.Drawing.Point(620, 332);
             this.btnTestConnection.Name = "btnTestConnection";
             this.btnTestConnection.Size = new System.Drawing.Size(75, 23);
             this.btnTestConnection.TabIndex = 11;
@@ -133,33 +212,57 @@
             // 
             // ldapServerGroupBox
             // 
-            this.ldapServerGroupBox.Controls.Add(this.validateServerDNSCheckBox);
+            this.ldapServerGroupBox.Controls.Add(this.useWindowsStoreBindcheckBox);
+            this.ldapServerGroupBox.Controls.Add(this.lblBindCertificateStore);
+            this.ldapServerGroupBox.Controls.Add(this.certSubjectBindTextBox);
             this.ldapServerGroupBox.Controls.Add(this.showPwCB);
             this.ldapServerGroupBox.Controls.Add(this.timeoutTextBox);
             this.ldapServerGroupBox.Controls.Add(this.timeoutLabel);
             this.ldapServerGroupBox.Controls.Add(this.tbBindPassTextBox);
-            this.ldapServerGroupBox.Controls.Add(this.sslCertFileBrowseButton);
             this.ldapServerGroupBox.Controls.Add(this.lblBindPassword);
             this.ldapServerGroupBox.Controls.Add(this.tbBindDnTextBox);
-            this.ldapServerGroupBox.Controls.Add(this.sslCertFileTextBox);
             this.ldapServerGroupBox.Controls.Add(this.lblBindDN);
-            this.ldapServerGroupBox.Controls.Add(this.label1);
-            this.ldapServerGroupBox.Controls.Add(this.validateServerCertCheckBox);
             this.ldapServerGroupBox.Controls.Add(this.ldapPortTextBox);
             this.ldapServerGroupBox.Controls.Add(this.ldapHostTextBox);
             this.ldapServerGroupBox.Controls.Add(this.ldapPortLabel);
             this.ldapServerGroupBox.Controls.Add(this.ldapHostDescriptionLabel);
             this.ldapServerGroupBox.Location = new System.Drawing.Point(6, 6);
             this.ldapServerGroupBox.Name = "ldapServerGroupBox";
-            this.ldapServerGroupBox.Size = new System.Drawing.Size(676, 151);
+            this.ldapServerGroupBox.Size = new System.Drawing.Size(689, 185);
             this.ldapServerGroupBox.TabIndex = 8;
             this.ldapServerGroupBox.TabStop = false;
-            this.ldapServerGroupBox.Text = "LDAP Server";
+            this.ldapServerGroupBox.Text = "KeyHub Server Settings";
+            // 
+            // useWindowsStoreBindcheckBox
+            // 
+            this.useWindowsStoreBindcheckBox.AutoSize = true;
+            this.useWindowsStoreBindcheckBox.Location = new System.Drawing.Point(11, 81);
+            this.useWindowsStoreBindcheckBox.Name = "useWindowsStoreBindcheckBox";
+            this.useWindowsStoreBindcheckBox.Size = new System.Drawing.Size(159, 17);
+            this.useWindowsStoreBindcheckBox.TabIndex = 24;
+            this.useWindowsStoreBindcheckBox.Text = "Use CertificateStore for Bind";
+            this.useWindowsStoreBindcheckBox.UseVisualStyleBackColor = true;
+            // 
+            // lblBindCertificateStore
+            // 
+            this.lblBindCertificateStore.AutoSize = true;
+            this.lblBindCertificateStore.Location = new System.Drawing.Point(7, 154);
+            this.lblBindCertificateStore.Name = "lblBindCertificateStore";
+            this.lblBindCertificateStore.Size = new System.Drawing.Size(145, 13);
+            this.lblBindCertificateStore.TabIndex = 23;
+            this.lblBindCertificateStore.Text = "Bind Certificate Store Subject";
+            // 
+            // certSubjectBindTextBox
+            // 
+            this.certSubjectBindTextBox.Location = new System.Drawing.Point(163, 151);
+            this.certSubjectBindTextBox.Name = "certSubjectBindTextBox";
+            this.certSubjectBindTextBox.Size = new System.Drawing.Size(429, 20);
+            this.certSubjectBindTextBox.TabIndex = 21;
             // 
             // showPwCB
             // 
             this.showPwCB.AutoSize = true;
-            this.showPwCB.Location = new System.Drawing.Point(578, 128);
+            this.showPwCB.Location = new System.Drawing.Point(606, 127);
             this.showPwCB.Name = "showPwCB";
             this.showPwCB.Size = new System.Drawing.Size(77, 17);
             this.showPwCB.TabIndex = 17;
@@ -169,7 +272,7 @@
             // 
             // timeoutTextBox
             // 
-            this.timeoutTextBox.Location = new System.Drawing.Point(265, 45);
+            this.timeoutTextBox.Location = new System.Drawing.Point(318, 45);
             this.timeoutTextBox.Name = "timeoutTextBox";
             this.timeoutTextBox.Size = new System.Drawing.Size(76, 20);
             this.timeoutTextBox.TabIndex = 5;
@@ -177,7 +280,7 @@
             // timeoutLabel
             // 
             this.timeoutLabel.AutoSize = true;
-            this.timeoutLabel.Location = new System.Drawing.Point(206, 48);
+            this.timeoutLabel.Location = new System.Drawing.Point(259, 48);
             this.timeoutLabel.Name = "timeoutLabel";
             this.timeoutLabel.Size = new System.Drawing.Size(45, 13);
             this.timeoutLabel.TabIndex = 4;
@@ -185,26 +288,16 @@
             // 
             // tbBindPassTextBox
             // 
-            this.tbBindPassTextBox.Location = new System.Drawing.Point(110, 123);
+            this.tbBindPassTextBox.Location = new System.Drawing.Point(163, 124);
             this.tbBindPassTextBox.Name = "tbBindPassTextBox";
-            this.tbBindPassTextBox.Size = new System.Drawing.Size(462, 20);
+            this.tbBindPassTextBox.Size = new System.Drawing.Size(428, 20);
             this.tbBindPassTextBox.TabIndex = 16;
             this.tbBindPassTextBox.UseSystemPasswordChar = true;
-            // 
-            // sslCertFileBrowseButton
-            // 
-            this.sslCertFileBrowseButton.Location = new System.Drawing.Point(578, 71);
-            this.sslCertFileBrowseButton.Name = "sslCertFileBrowseButton";
-            this.sslCertFileBrowseButton.Size = new System.Drawing.Size(80, 20);
-            this.sslCertFileBrowseButton.TabIndex = 11;
-            this.sslCertFileBrowseButton.Text = "Browse...";
-            this.sslCertFileBrowseButton.UseVisualStyleBackColor = true;
-            this.sslCertFileBrowseButton.Click += new System.EventHandler(this.sslCertFileBrowseButton_Click);
             // 
             // lblBindPassword
             // 
             this.lblBindPassword.AutoSize = true;
-            this.lblBindPassword.Location = new System.Drawing.Point(6, 126);
+            this.lblBindPassword.Location = new System.Drawing.Point(7, 127);
             this.lblBindPassword.Name = "lblBindPassword";
             this.lblBindPassword.Size = new System.Drawing.Size(77, 13);
             this.lblBindPassword.TabIndex = 15;
@@ -212,50 +305,23 @@
             // 
             // tbBindDnTextBox
             // 
-            this.tbBindDnTextBox.Location = new System.Drawing.Point(110, 97);
+            this.tbBindDnTextBox.Location = new System.Drawing.Point(163, 98);
             this.tbBindDnTextBox.Name = "tbBindDnTextBox";
-            this.tbBindDnTextBox.Size = new System.Drawing.Size(462, 20);
+            this.tbBindDnTextBox.Size = new System.Drawing.Size(428, 20);
             this.tbBindDnTextBox.TabIndex = 13;
-            // 
-            // sslCertFileTextBox
-            // 
-            this.sslCertFileTextBox.Location = new System.Drawing.Point(109, 71);
-            this.sslCertFileTextBox.Name = "sslCertFileTextBox";
-            this.sslCertFileTextBox.Size = new System.Drawing.Size(463, 20);
-            this.sslCertFileTextBox.TabIndex = 10;
             // 
             // lblBindDN
             // 
             this.lblBindDN.AutoSize = true;
-            this.lblBindDN.Location = new System.Drawing.Point(6, 100);
+            this.lblBindDN.Location = new System.Drawing.Point(7, 101);
             this.lblBindDN.Name = "lblBindDN";
             this.lblBindDN.Size = new System.Drawing.Size(47, 13);
             this.lblBindDN.TabIndex = 12;
             this.lblBindDN.Text = "Bind DN";
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 74);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(54, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Certificate";
-            // 
-            // validateServerCertCheckBox
-            // 
-            this.validateServerCertCheckBox.AutoSize = true;
-            this.validateServerCertCheckBox.Location = new System.Drawing.Point(347, 47);
-            this.validateServerCertCheckBox.Name = "validateServerCertCheckBox";
-            this.validateServerCertCheckBox.Size = new System.Drawing.Size(148, 17);
-            this.validateServerCertCheckBox.TabIndex = 8;
-            this.validateServerCertCheckBox.Text = "Validate Server Certificate";
-            this.validateServerCertCheckBox.UseVisualStyleBackColor = true;
-            this.validateServerCertCheckBox.CheckedChanged += new System.EventHandler(this.validateServerCertCheckBox_CheckedChanged);
-            // 
             // ldapPortTextBox
             // 
-            this.ldapPortTextBox.Location = new System.Drawing.Point(110, 45);
+            this.ldapPortTextBox.Location = new System.Drawing.Point(163, 45);
             this.ldapPortTextBox.Name = "ldapPortTextBox";
             this.ldapPortTextBox.Size = new System.Drawing.Size(70, 20);
             this.ldapPortTextBox.TabIndex = 3;
@@ -264,9 +330,9 @@
             // 
             this.ldapHostTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ldapHostTextBox.Location = new System.Drawing.Point(110, 19);
+            this.ldapHostTextBox.Location = new System.Drawing.Point(163, 19);
             this.ldapHostTextBox.Name = "ldapHostTextBox";
-            this.ldapHostTextBox.Size = new System.Drawing.Size(462, 20);
+            this.ldapHostTextBox.Size = new System.Drawing.Size(427, 20);
             this.ldapHostTextBox.TabIndex = 1;
             // 
             // ldapPortLabel
@@ -300,7 +366,7 @@
             this.tpAuthorization.Location = new System.Drawing.Point(4, 22);
             this.tpAuthorization.Name = "tpAuthorization";
             this.tpAuthorization.Padding = new System.Windows.Forms.Padding(3);
-            this.tpAuthorization.Size = new System.Drawing.Size(690, 209);
+            this.tpAuthorization.Size = new System.Drawing.Size(701, 362);
             this.tpAuthorization.TabIndex = 1;
             this.tpAuthorization.Text = "Authorization";
             this.tpAuthorization.UseVisualStyleBackColor = true;
@@ -325,7 +391,7 @@
             // 
             // btLoadGroups
             // 
-            this.btLoadGroups.Location = new System.Drawing.Point(7, 180);
+            this.btLoadGroups.Location = new System.Drawing.Point(7, 333);
             this.btLoadGroups.Name = "btLoadGroups";
             this.btLoadGroups.Size = new System.Drawing.Size(96, 23);
             this.btLoadGroups.TabIndex = 5;
@@ -335,7 +401,7 @@
             // 
             // btRemove
             // 
-            this.btRemove.Location = new System.Drawing.Point(411, 115);
+            this.btRemove.Location = new System.Drawing.Point(411, 178);
             this.btRemove.Name = "btRemove";
             this.btRemove.Size = new System.Drawing.Size(27, 23);
             this.btRemove.TabIndex = 4;
@@ -345,7 +411,7 @@
             // 
             // btAdd
             // 
-            this.btAdd.Location = new System.Drawing.Point(411, 86);
+            this.btAdd.Location = new System.Drawing.Point(411, 149);
             this.btAdd.Name = "btAdd";
             this.btAdd.Size = new System.Drawing.Size(27, 23);
             this.btAdd.TabIndex = 3;
@@ -357,7 +423,7 @@
             // 
             this.lvKeyHubGroupsSelected.Location = new System.Drawing.Point(444, 31);
             this.lvKeyHubGroupsSelected.Name = "lvKeyHubGroupsSelected";
-            this.lvKeyHubGroupsSelected.Size = new System.Drawing.Size(240, 172);
+            this.lvKeyHubGroupsSelected.Size = new System.Drawing.Size(240, 325);
             this.lvKeyHubGroupsSelected.TabIndex = 2;
             this.lvKeyHubGroupsSelected.UseCompatibleStateImageBehavior = false;
             this.lvKeyHubGroupsSelected.DoubleClick += new System.EventHandler(this.lvGroupsSelected_DoubleClicked);
@@ -366,7 +432,7 @@
             // 
             this.lvKeyHubGroupsNotSelected.Location = new System.Drawing.Point(165, 31);
             this.lvKeyHubGroupsNotSelected.Name = "lvKeyHubGroupsNotSelected";
-            this.lvKeyHubGroupsNotSelected.Size = new System.Drawing.Size(240, 172);
+            this.lvKeyHubGroupsNotSelected.Size = new System.Drawing.Size(240, 325);
             this.lvKeyHubGroupsNotSelected.TabIndex = 1;
             this.lvKeyHubGroupsNotSelected.UseCompatibleStateImageBehavior = false;
             this.lvKeyHubGroupsNotSelected.DoubleClick += new System.EventHandler(this.lvGroupsNotSelected_DoubleClicked);
@@ -396,14 +462,14 @@
             this.tbGateway.Location = new System.Drawing.Point(4, 22);
             this.tbGateway.Name = "tbGateway";
             this.tbGateway.Padding = new System.Windows.Forms.Padding(3);
-            this.tbGateway.Size = new System.Drawing.Size(690, 209);
+            this.tbGateway.Size = new System.Drawing.Size(701, 362);
             this.tbGateway.TabIndex = 2;
             this.tbGateway.Text = "Gateway";
             this.tbGateway.UseVisualStyleBackColor = true;
             // 
             // btDeleteGatewayRule
             // 
-            this.btDeleteGatewayRule.Location = new System.Drawing.Point(609, 180);
+            this.btDeleteGatewayRule.Location = new System.Drawing.Point(620, 333);
             this.btDeleteGatewayRule.Name = "btDeleteGatewayRule";
             this.btDeleteGatewayRule.Size = new System.Drawing.Size(75, 23);
             this.btDeleteGatewayRule.TabIndex = 17;
@@ -415,7 +481,7 @@
             // 
             this.lvGatewayRules.Location = new System.Drawing.Point(240, 31);
             this.lvGatewayRules.Name = "lvGatewayRules";
-            this.lvGatewayRules.Size = new System.Drawing.Size(444, 143);
+            this.lvGatewayRules.Size = new System.Drawing.Size(455, 296);
             this.lvGatewayRules.TabIndex = 16;
             this.lvGatewayRules.UseCompatibleStateImageBehavior = false;
             // 
@@ -465,7 +531,7 @@
             // 
             // lbLoadgroups
             // 
-            this.lbLoadgroups.Location = new System.Drawing.Point(6, 180);
+            this.lbLoadgroups.Location = new System.Drawing.Point(6, 333);
             this.lbLoadgroups.Name = "lbLoadgroups";
             this.lbLoadgroups.Size = new System.Drawing.Size(96, 23);
             this.lbLoadgroups.TabIndex = 10;
@@ -484,7 +550,7 @@
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(552, 253);
+            this.btnClose.Location = new System.Drawing.Point(565, 406);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 10;
@@ -492,21 +558,11 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // validateServerDNSCheckBox
-            // 
-            this.validateServerDNSCheckBox.AutoSize = true;
-            this.validateServerDNSCheckBox.Location = new System.Drawing.Point(501, 48);
-            this.validateServerDNSCheckBox.Name = "validateServerDNSCheckBox";
-            this.validateServerDNSCheckBox.Size = new System.Drawing.Size(124, 17);
-            this.validateServerDNSCheckBox.TabIndex = 18;
-            this.validateServerDNSCheckBox.Text = "Validate Server DNS";
-            this.validateServerDNSCheckBox.UseVisualStyleBackColor = true;
-            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(733, 299);
+            this.ClientSize = new System.Drawing.Size(733, 439);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.tcPluginSettings);
             this.Controls.Add(this.btnCancel);
@@ -516,6 +572,8 @@
             this.Text = "Topicus KeyHub Plugin Configuration";
             this.tcPluginSettings.ResumeLayout(false);
             this.tpLDAPServer.ResumeLayout(false);
+            this.certificateSettingsgroupBox.ResumeLayout(false);
+            this.certificateSettingsgroupBox.PerformLayout();
             this.ldapServerGroupBox.ResumeLayout(false);
             this.ldapServerGroupBox.PerformLayout();
             this.tpAuthorization.ResumeLayout(false);
@@ -540,9 +598,9 @@
         private System.Windows.Forms.Button sslCertFileBrowseButton;
         private System.Windows.Forms.Label lblBindPassword;
         private System.Windows.Forms.TextBox tbBindDnTextBox;
-        private System.Windows.Forms.TextBox sslCertFileTextBox;
+        private System.Windows.Forms.TextBox sslCertFileConnectionTextBox;
         private System.Windows.Forms.Label lblBindDN;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblCertificateFileConnection;
         private System.Windows.Forms.CheckBox validateServerCertCheckBox;
         private System.Windows.Forms.TextBox ldapPortTextBox;
         private System.Windows.Forms.TextBox ldapHostTextBox;
@@ -569,5 +627,10 @@
         private System.Windows.Forms.ListView lvGatewayRules;
         private System.Windows.Forms.Button btDeleteGatewayRule;
         private System.Windows.Forms.CheckBox validateServerDNSCheckBox;
+        private System.Windows.Forms.GroupBox certificateSettingsgroupBox;
+        private System.Windows.Forms.CheckBox useWindowsStoreConnectionCheckBox;
+        private System.Windows.Forms.Label lblBindCertificateStore;
+        private System.Windows.Forms.TextBox certSubjectBindTextBox;
+        private System.Windows.Forms.CheckBox useWindowsStoreBindcheckBox;
     }
 }

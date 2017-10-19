@@ -7,20 +7,26 @@
         private readonly string serverCertFile;
         private readonly string[] ldapHosts;
         private readonly int ldapPort;
-        private readonly string searchDN;
-        private readonly string searchPW;
+        private readonly string bindDN;
+        private readonly string bindPW;
         private readonly bool dnsCheck;
+        private readonly bool useWindowsStoreBind;
+        private readonly bool useWindowsStoreConnection;
+        private readonly string certSubjectBind;
 
-        public ConnectionSettings(string[] ldapHosts, int ldapPort,int ldapTimeout, bool requireCert, string serverCertFile, string searchDn, string searchPw, bool dnsCheck)
+        public ConnectionSettings(string[] ldapHosts, int ldapPort,int ldapTimeout, bool requireCert, string serverCertFile, string bindDN, string bindPw, string certSubjectBind, bool dnsCheck, bool useWindowsStoreBind, bool useWindowsStoreConnection)
         {
             this.ldapTimeout = ldapTimeout;
             this.requireCert = requireCert;
             this.serverCertFile = serverCertFile;
             this.ldapHosts = ldapHosts;
             this.ldapPort = ldapPort;
-            this.searchDN = searchDn;
-            this.searchPW = searchPw;
+            this.bindDN = bindDN;
+            this.bindPW = bindPw;
             this.dnsCheck = dnsCheck;
+            this.useWindowsStoreBind = useWindowsStoreBind;
+            this.certSubjectBind = certSubjectBind;
+            this.useWindowsStoreConnection = useWindowsStoreConnection;
         }
 
         public int LdapTimeout {
@@ -47,16 +53,34 @@
             get { return this.ldapPort; }
         }
 
-        public string SearchDN
+        public string BindDN
         {
-            get { return this.searchDN; }
+            get { return this.bindDN; }
         }
 
-        public string SearchPW
+        public string BindPw
         {
-            get { return this.searchPW; }
+            get { return this.bindPW; }
         }
 
-        public bool DNSCheck { get { return this.dnsCheck; } }
+        public string CertSubjectBind
+        {
+            get { return this.certSubjectBind; }
+        }
+
+        public bool DNSCheck
+        {
+            get { return this.dnsCheck; }
+        }
+
+        public bool UseWindowsStoreBind
+        {
+            get { return this.useWindowsStoreBind; }
+        }
+
+        public bool UseWindowsStoreConnection
+        {
+            get { return this.useWindowsStoreConnection; }
+        }
     }
 }

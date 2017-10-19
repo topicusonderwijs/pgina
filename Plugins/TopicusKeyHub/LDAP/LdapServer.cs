@@ -138,7 +138,7 @@ namespace pGina.Plugin.TopicusKeyHub.LDAP
 
             if (list.Count != 2)
             {
-                throw new Exception("Topicus KeyHub can't have more than 2 namingcontexts");
+                throw new Exception(string.Format("Topicus KeyHub must have 2 namingcontexts got {0}", list.Count()));
             }
 
             if (list.Count(b => b.Dynamic) != 1)
@@ -155,19 +155,58 @@ namespace pGina.Plugin.TopicusKeyHub.LDAP
         /// </summary>
         private void BindForSearch()
         {
-            NetworkCredential creds = new NetworkCredential(this.connectionsettings.SearchDN, this.connectionsettings.SearchPW);
-
             if (this.ldapconnection == null)
                 throw new LdapException("Bind attempted when server is not connected.");
 
-            this.logger.DebugFormat("Attempting bind as {0}", creds.UserName);
-
-            this.ldapconnection.AuthType = AuthType.Basic;
-
             try
             {
-                this.ldapconnection.Bind(creds);
-                this.logger.DebugFormat("Successful bind to {0} as {1}", this.ldapconnection.SessionOptions.HostName, creds.UserName);
+                if (this.connectionsettings.UseWindowsStoreBind)
+                {
+                    X509Certificate2 matchCertificate = null;
+                    this.ldapconnection.AuthType = AuthType.Basic;
+                    var store = new X509Store(StoreLocation.LocalMachine);
+                    store.Open(OpenFlags.ReadOnly);
+                    try
+                    {
+                        
+                        foreach (var storeCertificate in store.Certificates)
+                        {
+                            this.logger.DebugFormat("Certificate in LocalMachineStore found: {0}", storeCertificate.SubjectName.Name);
+                            if (storeCertificate.SubjectName.Name != null && 
+                                storeCertificate.SubjectName.Name.Equals(this.connectionsettings.CertSubjectBind,StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                if (matchCertificate != null)
+                                {
+                                    this.logger.DebugFormat("More then one certificate found with subject: '{0}'", this.connectionsettings.CertSubjectBind);
+                                }
+                                this.logger.DebugFormat("Use match {0}", storeCertificate.SubjectName.Name);
+                                matchCertificate = storeCertificate;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        store.Close();
+                    }
+                    if (matchCertificate == null)
+                    {
+                        this.logger.ErrorFormat("No certificate found with subject: {0}", this.connectionsettings.CertSubjectBind);
+                        throw new Exception(string.Format("No certificate found with subject: {0}", this.connectionsettings.CertSubjectBind));
+                    }
+                    this.logger.DebugFormat("Attempting bind with {0}", this.connectionsettings.CertSubjectBind);
+                    this.ldapconnection.AuthType = AuthType.External;
+                    this.ldapconnection.ClientCertificates.Add(matchCertificate);
+                    this.ldapconnection.Bind();
+                    this.logger.DebugFormat("Successful bind to {0} with certificate '{1}'", this.ldapconnection.SessionOptions.HostName, this.connectionsettings.CertSubjectBind);
+                }
+                else
+                {
+                    var creds = new NetworkCredential(this.connectionsettings.BindDN, this.connectionsettings.BindPw);
+                    this.logger.DebugFormat("Attempting bind as {0}", creds.UserName);
+                    this.ldapconnection.AuthType = AuthType.Basic;
+                    this.ldapconnection.Bind(creds);
+                    this.logger.DebugFormat("Successful bind to {0} as {1}", this.ldapconnection.SessionOptions.HostName, creds.UserName);
+                }
             }
             catch (LdapException e)
             {
@@ -268,7 +307,14 @@ namespace pGina.Plugin.TopicusKeyHub.LDAP
                 if (!String.IsNullOrEmpty(this.connectionsettings.ServerCertFile) && File.Exists(this.connectionsettings.ServerCertFile))
                 {
                     this.logger.DebugFormat("Loading server certificate: {0}", this.connectionsettings.ServerCertFile);
-                    this.cert = new X509Certificate2(this.connectionsettings.ServerCertFile);
+                    if (this.connectionsettings.UseWindowsStoreConnection)
+                    {
+                        
+                    }
+                    else
+                    {
+                        this.cert = new X509Certificate2(this.connectionsettings.ServerCertFile);
+                    }                    
                 }
                 else
                 {

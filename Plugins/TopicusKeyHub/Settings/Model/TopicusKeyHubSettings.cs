@@ -30,12 +30,15 @@ namespace pGina.Plugin.TopicusKeyHub.Settings.Model
                 bool requireCert = this.settings.RequireCert;
                 string[] ldapHost = this.settings.LdapHost;
                 int ldapPort = this.settings.LdapPort;
-                string searchDN = this.settings.SearchDN;
-                string searchPw = this.settings.GetEncryptedSetting("SearchPW");
+                string bindDN = this.settings.BindDN;
+                string bindPw = this.settings.GetEncryptedSetting("BindPW");
                 string serverCertFile = this.settings.ServerCertFile;
                 bool dnsCheck = this.settings.DNSCheck;
-                return new ConnectionSettings(ldapHost, ldapPort, ldapTimeout, requireCert, serverCertFile, searchDN,
-                    searchPw, dnsCheck);
+                string certSubjectBind = this.settings.CertSubjectBind;
+                bool useWindowsStoreBind = this.settings.UseWindowsStoreBind;
+                bool useWindowsStoreConnection = this.settings.UseWindowsStoreConnection;            
+                return new ConnectionSettings(ldapHost, ldapPort, ldapTimeout, requireCert, serverCertFile, bindDN,
+                    bindPw, certSubjectBind, dnsCheck, useWindowsStoreBind, useWindowsStoreConnection);
             }
         }
 
@@ -47,8 +50,11 @@ namespace pGina.Plugin.TopicusKeyHub.Settings.Model
             this.settings.RequireCert = connectionSettings.RequireCert;
             this.settings.DNSCheck = connectionSettings.DNSCheck;
             this.settings.ServerCertFile = connectionSettings.ServerCertFile.EmptyStringIfNull();
-            this.settings.SearchDN = connectionSettings.SearchDN.EmptyStringIfNull();
-            this.settings.SetEncryptedSetting("SearchPW",connectionSettings.SearchPW.EmptyStringIfNull());
+            this.settings.BindDN = connectionSettings.BindDN.EmptyStringIfNull();
+            this.settings.UseWindowsStoreBind = connectionSettings.UseWindowsStoreBind;
+            this.settings.UseWindowsStoreConnection = connectionSettings.UseWindowsStoreConnection;
+            this.settings.CertSubjectBind = connectionSettings.CertSubjectBind;
+            this.settings.SetEncryptedSetting("BindPW", connectionSettings.BindPw.EmptyStringIfNull());
         }
 
         public GroupSettings GetGroupSettings

@@ -22,7 +22,6 @@ namespace pGina.Plugin.TopicusKeyHub
 
         private readonly SettingsProvider settingsProvider =
             SettingsProvider.GetInstance(TopicusKeyHubPlugin.TopicusKeyHubUuid);
-
         private readonly ILog logger = LogManager.GetLogger("ConfigurationKeyHub");
         private List<GroupConfigurationHelper.GatewayRule> gatewayrules = new List<GroupConfigurationHelper.GatewayRule>();
         private List<KeyHubGroup> keyHubGroups = new List<KeyHubGroup>();
@@ -53,10 +52,17 @@ namespace pGina.Plugin.TopicusKeyHub
             this.timeoutTextBox.Text = connectionSettings.LdapTimeout.ToString();
             this.validateServerCertCheckBox.Checked = connectionSettings.RequireCert;
             this.validateServerDNSCheckBox.Checked = connectionSettings.DNSCheck;
-            this.sslCertFileTextBox.Text = connectionSettings.ServerCertFile;
-            this.tbBindDnTextBox.Text = connectionSettings.SearchDN;
-            this.tbBindPassTextBox.Text = connectionSettings.SearchPW;
+            this.sslCertFileConnectionTextBox.Text = connectionSettings.ServerCertFile;
+            this.tbBindDnTextBox.Text = connectionSettings.BindDN;
+            this.tbBindPassTextBox.Text = connectionSettings.BindPw;
+            this.certSubjectBindTextBox.Text = connectionSettings.CertSubjectBind;
+            this.useWindowsStoreBindcheckBox.Checked = connectionSettings.UseWindowsStoreBind;
+            this.useWindowsStoreConnectionCheckBox.Checked = connectionSettings.UseWindowsStoreConnection;
+            this.useWindowsStoreBindcheckBox.CheckedChanged += this.useWindowsStoreBindcheckBox_CheckedChanged;
+            this.useWindowsStoreConnectionCheckBox.CheckedChanged += this.useWindowsStoreConnectioncheckBox_CheckedChanged;
             this.SetDNSCheckCheckBox();
+            this.SetsslCertFileTextBox();
+            this.SetBindChoice();
 
             // Groups 
             var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
@@ -157,17 +163,27 @@ namespace pGina.Plugin.TopicusKeyHub
         }
 
         private void UpdateConnectionSettings()
-        {
+        {            
+            if (this.useWindowsStoreBindcheckBox.Checked)
+            {
+                // make username and password empty if WindowsStore is used
+                this.tbBindPassTextBox.Text = string.Empty;
+                this.tbBindDnTextBox.Text = string.Empty;
+            }
+
             // LDAP server Connection settings
             this.topicusKeyHubSettings.SetConnectionSettings(new ConnectionSettings(
                 Regex.Split(this.ldapHostTextBox.Text.Trim(), @"\s+"),
                 int.Parse(this.ldapPortTextBox.Text),
                 int.Parse(this.timeoutTextBox.Text),
                 this.validateServerCertCheckBox.Checked,
-                this.sslCertFileTextBox.Text,
+                this.sslCertFileConnectionTextBox.Text,
                 this.tbBindDnTextBox.Text,
                 this.tbBindPassTextBox.Text,
-                this.validateServerDNSCheckBox.Checked));
+                this.certSubjectBindTextBox.Text,
+                this.validateServerDNSCheckBox.Checked,
+                this.useWindowsStoreBindcheckBox.Checked,
+                this.useWindowsStoreConnectionCheckBox.Checked));
         }
 
         private bool ValidateInput()
@@ -201,8 +217,8 @@ namespace pGina.Plugin.TopicusKeyHub
             }
 
             if (this.validateServerCertCheckBox.CheckState == CheckState.Checked &&
-                this.sslCertFileTextBox.Text.Trim().Length > 0 &&
-                !(File.Exists(this.sslCertFileTextBox.Text.Trim())))
+                this.sslCertFileConnectionTextBox.Text.Trim().Length > 0 &&
+                !(File.Exists(this.sslCertFileConnectionTextBox.Text.Trim())))
             {
                 MessageBox.Show("SSL certificate file does not exist." + "Please select a valid certificate file.");
                 return false;
@@ -246,7 +262,7 @@ namespace pGina.Plugin.TopicusKeyHub
 
             if (result == DialogResult.OK)
             {
-                this.sslCertFileTextBox.Text = fileName;
+                this.sslCertFileConnectionTextBox.Text = fileName;
             }
         }
 
@@ -512,6 +528,34 @@ namespace pGina.Plugin.TopicusKeyHub
         private void validateServerCertCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             this.SetDNSCheckCheckBox();
+        }
+
+        private void SetsslCertFileTextBox()
+        {
+            this.sslCertFileConnectionTextBox.Visible = !this.useWindowsStoreConnectionCheckBox.Checked;
+            this.lblCertificateFileConnection.Visible = !this.useWindowsStoreConnectionCheckBox.Checked;  
+            this.sslCertFileBrowseButton.Visible = !this.useWindowsStoreConnectionCheckBox.Checked;
+        }
+
+        private void SetBindChoice()
+        {
+            this.tbBindDnTextBox.Visible = !this.useWindowsStoreBindcheckBox.Checked;
+            this.tbBindPassTextBox.Visible = !this.useWindowsStoreBindcheckBox.Checked;            
+            this.lblBindDN.Visible = !this.useWindowsStoreBindcheckBox.Checked;
+            this.lblBindPassword.Visible = !this.useWindowsStoreBindcheckBox.Checked;
+            this.showPwCB.Visible = !this.useWindowsStoreBindcheckBox.Checked;
+
+            this.lblBindCertificateStore.Visible = this.useWindowsStoreBindcheckBox.Checked;
+        }
+
+        private void useWindowsStoreConnectioncheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            this.SetsslCertFileTextBox();
+        }
+
+        private void useWindowsStoreBindcheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            this.SetBindChoice();
         }
     }
 }
