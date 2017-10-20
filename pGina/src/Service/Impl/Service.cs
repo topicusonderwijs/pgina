@@ -523,7 +523,7 @@ namespace pGina.Service.Impl
                             }else
                             {
                                 // password is may be changed in external system, change passsword of local-created-user to the same password
-                                User.ChangeLocalUserPassword(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Password);
+                                Abstractions.WindowsApi.pInvokes.SetUserPassword(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Password);
                             }
                         }
                         else
