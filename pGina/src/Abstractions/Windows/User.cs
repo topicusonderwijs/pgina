@@ -27,13 +27,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Security.Principal;
 using Microsoft.Win32;
-using Abstractions.WindowsApi;
 using Abstractions.Logging;
-using System.DirectoryServices.AccountManagement;
-using static Abstractions.WindowsApi.pInvokes.SafeNativeMethods;
 
 namespace Abstractions.Windows
 {
