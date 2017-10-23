@@ -413,7 +413,8 @@ namespace pGina.Service.Impl
 
                     // is this user a local user and was not created by pGina
                     Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4 userinfo4 = new Abstractions.WindowsApi.pInvokes.structenums.USER_INFO_4();
-                    if (Abstractions.WindowsApi.pInvokes.UserGet(sessionDriver.UserInformation.Username, ref userinfo4))
+                    var localuserexists = Abstractions.WindowsApi.pInvokes.UserGet(sessionDriver.UserInformation.Username, ref userinfo4);
+                    if (localuserexists)
                     {
                         if (!userinfo4.comment.Contains(m_pGinaCreatedComment))
                         {
@@ -505,9 +506,9 @@ namespace pGina.Service.Impl
                     else
                     {
                         // testing. ValidateCredentials would be correct here
-                        if (userinfo4.comment.Contains(m_pGinaCreatedComment) && CheckIfUserWasLoginWithpGina(sessionDriver))
+                        if (CheckIfUserWasLoginWithpGina(sessionDriver))
                         {
-                            // Validate the pGina-user with pGine Credentials not the local-user (SAM). Password can be changed.
+                            // Session is a pGina session, Validate pGine Credentials not the local-user (SAM). Password can be changed.
                             result = sessionDriver.PerformProcess(sessionDriver.AuthenticateUser);
                             if (!result.Success)
                             {
@@ -522,12 +523,16 @@ namespace pGina.Service.Impl
                                 };
                             }else
                             {
-                                // password is may be changed in external system, change passsword of local-created-user to the same password
-                                Abstractions.WindowsApi.pInvokes.SetUserPassword(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Password);
+                                if (localuserexists && userinfo4.comment.Contains(m_pGinaCreatedComment))
+                                {
+                                    // if there local-user and it is a pGina-user the password may be changed in external system, change passsword of local-created-user to the new password
+                                    Abstractions.WindowsApi.pInvokes.SetUserPassword(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Password);
+                                }   
                             }
                         }
                         else
                         {
+                            // Session is not a pGina session, use local-user Credentials validation
                             if (!Abstractions.WindowsApi.pInvokes.ValidateUser(sessionDriver.UserInformation.Username, sessionDriver.UserInformation.Domain, sessionDriver.UserInformation.Password))
                             {
                                 m_logger.ErrorFormat("Query local SAM: Bad password");
