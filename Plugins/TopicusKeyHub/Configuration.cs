@@ -468,7 +468,7 @@ namespace pGina.Plugin.TopicusKeyHub
         private void LoadMachineGroups()
         {
             this.cbLocalMachineGroups.Items.Clear();
-            var localMachineGroups = Abstractions.Windows.Group.GetLocalMachineGroups();
+            var localMachineGroups = GroupConfigurationHelper.GetLocalMachineGroups();
             foreach (var localMachineGroup in localMachineGroups)
             {
                 this.cbLocalMachineGroups.Items.Add(new ComboBoxItem(localMachineGroup, localMachineGroup));

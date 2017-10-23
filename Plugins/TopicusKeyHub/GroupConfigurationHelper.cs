@@ -7,6 +7,9 @@ using pGina.Plugin.TopicusKeyHub.Settings.Model;
 
 namespace pGina.Plugin.TopicusKeyHub
 {
+    using System.DirectoryServices.AccountManagement;
+    using System.Security.Principal;
+
     public class GroupConfigurationHelper
     {
         internal List<KeyHubGroup> GetKeyHubGroups(ConnectionSettings settings, bool dynamic)
@@ -17,6 +20,20 @@ namespace pGina.Plugin.TopicusKeyHub
                 var groups = ldap.GetGroups(contexts.Single(b => b.Dynamic == dynamic).DistributionName)
                     .OrderBy(c => c.CommonName);
                 return groups.ToList();
+            }
+        }
+
+        public static IEnumerable<string> GetLocalMachineGroups()
+        {
+            PrincipalContext PC = new PrincipalContext(ContextType.Machine);
+
+            foreach (var G in WindowsIdentity.GetCurrent().Groups)
+            {
+                var group = Principal.FindByIdentity(PC, IdentityType.Sid, G.ToString());
+                if (group != null)
+                {
+                    yield return group.Name;
+                }
             }
         }
 
