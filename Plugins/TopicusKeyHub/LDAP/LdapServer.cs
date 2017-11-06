@@ -47,7 +47,7 @@ namespace pGina.Plugin.TopicusKeyHub.LDAP
         internal IEnumerable<KeyHubGroup> GetGroups(string distinguishedName)
         {
             var searchRequest = new SearchRequest
-            (distinguishedName,
+            ("OU=GROUPS," + distinguishedName,
                 "(objectclass=groupofnames)",
                 SearchScope.Subtree,
                 "*");
@@ -65,7 +65,7 @@ namespace pGina.Plugin.TopicusKeyHub.LDAP
 
         internal KeyHubUser GetUser(string rootdistributionName, string commonName)
         {
-            var searchRequest = new SearchRequest(rootdistributionName,
+            var searchRequest = new SearchRequest("OU=USERS," + rootdistributionName,
                 string.Format("(&(objectclass=keyhubUser)(cn={0}))",commonName),
                 SearchScope.Subtree,
                 "*");
