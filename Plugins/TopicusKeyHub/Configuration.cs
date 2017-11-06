@@ -306,7 +306,6 @@ namespace pGina.Plugin.TopicusKeyHub
                 var groupsettings = this.topicusKeyHubSettings.GetGroupSettings;
                 foreach (var keyHubGroup in this.keyHubGroups.Where(b => groupsettings.Groups.Contains(b.DistinguishedName)))
                 {
-                    this.logger.DebugFormat("init item {0}", keyHubGroup.CommonName);
                     var item = new ListViewItem(keyHubGroup.CommonName, index)
                     {
                         Name = keyHubGroup.DistinguishedName
@@ -324,7 +323,6 @@ namespace pGina.Plugin.TopicusKeyHub
                              this.GroupInListView(keyHubGroup, this.lvKeyHubGroupsSelected) != null);
                 if (add)
                 {
-                    this.logger.DebugFormat("add item {0}", keyHubGroup.CommonName);
                     var item = new ListViewItem(keyHubGroup.CommonName, index)
                     {
                         Name = keyHubGroup.DistinguishedName
