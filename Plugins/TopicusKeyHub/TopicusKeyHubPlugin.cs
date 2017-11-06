@@ -183,6 +183,9 @@ namespace pGina.Plugin.TopicusKeyHub
                 var userInfo = properties.GetTrackedSingle<UserInformation>();
                 var ldapServer = properties.GetTrackedSingle<LdapServer>();
 
+                // Remove domain name from user
+                userInfo.Username = userInfo.Username.RemoveDomainFromUsername();
+
                 this.logger.DebugFormat("Found username: {0}", userInfo.Username);
                 var groupsettings = this.settings.GetGroupSettings;
                 var dynamic = groupsettings.Dynamic;                
